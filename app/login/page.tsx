@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import LoginForm from '@/app/components/LoginForm'
 import Link from 'next/link'
 
@@ -11,7 +12,14 @@ export default function LoginPage() {
         </div>
 
         <div className="rounded-2xl border bg-white p-8 shadow-sm">
-          <LoginForm />
+          <Suspense fallback={
+            <div className="text-center py-8">
+              <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-slate-900 border-r-transparent"></div>
+              <p className="text-slate-600">Loading...</p>
+            </div>
+          }>
+            <LoginForm />
+          </Suspense>
         </div>
 
         <p className="mt-6 text-center text-sm text-slate-600">

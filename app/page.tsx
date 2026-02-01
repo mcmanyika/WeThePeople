@@ -7,6 +7,7 @@ import Header from './components/Header';
 import HeroSection from './components/HeroSection';
 import ContactForm from './components/ContactForm';
 import DonationModal from './components/DonationModal';
+import Chatbot from './components/Chatbot';
 import { getNews } from '@/lib/firebase/firestore';
 import type { News } from '@/types';
 
@@ -57,8 +58,8 @@ export default function Home() {
 
       <HeroSection onSupportClick={() => setDonationModalOpen(true)} />
 
-      {/* Stats Section */}
-      <section className="border-y bg-white py-8 sm:py-12">
+      {/* Stats Section - Hidden for now */}
+      {/* <section className="border-y bg-white py-8 sm:py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3">
             <StatCard value="40+" label="Communities Reached" />
@@ -66,7 +67,7 @@ export default function Home() {
             <StatCard value="300+" label="Volunteers" />
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Updates Section */}
       <section id="updates" className="bg-slate-50 py-12 sm:py-20 md:py-28">
@@ -232,6 +233,9 @@ export default function Home() {
         isOpen={donationModalOpen}
         onClose={() => setDonationModalOpen(false)}
       />
+
+      {/* Chatbot */}
+      <Chatbot />
     </main>
   );
 }

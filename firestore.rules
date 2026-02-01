@@ -109,8 +109,8 @@ service cloud.firestore {
 
     // Products collection
     match /products/{productId} {
-      // All authenticated users can read active products
-      allow read: if isAuthenticated() && resource.data.isActive == true;
+      // Everyone can read active products (authenticated or not)
+      allow read: if resource.data.isActive == true;
       // Admins can read all products (active and inactive)
       allow read: if isAdmin();
       // Only admins can create, update, or delete products

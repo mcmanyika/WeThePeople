@@ -90,6 +90,13 @@ export default function ShopPage() {
   const handlePurchase = async (product: Product) => {
     setError('')
     
+    // Check if user is authenticated
+    if (!user) {
+      // Redirect to login page with return URL to shop
+      router.push(`/login?returnUrl=${encodeURIComponent('/shop')}`)
+      return
+    }
+    
     // Check stock availability
     if (product.stock <= 0) {
       setError('This product is out of stock')

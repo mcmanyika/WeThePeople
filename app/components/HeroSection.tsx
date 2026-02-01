@@ -8,7 +8,36 @@ interface HeroSectionProps {
 
 export default function HeroSection({ onSupportClick }: HeroSectionProps) {
   const [scrollY, setScrollY] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(0);
   const heroRef = useRef<HTMLElement>(null);
+
+  // Text slides for the hero section - each slide contains title, subtitle, and description
+  const textSlides = [
+    {
+      title: "OUR CONSTITUTION.",
+      titleSecondary: "OUR FUTURE.",
+      subtitle: "DCP: A Patriotic Coalition of the Willing",
+      description: "Zimbabwe's Constitution was adopted by the people to limit power, protect rights and guarantee democratic governance. Today, that constitutional promise is under threat from both mutilation and non-implementation.",
+    },
+    {
+      title: "DEFENDING DEMOCRACY.",
+      titleSecondary: "PROTECTING RIGHTS.",
+      subtitle: "Defending Constitutional Supremacy",
+      description: "We work tirelessly to ensure Zimbabwe's Constitution is respected, implemented, and protected from mutilation or disregard. Join us in defending the foundation of our democracy.",
+    },
+    {
+      title: "CITIZEN EMPOWERMENT.",
+      titleSecondary: "COMMUNITY ACTION.",
+      subtitle: "Protecting Democratic Values",
+      description: "Through civic education, advocacy, and community engagement, we empower citizens to understand their rights and participate actively in democratic governance.",
+    },
+    {
+      title: "UNITED FOR CHANGE.",
+      titleSecondary: "BUILDING TOMORROW.",
+      subtitle: "Empowering Citizens for Change",
+      description: "Join thousands of citizens working together to oppose the ED 2030 agenda, defend the Constitution, and protect our democratic values for future generations.",
+    },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,6 +55,15 @@ export default function HeroSection({ onSupportClick }: HeroSectionProps) {
     handleScroll(); // Initial call
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Auto-rotate text slides
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % textSlides.length);
+    }, 8000); // Change slide every 8 seconds
+
+    return () => clearInterval(interval);
+  }, [textSlides.length]);
 
   // Parallax effect: background moves slower than scroll
   const parallaxOffset = scrollY * 0.5;
@@ -52,19 +90,32 @@ export default function HeroSection({ onSupportClick }: HeroSectionProps) {
       <div className="absolute inset-0 z-[1] bg-black/40" />
       {/* Content layer */}
       <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-12 text-center sm:px-6 sm:pb-20">
-        <h1 className="mb-4 animate-fade-in-up text-3xl font-thin leading-tight tracking-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] sm:mb-6 sm:text-5xl md:text-7xl lg:text-8xl">
-          OUR CONSTITUTION.
-          <br />
-          <span className="text-slate-100 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">OUR FUTURE.</span>
-        </h1>
+        <div className="relative">
+          {textSlides.map((slide, index) => (
+            <div
+              key={index}
+              className={`transition-opacity duration-3000 ${
+                index === currentSlide
+                  ? 'opacity-100'
+                  : 'opacity-0 pointer-events-none absolute inset-0'
+              }`}
+            >
+              <h1 className="mb-4 text-3xl font-thin leading-tight tracking-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] sm:mb-6 sm:text-5xl md:text-7xl lg:text-8xl">
+                {slide.title}
+                <br />
+                <span className="text-slate-100 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">{slide.titleSecondary}</span>
+              </h1>
 
-        <p className="mx-auto mb-6 max-w-2xl animate-fade-in-up animate-delay-200 text-base font-thin text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)] sm:mb-8 sm:text-lg md:text-xl lg:text-2xl">
-          DCP: A Patriotic Coalition of the Willing
-        </p>
-        
-        <p className="mx-auto mb-8 max-w-3xl animate-fade-in-up animate-delay-200 text-sm font-thin text-white/90 drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)] sm:mb-10 sm:text-base md:text-lg">
-          Zimbabwe's Constitution was adopted by the people to limit power, protect rights and guarantee democratic governance. Today, that constitutional promise is under threat from both mutilation and non-implementation.
-        </p>
+              <p className="mx-auto mb-6 max-w-2xl text-base font-thin text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)] sm:mb-8 sm:text-lg md:text-xl lg:text-2xl">
+                {slide.subtitle}
+              </p>
+              
+              <p className="mx-auto mb-8 max-w-3xl text-sm font-thin text-white/90 drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)] sm:mb-10 sm:text-base md:text-lg">
+                {slide.description}
+              </p>
+            </div>
+          ))}
+        </div>
 
         <div className="flex animate-fade-in-up animate-delay-300 flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
           <a

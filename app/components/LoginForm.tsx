@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
 export default function LoginForm() {
@@ -14,6 +14,8 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false)
   const { signIn, signInWithGoogle } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const returnUrl = searchParams.get('returnUrl') || '/dashboard'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -22,7 +24,7 @@ export default function LoginForm() {
 
     try {
       await signIn(formData.email, formData.password)
-      router.push('/dashboard')
+      router.push(returnUrl)
     } catch (err: any) {
       let errorMessage = err.message || 'Failed to sign in'
       
@@ -52,7 +54,7 @@ export default function LoginForm() {
     setLoading(true)
     try {
       await signInWithGoogle()
-      router.push('/dashboard')
+      router.push(returnUrl)
     } catch (err: any) {
       let errorMessage = err.message || 'Failed to sign in with Google'
       
