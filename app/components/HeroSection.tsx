@@ -9,7 +9,10 @@ interface HeroSectionProps {
 export default function HeroSection({ onSupportClick }: HeroSectionProps) {
   const [scrollY, setScrollY] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentBgImage, setCurrentBgImage] = useState(0);
   const heroRef = useRef<HTMLElement>(null);
+  
+  const backgroundImages = ['/images/banner.png', '/images/banner-2.png'];
 
   // Text slides for the hero section - each slide contains title, subtitle, and description
   const textSlides = [
@@ -65,6 +68,15 @@ export default function HeroSection({ onSupportClick }: HeroSectionProps) {
     return () => clearInterval(interval);
   }, [textSlides.length]);
 
+  // Auto-rotate background images
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentBgImage((prev) => (prev + 1) % backgroundImages.length);
+    }, 8000); // Change background every 8 seconds (same as text slides)
+
+    return () => clearInterval(interval);
+  }, [backgroundImages.length]);
+
   // Parallax effect: background moves slower than scroll
   const parallaxOffset = scrollY * 0.5;
 
@@ -76,9 +88,9 @@ export default function HeroSection({ onSupportClick }: HeroSectionProps) {
     >
       {/* Background with parallax */}
       <div
-        className="absolute inset-0 z-0"
+        className="absolute inset-0 z-0 transition-opacity duration-1000"
         style={{
-          backgroundImage: 'url(/images/banner.png)',
+          backgroundImage: `url(${backgroundImages[currentBgImage]})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',

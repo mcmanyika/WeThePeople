@@ -54,6 +54,8 @@ function ProductsManagement() {
   const [error, setError] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const productsPerPage = 10
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -80,6 +82,7 @@ function ProductsManagement() {
       ])
       setProducts(allProducts)
       setLowStockProducts(lowStock)
+      setCurrentPage(1) // Reset to first page when products are loaded
       setError('')
     } catch (err: any) {
       setError(err.message || 'Failed to load products')
@@ -326,85 +329,221 @@ function ProductsManagement() {
                 </td>
               </tr>
             ) : (
-              products.map((product) => {
-                const isLowStock = product.stock <= product.lowStockThreshold && product.stock > 0
-                const isOutOfStock = product.stock === 0
+              (() => {
+                // Calculate pagination
+                const totalPages = Math.ceil(products.length / productsPerPage)
+                const startIndex = (currentPage - 1) * productsPerPage
+                const endIndex = startIndex + productsPerPage
+                const currentProducts = products.slice(startIndex, endIndex)
 
-                return (
-                  <tr key={product.id} className={!product.isActive ? 'opacity-50' : ''}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="h-12 w-12 rounded-lg object-cover mr-3"
-                        />
-                        <div>
-                          <div className="text-sm font-medium text-slate-900">{product.name}</div>
-                          <div className="text-xs text-slate-500 truncate max-w-xs">
-                            {product.description}
+                return currentProducts.map((product) => {
+                  const isLowStock = product.stock <= product.lowStockThreshold && product.stock > 0
+                  const isOutOfStock = product.stock === 0
+
+                  return (
+                    <tr key={product.id} className={!product.isActive ? 'opacity-50' : ''}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <img
+                            src={product.image}
+                            alt={product.name}
+                            className="h-12 w-12 rounded-lg object-cover mr-3"
+                          />
+                          <div>
+                            <div className="text-sm font-medium text-slate-900">{product.name}</div>
+                            <div className="text-xs text-slate-500 truncate max-w-xs">
+                              {product.description}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
-                      ${product.price.toFixed(2)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="number"
-                          value={product.stock}
-                          onChange={(e) => handleStockUpdate(product.id, parseInt(e.target.value) || 0)}
-                          className="w-20 rounded border border-slate-300 px-2 py-1 text-sm"
-                          min="0"
-                        />
-                        {isLowStock && (
-                          <span className="inline-flex items-center rounded-full bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800">
-                            Low
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
+                        ${product.price.toFixed(2)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            value={product.stock}
+                            onChange={(e) => handleStockUpdate(product.id, parseInt(e.target.value) || 0)}
+                            className="w-20 rounded border border-slate-300 px-2 py-1 text-sm"
+                            min="0"
+                          />
+                          {isLowStock && (
+                            <span className="inline-flex items-center rounded-full bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800">
+                              Low
+                            </span>
+                          )}
+                          {isOutOfStock && (
+                            <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800">
+                              Out
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {product.isActive ? (
+                          <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800">
+                            Active
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-800">
+                            Inactive
                           </span>
                         )}
-                        {isOutOfStock && (
-                          <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800">
-                            Out
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {product.isActive ? (
-                        <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800">
-                          Active
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-800">
-                          Inactive
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => handleOpenModal(product)}
-                          className="text-slate-600 hover:text-slate-900 transition-colors"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(product.id)}
-                          className="text-red-600 hover:text-red-900 transition-colors"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                )
-              })
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => handleOpenModal(product)}
+                            className="text-slate-600 hover:text-slate-900 transition-colors"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(product.id)}
+                            className="text-red-600 hover:text-red-900 transition-colors"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })
+              })()
             )}
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {products.length > productsPerPage && (() => {
+        const totalPages = Math.ceil(products.length / productsPerPage)
+        const startIndex = (currentPage - 1) * productsPerPage
+        const endIndex = startIndex + productsPerPage
+
+        return (
+          <div className="mt-6 flex items-center justify-between">
+            <div className="text-sm text-slate-600">
+              Showing {startIndex + 1} to {Math.min(endIndex, products.length)} of {products.length} products
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Previous
+              </button>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                  // Show first page, last page, current page, and pages around current
+                  if (
+                    page === 1 ||
+                    page === totalPages ||
+                    (page >= currentPage - 1 && page <= currentPage + 1)
+                  ) {
+                    return (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                          currentPage === page
+                            ? 'bg-slate-900 text-white'
+                            : 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    )
+                  } else if (
+                    page === currentPage - 2 ||
+                    page === currentPage + 2
+                  ) {
+                    return (
+                      <span key={page} className="px-1 text-xs text-slate-400">
+                        ...
+                      </span>
+                    )
+                  }
+                  return null
+                })}
+              </div>
+
+              <button
+                onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )
+      })()}
+
+      {/* Pagination */}
+      {products.length > productsPerPage && (
+        <div className="mt-6 flex items-center justify-between">
+          <div className="text-sm text-slate-600">
+            Showing {startIndex + 1} to {Math.min(endIndex, products.length)} of {products.length} products
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+
+            <div className="flex items-center gap-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                // Show first page, last page, current page, and pages around current
+                if (
+                  page === 1 ||
+                  page === totalPages ||
+                  (page >= currentPage - 1 && page <= currentPage + 1)
+                ) {
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                        currentPage === page
+                          ? 'bg-slate-900 text-white'
+                          : 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  )
+                } else if (
+                  page === currentPage - 2 ||
+                  page === currentPage + 2
+                ) {
+                  return (
+                    <span key={page} className="px-1 text-xs text-slate-400">
+                      ...
+                    </span>
+                  )
+                }
+                return null
+              })}
+            </div>
+
+            <button
+              onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Add/Edit Modal */}
       {showModal && (
