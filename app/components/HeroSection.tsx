@@ -118,13 +118,10 @@ export default function HeroSection({ onSupportClick }: HeroSectionProps) {
                   : 'opacity-0 pointer-events-none absolute inset-0'
               }`}
             >
-              <h1 className="mb-4 text-3xl font-thin leading-tight tracking-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] sm:mb-6 sm:text-5xl md:text-7xl lg:text-8xl">
-                {slide.title}
-                <br />
-                <span className="text-slate-100 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">{slide.titleSecondary}</span>
-              </h1>
+              {/* Spacer to maintain exact positioning after removing titles */}
+              <div className="mb-4 sm:mb-6" />
 
-              <p className="mx-auto mb-6 max-w-2xl text-base font-thin text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)] sm:mb-8 sm:text-lg md:text-xl lg:text-2xl">
+              <p className="mx-auto mb-6 max-w-2xl text-lg font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)] sm:mb-8 sm:text-xl md:text-2xl lg:text-3xl">
                 {slide.subtitle}
               </p>
               
