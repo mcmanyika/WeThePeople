@@ -181,6 +181,39 @@ service cloud.firestore {
       allow update: if isAdmin() &&
                      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'notes', 'reviewedBy', 'reviewedAt', 'updatedAt']);
     }
+
+    // Petitions collection
+    match /petitions/{petitionId} {
+      // Everyone can read published and active petitions
+      allow read: if resource.data.isPublished == true && 
+                   resource.data.isActive == true;
+      // Admins can read all petitions
+      allow read: if isAdmin();
+      // Only admins can create, update, or delete petitions
+      allow create: if isAdmin() &&
+                     request.resource.data.keys().hasAll(['title', 'description', 'goal', 'isActive', 'isPublished', 'createdBy', 'currentSignatures', 'signatures']) &&
+                     request.resource.data.title is string &&
+                     request.resource.data.description is string &&
+                     request.resource.data.goal is number &&
+                     request.resource.data.isActive is bool &&
+                     request.resource.data.isPublished is bool &&
+                     request.resource.data.createdBy is string &&
+                     request.resource.data.currentSignatures is number &&
+                     request.resource.data.signatures is list &&
+                     request.resource.data.title.size() > 0 &&
+                     request.resource.data.description.size() > 0 &&
+                     request.resource.data.goal > 0 &&
+                     request.resource.data.currentSignatures == 0;
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+      // Authenticated users can sign petitions (update signatures array and currentSignatures)
+      allow update: if isAuthenticated() && 
+                     resource.data.isPublished == true &&
+                     resource.data.isActive == true &&
+                     request.resource.data.diff(resource.data).affectedKeys().hasOnly(['signatures', 'currentSignatures', 'updatedAt']) &&
+                     request.resource.data.currentSignatures > resource.data.currentSignatures &&
+                     request.resource.data.signatures.size() > resource.data.signatures.size();
+    }
   }
 }
 

@@ -121,3 +121,29 @@ export interface VolunteerApplication {
   updatedAt: Timestamp | Date
 }
 
+export interface PetitionSignature {
+  userId?: string
+  name: string
+  email: string
+  signedAt: Timestamp | Date
+  anonymous?: boolean
+}
+
+export interface Petition {
+  id: string
+  title: string
+  description: string
+  content?: string
+  image?: string
+  goal: number
+  currentSignatures: number
+  signatures: PetitionSignature[]
+  isActive: boolean
+  isPublished: boolean
+  createdBy: string
+  createdAt: Timestamp | Date
+  updatedAt: Timestamp | Date
+  publishedAt?: Timestamp | Date
+  expiresAt?: Timestamp | Date
+}
+

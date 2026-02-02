@@ -61,6 +61,7 @@ export default function Header({ onDonateClick }: HeaderProps) {
           <Link href="/" className="text-xs font-medium text-slate-300 hover:text-white transition-colors sm:text-sm">Home</Link>
           <Link href="/about" className="text-xs font-medium text-slate-300 hover:text-white transition-colors sm:text-sm">About</Link>
           <Link href="/our-work" className="text-xs font-medium text-slate-300 hover:text-white transition-colors sm:text-sm">Our Work</Link>
+          <Link href="/petitions" className="text-xs font-medium text-slate-300 hover:text-white transition-colors sm:text-sm">Petitions</Link>
           <Link href="/shop" className="text-xs font-medium text-slate-300 hover:text-white transition-colors sm:text-sm">Shop</Link>
           <Link href="/#contact" className="text-xs font-medium text-slate-300 hover:text-white transition-colors sm:text-sm">Contact</Link>
         </nav>
@@ -205,6 +206,13 @@ export default function Header({ onDonateClick }: HeaderProps) {
               className="rounded-lg px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
             >
               Our Work
+            </Link>
+            <Link
+              href="/petitions"
+              onClick={() => setMobileMenuOpen(false)}
+              className="rounded-lg px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+            >
+              Petitions
             </Link>
             <Link
               href="/shop"

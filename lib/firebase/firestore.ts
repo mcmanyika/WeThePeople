@@ -12,7 +12,7 @@ import {
   Timestamp,
 } from 'firebase/firestore'
 import { db } from './config'
-import type { UserProfile, Donation, Membership, ContactSubmission, Purchase, Product, UserRole, News, CartItem, VolunteerApplication, VolunteerApplicationStatus } from '@/types'
+import type { UserProfile, Donation, Membership, ContactSubmission, Purchase, Product, UserRole, News, CartItem, VolunteerApplication, VolunteerApplicationStatus, Petition, PetitionSignature } from '@/types'
 
 // Helper functions
 function requireDb() {
@@ -933,6 +933,207 @@ export async function deleteNews(newsId: string): Promise<void> {
   await updateDoc(doc(requireDb(), 'news', newsId), { isPublished: false })
   // Or use deleteDoc if you want to permanently delete:
   // await deleteDoc(doc(requireDb(), 'news', newsId))
+}
+
+// Petition operations
+export async function createPetition(
+  petition: Omit<Petition, 'id' | 'createdAt' | 'updatedAt' | 'currentSignatures' | 'signatures'>
+): Promise<string> {
+  const petitionRef = doc(collection(requireDb(), 'petitions'))
+  
+  const cleanPetition: any = {}
+  if (petition.title !== undefined) cleanPetition.title = petition.title
+  if (petition.description !== undefined) cleanPetition.description = petition.description
+  if (petition.content !== undefined && petition.content !== '') cleanPetition.content = petition.content
+  if (petition.image !== undefined && petition.image !== '') cleanPetition.image = petition.image
+  if (petition.goal !== undefined) cleanPetition.goal = petition.goal
+  if (petition.isActive !== undefined) cleanPetition.isActive = petition.isActive
+  if (petition.isPublished !== undefined) cleanPetition.isPublished = petition.isPublished
+  if (petition.createdBy !== undefined) cleanPetition.createdBy = petition.createdBy
+  if (petition.expiresAt !== undefined) cleanPetition.expiresAt = petition.expiresAt
+  
+  const petitionData = {
+    ...cleanPetition,
+    id: petitionRef.id,
+    currentSignatures: 0,
+    signatures: [],
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+    publishedAt: petition.isPublished ? Timestamp.now() : null,
+  }
+  await setDoc(petitionRef, petitionData)
+  return petitionRef.id
+}
+
+export async function getPetitions(publishedOnly: boolean = true, activeOnly: boolean = true): Promise<Petition[]> {
+  if (!db) {
+    console.warn('Firestore not initialized')
+    return []
+  }
+
+  try {
+    let q = query(collection(requireDb(), 'petitions'), orderBy('createdAt', 'desc'))
+    
+    if (publishedOnly) {
+      q = query(q, where('isPublished', '==', true))
+    }
+    if (activeOnly) {
+      q = query(q, where('isActive', '==', true))
+    }
+
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map((doc) => {
+      const data = doc.data()
+      return {
+        ...data,
+        id: doc.id,
+        createdAt: toDate(data.createdAt),
+        updatedAt: toDate(data.updatedAt),
+        publishedAt: data.publishedAt ? toDate(data.publishedAt) : undefined,
+        expiresAt: data.expiresAt ? toDate(data.expiresAt) : undefined,
+        signatures: (data.signatures || []).map((sig: any) => ({
+          ...sig,
+          signedAt: toDate(sig.signedAt),
+        })),
+      } as Petition
+    })
+  } catch (error: any) {
+    console.error('Error fetching petitions:', error)
+    // Fallback: try without filters if composite index not ready
+    if (error.code === 'failed-precondition') {
+      try {
+        const snapshot = await getDocs(query(collection(requireDb(), 'petitions'), orderBy('createdAt', 'desc')))
+        return snapshot.docs
+          .map((doc) => {
+            const data = doc.data()
+            return {
+              ...data,
+              id: doc.id,
+              createdAt: toDate(data.createdAt),
+              updatedAt: toDate(data.updatedAt),
+              publishedAt: data.publishedAt ? toDate(data.publishedAt) : undefined,
+              expiresAt: data.expiresAt ? toDate(data.expiresAt) : undefined,
+              signatures: (data.signatures || []).map((sig: any) => ({
+                ...sig,
+                signedAt: toDate(sig.signedAt),
+              })),
+            } as Petition
+          })
+          .filter((petition) => {
+            if (publishedOnly && !petition.isPublished) return false
+            if (activeOnly && !petition.isActive) return false
+            return true
+          })
+      } catch (fallbackError: any) {
+        console.error('Error in fallback petition query:', fallbackError)
+        return []
+      }
+    }
+    return []
+  }
+}
+
+export async function getPetitionById(petitionId: string): Promise<Petition | null> {
+  const petitionDoc = await getDoc(doc(requireDb(), 'petitions', petitionId))
+  if (!petitionDoc.exists()) return null
+
+  const data = petitionDoc.data()
+  return {
+    ...data,
+    id: petitionDoc.id,
+    createdAt: toDate(data.createdAt),
+    updatedAt: toDate(data.updatedAt),
+    publishedAt: data.publishedAt ? toDate(data.publishedAt) : undefined,
+    expiresAt: data.expiresAt ? toDate(data.expiresAt) : undefined,
+    signatures: (data.signatures || []).map((sig: any) => ({
+      ...sig,
+      signedAt: toDate(sig.signedAt),
+    })),
+  } as Petition
+}
+
+export async function updatePetition(petitionId: string, data: Partial<Petition>): Promise<void> {
+  const updateData: any = { updatedAt: Timestamp.now() }
+  
+  if (data.title !== undefined) updateData.title = data.title
+  if (data.description !== undefined) updateData.description = data.description
+  if (data.content !== undefined) {
+    if (data.content !== '') {
+      updateData.content = data.content
+    } else {
+      updateData.content = null
+    }
+  }
+  if (data.image !== undefined) {
+    if (data.image !== '') {
+      updateData.image = data.image
+    } else {
+      updateData.image = null
+    }
+  }
+  if (data.goal !== undefined) updateData.goal = data.goal
+  if (data.isActive !== undefined) updateData.isActive = data.isActive
+  if (data.isPublished !== undefined) {
+    updateData.isPublished = data.isPublished
+    if (data.isPublished && !data.publishedAt) {
+      updateData.publishedAt = Timestamp.now()
+    }
+  }
+  if (data.expiresAt !== undefined) {
+    if (data.expiresAt) {
+      updateData.expiresAt = data.expiresAt instanceof Date ? Timestamp.fromDate(data.expiresAt) : data.expiresAt
+    } else {
+      updateData.expiresAt = null
+    }
+  }
+
+  await updateDoc(doc(requireDb(), 'petitions', petitionId), updateData)
+}
+
+export async function deletePetition(petitionId: string): Promise<void> {
+  await updateDoc(doc(requireDb(), 'petitions', petitionId), { isActive: false, isPublished: false })
+  // Or use deleteDoc if you want to permanently delete:
+  // await deleteDoc(doc(requireDb(), 'petitions', petitionId))
+}
+
+export async function signPetition(
+  petitionId: string,
+  signature: Omit<PetitionSignature, 'signedAt'>
+): Promise<void> {
+  const petitionRef = doc(requireDb(), 'petitions', petitionId)
+  const petitionDoc = await getDoc(petitionRef)
+  
+  if (!petitionDoc.exists()) {
+    throw new Error('Petition not found')
+  }
+
+  const petitionData = petitionDoc.data() as Petition
+  const signatures = petitionData.signatures || []
+  
+  // Check if user already signed (if userId provided)
+  if (signature.userId) {
+    const alreadySigned = signatures.some((sig) => sig.userId === signature.userId)
+    if (alreadySigned) {
+      throw new Error('You have already signed this petition')
+    }
+  }
+  
+  // Check if email already signed
+  const emailSigned = signatures.some((sig) => sig.email.toLowerCase() === signature.email.toLowerCase())
+  if (emailSigned) {
+    throw new Error('This email has already signed this petition')
+  }
+
+  const newSignature: PetitionSignature = {
+    ...signature,
+    signedAt: Timestamp.now(),
+  }
+
+  await updateDoc(petitionRef, {
+    signatures: [...signatures, newSignature],
+    currentSignatures: signatures.length + 1,
+    updatedAt: Timestamp.now(),
+  })
 }
 
 // Cart operations

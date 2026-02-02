@@ -37,6 +37,18 @@ service firebase.storage {
       allow delete: if isAdmin();
     }
     
+    // Petition images - only admins can upload/delete, everyone can read
+    match /petitions/{petitionId} {
+      // Anyone can read petition images
+      allow read: if true;
+      // Only admins can upload petition images
+      allow write: if isAdmin() && 
+                     request.resource.size < 5 * 1024 * 1024 && // 5MB max
+                     request.resource.contentType.matches('image/.*');
+      // Only admins can delete petition images
+      allow delete: if isAdmin();
+    }
+    
     // Default: deny all other access
     match /{allPaths=**} {
       allow read, write: if false;

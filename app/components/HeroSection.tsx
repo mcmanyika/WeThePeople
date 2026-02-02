@@ -143,7 +143,7 @@ export default function HeroSection({ onSupportClick }: HeroSectionProps) {
             Join The Movement
           </a>
           <a
-            href="#peoples-resolution"
+            href="/petitions"
             className="inline-flex w-full items-center justify-center rounded-lg border-2 border-white bg-slate-900/90 backdrop-blur-sm px-6 py-3 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:bg-slate-800/90 transition-colors sm:w-auto sm:px-8 sm:py-4 sm:text-base"
           >
             Sign the People's Resolution
