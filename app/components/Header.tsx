@@ -2,17 +2,20 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCart } from '@/contexts/CartContext';
 import Link from 'next/link';
 
 interface HeaderProps {
   onDonateClick?: () => void;
 }
 
-export default function Header({ onDonateClick }: HeaderProps = {}) {
+export default function Header({ onDonateClick }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const { user, userProfile, logout } = useAuth();
+  const { getTotalItems } = useCart();
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const cartItemCount = getTotalItems();
 
   const handleDonateClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -42,27 +45,43 @@ export default function Header({ onDonateClick }: HeaderProps = {}) {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-slate-800 bg-black backdrop-blur-sm">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
-        <Link href="/" className="flex items-center gap-2 sm:gap-3 hover:opacity-80 transition-opacity">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-xs font-bold text-black sm:h-10 sm:w-10 sm:text-sm">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 sm:px-6">
+        <Link href="/" className="flex items-center gap-1.5 sm:gap-2 hover:opacity-80 transition-opacity">
+          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-xs font-bold text-black sm:h-8 sm:w-8">
             DCP
           </div>
-          <div className="leading-tight">
-            <p className="text-xs font-bold text-white sm:text-sm">Defend the Constitution</p>
-            <p className="text-[10px] text-slate-400 sm:text-xs">Platform</p>
+          <div className="leading-tight hidden sm:block">
+            <p className="text-xs font-bold text-white">Defend the Constitution</p>
+            <p className="text-[10px] text-slate-400">Platform</p>
           </div>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden items-center gap-6 md:flex lg:gap-8">
-          <Link href="/" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Home</Link>
-          <Link href="/about" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">About</Link>
-          <Link href="/our-work" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Our Work</Link>
-          <Link href="/shop" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Shop</Link>
-          <a href="#contact" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Contact</a>
+        <nav className="hidden items-center gap-4 md:flex lg:gap-6">
+          <Link href="/" className="text-xs font-medium text-slate-300 hover:text-white transition-colors sm:text-sm">Home</Link>
+          <Link href="/about" className="text-xs font-medium text-slate-300 hover:text-white transition-colors sm:text-sm">About</Link>
+          <Link href="/our-work" className="text-xs font-medium text-slate-300 hover:text-white transition-colors sm:text-sm">Our Work</Link>
+          <Link href="/shop" className="text-xs font-medium text-slate-300 hover:text-white transition-colors sm:text-sm">Shop</Link>
+          <Link href="/#contact" className="text-xs font-medium text-slate-300 hover:text-white transition-colors sm:text-sm">Contact</Link>
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* Cart Icon */}
+          <Link
+            href="/cart"
+            className="relative rounded-md p-1.5 text-white hover:bg-slate-800 transition-colors"
+            aria-label="Shopping cart"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            {cartItemCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[10px] font-bold text-slate-900">
+                {cartItemCount > 9 ? '9+' : cartItemCount}
+              </span>
+            )}
+          </Link>
+
           {user ? (
             <>
               <div className="relative" ref={userMenuRef}>
@@ -194,13 +213,13 @@ export default function Header({ onDonateClick }: HeaderProps = {}) {
             >
               Shop
             </Link>
-            <a
-              href="#contact"
+            <Link
+              href="/#contact"
               onClick={() => setMobileMenuOpen(false)}
               className="rounded-lg px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
             >
               Contact
-            </a>
+            </Link>
             {user ? (
               <>
                 <Link

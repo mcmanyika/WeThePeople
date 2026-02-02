@@ -11,12 +11,12 @@ export default function OurWorkPage() {
       <Header />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-slate-900 to-slate-800 py-16 text-white sm:py-24">
+      <section className="bg-gradient-to-r from-slate-900 to-slate-800 py-8 text-white sm:py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="text-center">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400 sm:mb-3 sm:text-sm">Our Work</p>
-            <h1 className="mb-4 text-4xl font-bold sm:text-5xl md:text-6xl">What We Do</h1>
-            <p className="mx-auto max-w-3xl text-lg text-slate-300 sm:text-xl">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Our Work</p>
+            <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">What We Do</h1>
+            <p className="mx-auto max-w-3xl text-sm text-slate-300 sm:text-base">
               Through education, advocacy, and community engagement, we work to defend constitutional supremacy and promote democratic governance.
             </p>
           </div>
@@ -24,7 +24,7 @@ export default function OurWorkPage() {
       </section>
 
       {/* Features Section */}
-      <section className="bg-white py-12 sm:py-20 md:py-28">
+      <section className="bg-white py-8 sm:py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="grid gap-6 sm:gap-8 md:grid-cols-3">
             <FeatureCard
@@ -47,11 +47,11 @@ export default function OurWorkPage() {
       </section>
 
       {/* Additional Content Section */}
-      <section className="bg-slate-50 py-12 sm:py-20 md:py-28">
+      <section className="bg-slate-50 py-8 sm:py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="mx-auto max-w-4xl">
-            <h2 className="mb-8 text-center text-3xl font-bold sm:text-4xl md:text-5xl">Our Approach</h2>
-            <div className="space-y-6 text-lg leading-relaxed text-slate-700 sm:text-xl">
+            <h2 className="mb-6 text-center text-2xl font-bold sm:text-3xl md:text-4xl">Our Approach</h2>
+            <div className="space-y-4 text-sm leading-relaxed text-slate-700 sm:text-base">
               <p>
                 The Defend the Constitution Platform (DCP) employs a multi-faceted approach to protect and promote constitutional governance in Zimbabwe. Our work is grounded in the belief that an informed and engaged citizenry is essential for democratic accountability.
               </p>
@@ -64,22 +64,22 @@ export default function OurWorkPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-gradient-to-r from-slate-900 to-slate-800 py-12 text-white sm:py-20">
+      <section className="bg-gradient-to-r from-slate-900 to-slate-800 py-8 text-white sm:py-12">
         <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
-          <h2 className="mb-4 text-3xl font-bold sm:text-4xl md:text-5xl">Get Involved</h2>
-          <p className="mb-8 text-lg text-slate-300 sm:text-xl">
+          <h2 className="mb-3 text-2xl font-bold sm:text-3xl md:text-4xl">Get Involved</h2>
+          <p className="mb-6 text-sm text-slate-300 sm:text-base">
             Join us in defending the Constitution and promoting democratic governance in Zimbabwe.
           </p>
-          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
+          <div className="flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-3">
             <Link
               href="/signup"
-              className="inline-flex w-full items-center justify-center rounded-lg bg-white px-6 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100 transition-colors sm:w-auto sm:px-8 sm:py-4 sm:text-base"
+              className="inline-flex w-full items-center justify-center rounded-md bg-white px-5 py-2.5 text-xs font-semibold text-slate-900 hover:bg-slate-100 transition-colors sm:w-auto sm:px-6 sm:py-3 sm:text-sm"
             >
               Join the Platform
             </Link>
             <Link
               href="/#contact"
-              className="inline-flex w-full items-center justify-center rounded-lg border-2 border-white px-6 py-3 text-sm font-semibold hover:bg-white/10 transition-colors sm:w-auto sm:px-8 sm:py-4 sm:text-base"
+              className="inline-flex w-full items-center justify-center rounded-md border-2 border-white px-5 py-2.5 text-xs font-semibold hover:bg-white/10 transition-colors sm:w-auto sm:px-6 sm:py-3 sm:text-sm"
             >
               Contact Us
             </Link>
@@ -154,12 +154,12 @@ export default function OurWorkPage() {
 
 function FeatureCard({ icon, title, description }: { icon: ReactNode; title: string; description: string }) {
   return (
-    <div className="group animate-fade-in-scale rounded-2xl bg-white p-6 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg sm:p-8">
-      <div className="mb-4 text-slate-900 transition-transform duration-300 group-hover:scale-110 group-hover:text-slate-700">
+    <div className="group rounded-lg bg-white p-4 shadow-sm transition-all duration-300 hover:border-slate-900 hover:shadow-md sm:p-5 border border-slate-200">
+      <div className="mb-3 text-slate-900 transition-transform duration-300 group-hover:scale-110 group-hover:text-slate-700">
         {icon}
       </div>
-      <h3 className="mb-3 text-lg font-bold transition-colors duration-300 group-hover:text-slate-900 sm:text-xl">{title}</h3>
-      <p className="text-sm text-slate-600 transition-colors duration-300 group-hover:text-slate-700 sm:text-base">{description}</p>
+      <h3 className="mb-2 text-base font-bold transition-colors duration-300 group-hover:text-slate-900 sm:text-lg">{title}</h3>
+      <p className="text-xs text-slate-600 transition-colors duration-300 group-hover:text-slate-700 sm:text-sm leading-relaxed">{description}</p>
     </div>
   );
 }

@@ -3,15 +3,41 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
+import { useCart } from '@/contexts/CartContext'
 import { useRouter } from 'next/navigation'
 import { getProducts, getProductById } from '@/lib/firebase/firestore'
 import type { Product } from '@/types'
+
+function FloatingCartIcon() {
+  const { getTotalItems } = useCart()
+  const cartItemCount = getTotalItems()
+
+  if (cartItemCount === 0) return null
+
+  return (
+    <Link
+      href="/cart"
+      className="fixed top-20 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-slate-900 text-white shadow-lg transition-all hover:scale-110 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2"
+      aria-label="View cart"
+    >
+      <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+      </svg>
+      {cartItemCount > 0 && (
+        <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-white text-xs font-bold text-slate-900">
+          {cartItemCount > 9 ? '9+' : cartItemCount}
+        </span>
+      )}
+    </Link>
+  )
+}
 
 type SortOption = 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc' | 'newest'
 type StockFilter = 'all' | 'in-stock' | 'low-stock' | 'out-of-stock'
 
 export default function ShopPage() {
   const { user } = useAuth()
+  const { addToCart } = useCart()
   const router = useRouter()
   const [products, setProducts] = useState<Product[]>([])
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
@@ -22,7 +48,7 @@ export default function ShopPage() {
   const [stockFilter, setStockFilter] = useState<StockFilter>('all')
   const [priceRange, setPriceRange] = useState<{ min: number; max: number }>({ min: 0, max: 1000 })
   const [currentPage, setCurrentPage] = useState(1)
-  const productsPerPage = 8
+  const productsPerPage = 10
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
 
   useEffect(() => {
@@ -163,141 +189,112 @@ export default function ShopPage() {
   return (
     <div className="min-h-screen bg-white pt-16">
       <section className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="mb-6 -mt-4">
+        <div className="mb-4 -mt-2">
           <Link
             href="/"
-            className="inline-flex items-center text-sm text-slate-600 hover:text-slate-900 transition-colors"
+            className="inline-flex items-center text-xs text-slate-500 hover:text-slate-900 transition-colors"
           >
-            <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="mr-1.5 h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Back to Home
+            Home
           </Link>
         </div>
-        <div className="mb-12 text-center">
-          <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-500">
-            Shop
-          </p>
-          <h1 className="text-4xl font-bold md:text-5xl">Support the Movement</h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-600">
-            Purchase merchandise and educational materials to support our mission
-          </p>
+        <div className="mb-6 flex items-center justify-between border-b border-slate-200 pb-4">
+          <div>
+            <h1 className="text-2xl font-bold sm:text-3xl">Shop</h1>
+            <p className="mt-1 text-xs text-slate-500 sm:text-sm">
+              {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'}
+            </p>
+          </div>
         </div>
 
         {error && (
-          <div className="mx-auto mb-6 max-w-4xl rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
+          <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-600">
             {error}
           </div>
         )}
 
-        {/* Filters and Sorting */}
+        {/* Filters and Sorting - Compact */}
         {!productsLoading && products.length > 0 && (
-          <div className="mb-8">
-            <div className="rounded-lg border border-slate-200 bg-white p-4">
-              <div className="grid gap-4 md:grid-cols-3">
-                {/* Sort By */}
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-700">
-                    Sort By
-                  </label>
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as SortOption)}
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
-                  >
-                    <option value="newest">Newest First</option>
-                    <option value="price-asc">Price: Low to High</option>
-                    <option value="price-desc">Price: High to Low</option>
-                    <option value="name-asc">Name: A to Z</option>
-                    <option value="name-desc">Name: Z to A</option>
-                  </select>
-                </div>
+          <div className="mb-4 flex flex-wrap items-center gap-3 border-b border-slate-200 pb-3">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as SortOption)}
+              className="rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-xs focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+            >
+              <option value="newest">Newest</option>
+              <option value="price-asc">Price: Low</option>
+              <option value="price-desc">Price: High</option>
+              <option value="name-asc">Name: A-Z</option>
+              <option value="name-desc">Name: Z-A</option>
+            </select>
 
-                {/* Stock Filter */}
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-700">
-                    Stock Status
-                  </label>
-                  <select
-                    value={stockFilter}
-                    onChange={(e) => setStockFilter(e.target.value as StockFilter)}
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
-                  >
-                    <option value="all">All Products</option>
-                    <option value="in-stock">In Stock</option>
-                    <option value="low-stock">Low Stock</option>
-                    <option value="out-of-stock">Out of Stock</option>
-                  </select>
-                </div>
+            <select
+              value={stockFilter}
+              onChange={(e) => setStockFilter(e.target.value as StockFilter)}
+              className="rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-xs focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+            >
+              <option value="all">All Stock</option>
+              <option value="in-stock">In Stock</option>
+              <option value="low-stock">Low Stock</option>
+              <option value="out-of-stock">Out of Stock</option>
+            </select>
 
-                {/* Price Range */}
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-700">
-                    Price Range: ${priceRange.min} - ${priceRange.max}
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="number"
-                      min="0"
-                      max={priceRange.max}
-                      value={priceRange.min}
-                      onChange={(e) => setPriceRange({ ...priceRange, min: Math.max(0, parseInt(e.target.value) || 0) })}
-                      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
-                      placeholder="Min"
-                    />
-                    <span className="text-slate-500">-</span>
-                    <input
-                      type="number"
-                      min={priceRange.min}
-                      value={priceRange.max}
-                      onChange={(e) => setPriceRange({ ...priceRange, max: Math.max(priceRange.min, parseInt(e.target.value) || priceRange.max) })}
-                      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
-                      placeholder="Max"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Results count */}
-              <div className="mt-4 flex items-center justify-between border-t border-slate-200 pt-4">
-                <p className="text-sm text-slate-600">
-                  Showing {startIndex + 1}-{Math.min(endIndex, filteredProducts.length)} of {filteredProducts.length} products
-                  {filteredProducts.length !== products.length && ` (${products.length} total)`}
-                </p>
-                {(stockFilter !== 'all' || priceRange.min > 0 || priceRange.max < 1000) && (
-                  <button
-                    onClick={() => {
-                      setStockFilter('all')
-                      if (products.length > 0) {
-                        const prices = products.map(p => p.price)
-                        const maxPrice = Math.ceil(Math.max(...prices) / 10) * 10
-                        setPriceRange({ min: 0, max: maxPrice })
-                      }
-                    }}
-                    className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
-                  >
-                    Clear Filters
-                  </button>
-                )}
-              </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-slate-500">$</span>
+              <input
+                type="number"
+                min="0"
+                max={priceRange.max}
+                value={priceRange.min}
+                onChange={(e) => setPriceRange({ ...priceRange, min: Math.max(0, parseInt(e.target.value) || 0) })}
+                className="w-16 rounded-md border border-slate-300 px-2 py-1.5 text-xs focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                placeholder="Min"
+              />
+              <span className="text-xs text-slate-400">-</span>
+              <input
+                type="number"
+                min={priceRange.min}
+                value={priceRange.max}
+                onChange={(e) => setPriceRange({ ...priceRange, max: Math.max(priceRange.min, parseInt(e.target.value) || priceRange.max) })}
+                className="w-16 rounded-md border border-slate-300 px-2 py-1.5 text-xs focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                placeholder="Max"
+              />
             </div>
+
+            {(stockFilter !== 'all' || priceRange.min > 0 || priceRange.max < 1000) && (
+              <button
+                onClick={() => {
+                  setStockFilter('all')
+                  if (products.length > 0) {
+                    const prices = products.map(p => p.price)
+                    const maxPrice = Math.ceil(Math.max(...prices) / 10) * 10
+                    setPriceRange({ min: 0, max: maxPrice })
+                  }
+                }}
+                className="ml-auto text-xs font-medium text-slate-500 hover:text-slate-900 transition-colors"
+              >
+                Clear
+              </button>
+            )}
           </div>
         )}
 
         {productsLoading ? (
-          <div className="flex items-center justify-center py-12">
+          <div className="flex items-center justify-center py-16">
             <div className="text-center">
-              <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-slate-900 border-r-transparent"></div>
-              <p className="text-slate-600">Loading products...</p>
+              <div className="mb-3 inline-block h-6 w-6 animate-spin rounded-full border-3 border-solid border-slate-900 border-r-transparent"></div>
+              <p className="text-sm text-slate-500">Loading...</p>
             </div>
           </div>
         ) : products.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-slate-600">No products available at the moment.</p>
+          <div className="text-center py-16">
+            <p className="text-sm text-slate-500">No products available.</p>
           </div>
         ) : filteredProducts.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-slate-600">No products match your filters.</p>
+          <div className="text-center py-16">
+            <p className="text-sm text-slate-500 mb-3">No products match your filters.</p>
             <button
               onClick={() => {
                 setStockFilter('all')
@@ -307,14 +304,14 @@ export default function ShopPage() {
                   setPriceRange({ min: 0, max: maxPrice })
                 }
               }}
-              className="mt-4 text-sm font-medium text-slate-900 hover:text-slate-700 transition-colors underline"
+              className="text-xs font-medium text-slate-900 hover:text-slate-700 transition-colors underline"
             >
-              Clear all filters
+              Clear filters
             </button>
           </div>
         ) : (
           <>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
               {currentProducts.map((product) => {
               const isOutOfStock = product.stock === 0
               const isLowStock = product.stock > 0 && product.stock <= product.lowStockThreshold
@@ -323,46 +320,59 @@ export default function ShopPage() {
                 <div
                   key={product.id}
                   onClick={() => setSelectedProduct(product)}
-                  className={`group rounded-xl border border-slate-200 bg-white overflow-hidden transition-all hover:border-slate-900 hover:shadow-lg cursor-pointer ${
-                    isOutOfStock ? 'opacity-75' : ''
+                  className={`group rounded-lg border border-slate-200 bg-white overflow-hidden transition-all hover:border-slate-900 hover:shadow-md cursor-pointer ${
+                    isOutOfStock ? 'opacity-60' : ''
                   }`}
                 >
                   <div className="aspect-square bg-slate-100 flex items-center justify-center overflow-hidden relative">
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="h-full w-full object-cover"
+                      className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     {isOutOfStock && (
-                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                        <span className="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold">
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                        <span className="bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold">
                           Out of Stock
                         </span>
                       </div>
                     )}
+                    {isLowStock && !isOutOfStock && (
+                      <div className="absolute top-2 right-2 bg-yellow-500 text-white text-xs font-semibold px-2 py-0.5 rounded">
+                        {product.stock} left
+                      </div>
+                    )}
                   </div>
-                  <div className="p-6">
-                    <h3 className="mb-2 text-lg font-bold">{product.name}</h3>
-                    <p className="mb-4 text-sm text-slate-600">{product.description}</p>
-                    <div className="mb-3">
-                      {isLowStock && !isOutOfStock && (
-                        <p className="text-xs font-medium text-yellow-600">
-                          Only {product.stock} left!
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xl font-bold">${product.price.toFixed(2)}</span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handlePurchase(product)
-                        }}
-                        disabled={loading === product.id || isOutOfStock}
-                        className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {loading === product.id ? 'Processing...' : isOutOfStock ? 'Out of Stock' : 'Buy'}
-                      </button>
+                  <div className="p-3">
+                    <h3 className="mb-1 text-sm font-bold line-clamp-1">{product.name}</h3>
+                    <p className="mb-2 text-xs text-slate-500 line-clamp-2 h-8">{product.description}</p>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-base font-bold">${product.price.toFixed(2)}</span>
+                      <div className="flex gap-1.5">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            addToCart(product)
+                          }}
+                          disabled={isOutOfStock}
+                          className="rounded-md border border-slate-300 bg-white p-1.5 text-slate-700 hover:bg-slate-50 hover:border-slate-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          aria-label="Add to cart"
+                        >
+                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handlePurchase(product)
+                          }}
+                          disabled={loading === product.id || isOutOfStock}
+                          className="rounded-md bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {loading === product.id ? '...' : isOutOfStock ? 'Out' : 'Buy'}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -372,13 +382,13 @@ export default function ShopPage() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="mt-12 flex items-center justify-center gap-2">
+              <div className="mt-6 flex items-center justify-center gap-1.5">
                 <button
                   onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                   disabled={currentPage === 1}
-                  className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Previous
+                  Prev
                 </button>
 
                 <div className="flex items-center gap-1">
@@ -393,7 +403,7 @@ export default function ShopPage() {
                         <button
                           key={page}
                           onClick={() => setCurrentPage(page)}
-                          className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                          className={`rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
                             currentPage === page
                               ? 'bg-slate-900 text-white'
                               : 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
@@ -407,7 +417,7 @@ export default function ShopPage() {
                       page === currentPage + 2
                     ) {
                       return (
-                        <span key={page} className="px-2 text-slate-500">
+                        <span key={page} className="px-1 text-xs text-slate-400">
                           ...
                         </span>
                       )
@@ -419,7 +429,7 @@ export default function ShopPage() {
                 <button
                   onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                   disabled={currentPage === totalPages}
-                  className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Next
                 </button>
@@ -427,6 +437,9 @@ export default function ShopPage() {
             )}
           </>
         )}
+
+        {/* Floating Cart Icon */}
+        <FloatingCartIcon />
 
         {/* Product Detail Modal */}
         {selectedProduct && (
@@ -506,7 +519,26 @@ export default function ShopPage() {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="mt-auto pt-6 border-t border-slate-200">
+                  <div className="mt-auto pt-6 border-t border-slate-200 space-y-3">
+                    <button
+                      onClick={() => {
+                        addToCart(selectedProduct)
+                        setSelectedProduct(null)
+                      }}
+                      disabled={selectedProduct.stock === 0}
+                      className="w-full rounded-lg border-2 border-slate-900 bg-white px-6 py-4 text-base font-semibold text-slate-900 hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      {selectedProduct.stock === 0 ? (
+                        'Out of Stock'
+                      ) : (
+                        <>
+                          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                          </svg>
+                          Add to Cart
+                        </>
+                      )}
+                    </button>
                     <button
                       onClick={() => {
                         setSelectedProduct(null)

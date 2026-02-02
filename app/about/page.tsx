@@ -9,31 +9,31 @@ export default function AboutPage() {
       <Header />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-slate-900 to-slate-800 py-16 text-white sm:py-24">
+      <section className="bg-gradient-to-r from-slate-900 to-slate-800 py-8 text-white sm:py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="text-center">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400 sm:mb-3 sm:text-sm">About DCP</p>
-            <h1 className="mb-4 text-4xl font-bold sm:text-5xl md:text-6xl">Why the Defend the Constitution Platform (DCP)</h1>
+            <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">About DCP</p>
+            <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Why the Defend the Constitution Platform (DCP)</h1>
           </div>
         </div>
       </section>
 
       {/* About Section - Why DCP */}
-      <section className="bg-white py-12 sm:py-20 md:py-28">
+      <section className="bg-white py-8 sm:py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="grid gap-8 md:grid-cols-2 md:items-center md:gap-12">
             {/* Left Column - Content */}
             <div className="animate-fade-in-up">
-              <p className="mb-6 text-lg leading-relaxed text-slate-700 sm:text-xl">
+              <p className="mb-4 text-sm leading-relaxed text-slate-700 sm:text-base">
                 Zimbabwe's Constitution was adopted by the people to limit power, protect rights and guarantee democratic governance.
               </p>
-              <p className="mb-6 text-lg font-semibold leading-relaxed text-slate-900 sm:text-xl">
+              <p className="mb-4 text-sm font-semibold leading-relaxed text-slate-900 sm:text-base">
                 Today, that constitutional promise is under threat.
               </p>
-              <p className="mb-6 text-lg leading-relaxed text-slate-700 sm:text-xl">
+              <p className="mb-4 text-sm leading-relaxed text-slate-700 sm:text-base">
                 The Defend the Constitution Platform (DCP) exists to ensure that Zimbabwe is governed according to its Constitution — not political convenience.
               </p>
-              <p className="text-lg leading-relaxed text-slate-700 sm:text-xl">
+              <p className="text-sm leading-relaxed text-slate-700 sm:text-base">
                 DCP is a non-partisan, inclusive national platform bringing together citizens from across political parties, civic movements and social bases to defend constitutional supremacy through lawful, peaceful and organised action.
               </p>
             </div>
@@ -53,35 +53,35 @@ export default function AboutPage() {
       </section>
 
       {/* Our Core Belief & Our Strength Section */}
-      <section className="bg-white py-12 sm:py-20 md:py-28">
+      <section className="bg-white py-8 sm:py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="grid gap-8 md:grid-cols-2">
+          <div className="grid gap-6 md:grid-cols-2">
             {/* Our Core Belief */}
-            <div className="animate-fade-in-up rounded-2xl bg-slate-50 p-6 sm:p-8">
-              <h3 className="mb-4 text-2xl font-bold text-slate-900 sm:text-3xl">Our Core Belief</h3>
-              <p className="text-lg leading-relaxed text-slate-700 sm:text-xl">
+            <div className="animate-fade-in-up rounded-lg bg-slate-50 p-4 sm:p-6">
+              <h3 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">Our Core Belief</h3>
+              <p className="text-sm leading-relaxed text-slate-700 sm:text-base">
                 A Constitution adopted by the people cannot be amended, suspended or manipulated by elites acting in their own interests.
               </p>
             </div>
 
             {/* Our Strength */}
             <div className="animate-fade-in-up animate-delay-200">
-              <h3 className="mb-6 text-2xl font-bold text-slate-900 sm:text-3xl">Our Strength</h3>
-              <ul className="space-y-4 text-lg leading-relaxed text-slate-700 sm:text-xl">
+              <h3 className="mb-4 text-lg font-bold text-slate-900 sm:text-xl">Our Strength</h3>
+              <ul className="space-y-2.5 text-sm leading-relaxed text-slate-700 sm:text-base">
                 <li className="flex items-start">
-                  <span className="mr-3 mt-1 text-slate-900">•</span>
+                  <span className="mr-2 mt-0.5 text-slate-900">•</span>
                   <span>We are rooted in real social bases — students, workers, communities, faith groups, liberation war veterans, women, youth, and the diaspora.</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="mr-3 mt-1 text-slate-900">•</span>
+                  <span className="mr-2 mt-0.5 text-slate-900">•</span>
                   <span>We are cross-party, bringing together members of different political parties, including those represented in Parliament.</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="mr-3 mt-1 text-slate-900">•</span>
+                  <span className="mr-2 mt-0.5 text-slate-900">•</span>
                   <span>We combine civic mobilisation with parliamentary action.</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="mr-3 mt-1 text-slate-900">•</span>
+                  <span className="mr-2 mt-0.5 text-slate-900">•</span>
                   <span>We prioritise youth and student leadership as guardians of generational democracy.</span>
                 </li>
               </ul>
@@ -91,46 +91,46 @@ export default function AboutPage() {
       </section>
 
       {/* What We Stand For & Our Campaign Section */}
-      <section className="bg-white py-12 sm:py-20 md:py-28">
+      <section className="bg-white py-8 sm:py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="grid gap-8 md:grid-cols-2">
+          <div className="grid gap-6 md:grid-cols-2">
             {/* What We Stand For */}
-            <div className="animate-fade-in-up rounded-2xl border-2 border-slate-200 bg-white p-6 sm:p-8">
-              <h3 className="mb-6 text-2xl font-bold text-slate-900 sm:text-3xl">What We Stand For</h3>
-              <div className="grid gap-4 sm:grid-cols-2">
+            <div className="animate-fade-in-up rounded-lg border-2 border-slate-200 bg-white p-4 sm:p-6">
+              <h3 className="mb-4 text-lg font-bold text-slate-900 sm:text-xl">What We Stand For</h3>
+              <div className="grid gap-3 sm:grid-cols-2">
                 <div className="flex items-start">
-                  <span className="mr-3 mt-1 text-slate-900">✓</span>
-                  <span className="text-lg text-slate-700 sm:text-xl">Constitutional term limits</span>
+                  <span className="mr-2 mt-0.5 text-slate-900">✓</span>
+                  <span className="text-sm text-slate-700 sm:text-base">Constitutional term limits</span>
                 </div>
                 <div className="flex items-start">
-                  <span className="mr-3 mt-1 text-slate-900">✓</span>
-                  <span className="text-lg text-slate-700 sm:text-xl">Regular, credible elections</span>
+                  <span className="mr-2 mt-0.5 text-slate-900">✓</span>
+                  <span className="text-sm text-slate-700 sm:text-base">Regular, credible elections</span>
                 </div>
                 <div className="flex items-start">
-                  <span className="mr-3 mt-1 text-slate-900">✓</span>
-                  <span className="text-lg text-slate-700 sm:text-xl">Full implementation of the Constitution</span>
+                  <span className="mr-2 mt-0.5 text-slate-900">✓</span>
+                  <span className="text-sm text-slate-700 sm:text-base">Full implementation of the Constitution</span>
                 </div>
                 <div className="flex items-start">
-                  <span className="mr-3 mt-1 text-slate-900">✓</span>
-                  <span className="text-lg text-slate-700 sm:text-xl">Peaceful civic participation</span>
+                  <span className="mr-2 mt-0.5 text-slate-900">✓</span>
+                  <span className="text-sm text-slate-700 sm:text-base">Peaceful civic participation</span>
                 </div>
                 <div className="flex items-start sm:col-span-2">
-                  <span className="mr-3 mt-1 text-slate-900">✓</span>
-                  <span className="text-lg text-slate-700 sm:text-xl">National unity grounded in law</span>
+                  <span className="mr-2 mt-0.5 text-slate-900">✓</span>
+                  <span className="text-sm text-slate-700 sm:text-base">National unity grounded in law</span>
                 </div>
               </div>
             </div>
 
             {/* Our Campaign */}
-            <div className="animate-fade-in-up animate-delay-200 rounded-2xl bg-slate-900 p-6 text-white sm:p-8">
-              <h3 className="mb-4 text-2xl font-bold sm:text-3xl">Our Campaign</h3>
-              <p className="mb-4 text-lg leading-relaxed text-slate-200 sm:text-xl">
+            <div className="animate-fade-in-up animate-delay-200 rounded-lg bg-slate-900 p-4 text-white sm:p-6">
+              <h3 className="mb-3 text-lg font-bold sm:text-xl">Our Campaign</h3>
+              <p className="mb-3 text-sm leading-relaxed text-slate-200 sm:text-base">
                 The People's Resolution is a citizen-led constitutional campaign that will be taken to the streets, communities, workplaces, campuses, farms and places of worship across Zimbabwe.
               </p>
-              <p className="text-lg leading-relaxed text-slate-200 sm:text-xl">
+              <p className="text-sm leading-relaxed text-slate-200 sm:text-base">
                 <strong>DCP is not about replacing parties or competing for power.</strong>
               </p>
-              <p className="mt-4 text-lg leading-relaxed text-slate-200 sm:text-xl">
+              <p className="mt-3 text-sm leading-relaxed text-slate-200 sm:text-base">
                 <strong>It is about defending the rules that govern power.</strong>
               </p>
             </div>
@@ -139,22 +139,22 @@ export default function AboutPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-gradient-to-r from-slate-900 to-slate-800 py-12 text-white sm:py-20">
+      <section className="bg-gradient-to-r from-slate-900 to-slate-800 py-8 text-white sm:py-12">
         <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
-          <h2 className="mb-4 text-3xl font-bold sm:text-4xl md:text-5xl">Ready to Make a Difference?</h2>
-          <p className="mb-8 text-lg text-slate-300 sm:text-xl">
+          <h2 className="mb-3 text-2xl font-bold sm:text-3xl md:text-4xl">Ready to Make a Difference?</h2>
+          <p className="mb-6 text-sm text-slate-300 sm:text-base">
             Join thousands of citizens working together to defend the Constitution and protect our democratic values.
           </p>
-          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
+          <div className="flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-3">
             <Link
               href="/signup"
-              className="inline-flex w-full items-center justify-center rounded-lg bg-white px-6 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100 transition-colors sm:w-auto sm:px-8 sm:py-4 sm:text-base"
+              className="inline-flex w-full items-center justify-center rounded-md bg-white px-5 py-2.5 text-xs font-semibold text-slate-900 hover:bg-slate-100 transition-colors sm:w-auto sm:px-6 sm:py-3 sm:text-sm"
             >
               Join the Platform
             </Link>
             <Link
               href="/#contact"
-              className="inline-flex w-full items-center justify-center rounded-lg border-2 border-white px-6 py-3 text-sm font-semibold hover:bg-white/10 transition-colors sm:w-auto sm:px-8 sm:py-4 sm:text-base"
+              className="inline-flex w-full items-center justify-center rounded-md border-2 border-white px-5 py-2.5 text-xs font-semibold hover:bg-white/10 transition-colors sm:w-auto sm:px-6 sm:py-3 sm:text-sm"
             >
               Contact Us
             </Link>

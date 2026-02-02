@@ -79,15 +79,15 @@ export default function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-3">
       {error && (
-        <div className="rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-800">
+        <div className="rounded-md bg-red-50 border border-red-200 p-2 text-xs text-red-800">
           {error}
         </div>
       )}
       {success && (
-        <div className="rounded-lg bg-green-50 border border-green-200 p-3 text-sm text-green-800">
-          Thank you! Your message has been sent successfully. We'll get back to you soon.
+        <div className="rounded-md bg-green-50 border border-green-200 p-2 text-xs text-green-800">
+          Thank you! Your message has been sent successfully.
         </div>
       )}
       <div>
@@ -96,7 +96,7 @@ export default function ContactForm() {
           placeholder="Your Name"
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          className="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 sm:text-base"
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-xs focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 sm:text-sm"
           required
         />
       </div>
@@ -106,24 +106,24 @@ export default function ContactForm() {
           placeholder="Your Email"
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          className="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 sm:text-base"
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-xs focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 sm:text-sm"
           required
         />
       </div>
       <div>
         <textarea
-          rows={4}
+          rows={3}
           placeholder="Your Message"
           value={formData.message}
           onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-          className="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 sm:text-base"
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-xs focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 sm:text-sm"
           required
         />
       </div>
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-lg bg-slate-900 px-6 py-3 text-sm font-semibold text-white hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed sm:text-base"
+        className="w-full rounded-md bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed sm:text-sm"
       >
         {loading ? 'Sending...' : 'Send Message'}
       </button>

@@ -90,3 +90,9 @@ export interface News {
   updatedAt: Timestamp | Date
 }
 
+export interface CartItem {
+  productId: string
+  product: Product
+  quantity: number
+}
+

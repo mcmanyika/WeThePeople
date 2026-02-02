@@ -201,29 +201,62 @@ export async function POST(request: NextRequest) {
           }
         } else if (type === 'purchase') {
           try {
-            const purchase = {
-              userId: userId || '',
-              productId: paymentIntent.metadata?.productId || '',
-              productName: paymentIntent.metadata?.productName || paymentIntent.metadata?.description?.replace('Purchase: ', '') || '',
-              amount: paymentIntent.amount / 100,
-              currency: paymentIntent.currency,
-              status: 'succeeded' as const,
-              stripePaymentIntentId: paymentIntent.id,
-              description: paymentIntent.metadata?.description,
-            }
+            // Check if this is a cart purchase (multiple items)
+            const cartItemsStr = paymentIntent.metadata?.cartItems
+            if (cartItemsStr) {
+              // Handle multiple items from cart
+              const cartItems = JSON.parse(cartItemsStr)
+              
+              for (const item of cartItems) {
+                // Create purchase record for each item
+                const purchase = {
+                  userId: userId || '',
+                  productId: item.productId,
+                  productName: item.productName,
+                  amount: item.price * item.quantity,
+                  currency: paymentIntent.currency,
+                  status: 'succeeded' as const,
+                  stripePaymentIntentId: paymentIntent.id,
+                  description: `${item.productName} x${item.quantity}`,
+                }
 
-            await createPurchase(purchase)
-            console.log(`Purchase recorded: ${paymentIntent.id}`)
+                await createPurchase(purchase)
+                console.log(`Purchase recorded for ${item.productName}: ${paymentIntent.id}`)
 
-            // Decrement product stock
-            const productId = paymentIntent.metadata?.productId
-            if (productId) {
-              try {
-                await decrementProductStock(productId, 1)
-                console.log(`Stock decremented for product: ${productId}`)
-              } catch (stockError: any) {
-                console.error('Error decrementing product stock:', stockError)
-                // Don't fail the webhook if stock decrement fails - log it for manual review
+                // Decrement product stock for each item
+                try {
+                  await decrementProductStock(item.productId, item.quantity)
+                  console.log(`Stock decremented for product ${item.productId}: -${item.quantity}`)
+                } catch (stockError: any) {
+                  console.error(`Error decrementing stock for product ${item.productId}:`, stockError)
+                }
+              }
+            } else {
+              // Handle single item purchase (backward compatibility)
+              const purchase = {
+                userId: userId || '',
+                productId: paymentIntent.metadata?.productId || '',
+                productName: paymentIntent.metadata?.productName || paymentIntent.metadata?.description?.replace('Purchase: ', '') || '',
+                amount: paymentIntent.amount / 100,
+                currency: paymentIntent.currency,
+                status: 'succeeded' as const,
+                stripePaymentIntentId: paymentIntent.id,
+                description: paymentIntent.metadata?.description,
+              }
+
+              await createPurchase(purchase)
+              console.log(`Purchase recorded: ${paymentIntent.id}`)
+
+              // Decrement product stock
+              const productId = paymentIntent.metadata?.productId
+              if (productId) {
+                try {
+                  await decrementProductStock(productId, 1)
+                  console.log(`Stock decremented for product: ${productId}`)
+                } catch (stockError: any) {
+                  console.error('Error decrementing product stock:', stockError)
+                  // Don't fail the webhook if stock decrement fails - log it for manual review
+                }
               }
             }
           } catch (error: any) {
