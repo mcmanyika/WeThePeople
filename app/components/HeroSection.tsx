@@ -19,7 +19,7 @@ export default function HeroSection({ onSupportClick }: HeroSectionProps) {
     {
       title: "OUR CONSTITUTION.",
       titleSecondary: "OUR FUTURE.",
-      subtitle: "DCP: A Patriotic Coalition of the Willing",
+      subtitle: "Non partisan inclusive political organization",
       description: "Zimbabwe's Constitution was adopted by the people to limit power, protect rights and guarantee democratic governance. Today, that constitutional promise is under threat from both mutilation and non-implementation.",
     },
     {
@@ -121,12 +121,8 @@ export default function HeroSection({ onSupportClick }: HeroSectionProps) {
               {/* Spacer to maintain exact positioning after removing titles */}
               <div className="mb-4 sm:mb-6" />
 
-              <p className="mx-auto mb-2 max-w-2xl text-lg font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)] sm:mb-3 sm:text-xl md:text-2xl lg:text-3xl">
+              <p className="mx-auto mb-6 max-w-2xl text-lg font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)] sm:mb-8 sm:text-xl md:text-2xl lg:text-3xl">
                 {slide.subtitle}
-              </p>
-              
-              <p className="mx-auto mb-6 text-sm text-white/80 drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)] sm:mb-8 sm:text-base">
-                Non partisan inclusive political organization
               </p>
               
               <p className="mx-auto mb-8 max-w-3xl text-sm font-thin text-white/90 drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)] sm:mb-10 sm:text-base md:text-lg">
