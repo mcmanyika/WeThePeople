@@ -104,8 +104,8 @@ export default function HeroSection({ onSupportClick }: HeroSectionProps) {
           }}
         />
       ))}
-      {/* Light overlay for better text visibility */}
-      <div className="absolute inset-0 z-[1] bg-black/5" />
+      {/* Dark overlay for better text visibility */}
+      <div className="absolute inset-0 z-[1] bg-black/40" />
       {/* Content layer */}
       <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-12 text-center sm:px-6 sm:pb-20">
         <div className="relative">
@@ -121,11 +121,11 @@ export default function HeroSection({ onSupportClick }: HeroSectionProps) {
               {/* Spacer to maintain exact positioning after removing titles */}
               <div className="mb-4 sm:mb-6" />
 
-              <p className="mx-auto mb-6 max-w-2xl text-lg font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)] sm:mb-8 sm:text-xl md:text-2xl lg:text-3xl">
+              <p className="mx-auto mb-6 max-w-2xl text-lg font-bold text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] sm:mb-8 sm:text-xl md:text-2xl lg:text-3xl">
                 {slide.subtitle}
               </p>
               
-              <p className="mx-auto mb-8 max-w-3xl text-sm font-thin text-white/90 drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)] sm:mb-10 sm:text-base md:text-lg">
+              <p className="mx-auto mb-8 max-w-3xl text-sm font-normal text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] sm:mb-10 sm:text-base md:text-lg">
                 {slide.description}
               </p>
             </div>
