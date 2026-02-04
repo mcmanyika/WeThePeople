@@ -22,6 +22,7 @@ export default function AboutPage() {
           <div className="text-center">
             <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">About DCP</p>
             <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Why the Defend the Constitution Platform (DCP)</h1>
+            <p className="text-sm text-slate-300 sm:text-base">Non partisan inclusive political organization</p>
           </div>
         </div>
       </section>

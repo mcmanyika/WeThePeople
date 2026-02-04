@@ -1,6 +1,11 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import WhatsAppButton from './WhatsAppButton'
+
+interface ChatbotProps {
+  hideWhatsApp?: boolean
+}
 
 interface Message {
   role: 'user' | 'assistant'
@@ -8,7 +13,7 @@ interface Message {
   timestamp: Date
 }
 
-export default function Chatbot() {
+export default function Chatbot({ hideWhatsApp = false }: ChatbotProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -95,6 +100,13 @@ export default function Chatbot() {
 
   return (
     <>
+      {/* WhatsApp Button */}
+      {!hideWhatsApp && (
+        <div className="fixed bottom-24 right-6 z-50">
+          <WhatsAppButton className="h-14 w-14" />
+        </div>
+      )}
+
       {/* Chat Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}

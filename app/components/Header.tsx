@@ -54,7 +54,7 @@ export default function Header({ onDonateClick }: HeaderProps) {
           />
           <div className="leading-tight hidden sm:block">
             <p className="text-xs font-bold text-white">Defend the Constitution</p>
-            <p className="text-[10px] text-slate-400">Platform</p>
+            <p className="text-[10px] text-slate-400">Our Constitution. Our Future</p>
           </div>
         </Link>
 

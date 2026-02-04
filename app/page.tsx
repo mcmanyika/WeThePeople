@@ -611,7 +611,7 @@ export default function Home() {
       />
 
       {/* Chatbot */}
-      <Chatbot />
+      <Chatbot hideWhatsApp />
     </main>
   );
 }
