@@ -107,8 +107,6 @@ export default function HeroSection({ onSupportClick }: HeroSectionProps) {
           }}
         />
       ))}
-      {/* Dark overlay for better text visibility */}
-      <div className="absolute inset-0 z-[1] bg-black/20" />
       
       {/* Social Media Icons - Left Side */}
       <div className="absolute left-4 top-1/2 z-20 -translate-y-1/2 hidden md:flex flex-col gap-4 bg-black/30 backdrop-blur-sm rounded-full py-4 px-2">
