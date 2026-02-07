@@ -847,10 +847,7 @@ export async function decrementProductStock(productId: string, amount: number = 
 }
 
 export async function deleteProduct(productId: string): Promise<void> {
-  await updateDoc(doc(requireDb(), 'products', productId), {
-    isActive: false,
-    updatedAt: Timestamp.now(),
-  })
+  await deleteDoc(doc(requireDb(), 'products', productId))
 }
 
 export async function getLowStockProducts(threshold?: number): Promise<Product[]> {

@@ -68,6 +68,9 @@ function ProductsManagement() {
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     loadProducts()
@@ -217,15 +220,24 @@ function ProductsManagement() {
     }
   }
 
-  const handleDelete = async (productId: string) => {
-    if (!confirm('Are you sure you want to delete this product?')) return
+  const handleDeleteClick = (product: Product) => {
+    setProductToDelete(product)
+    setDeleteModalOpen(true)
+  }
 
+  const handleDeleteConfirm = async () => {
+    if (!productToDelete) return
+    setDeleting(true)
     try {
-      await deleteProduct(productId)
+      await deleteProduct(productToDelete.id)
       await loadProducts()
+      setDeleteModalOpen(false)
+      setProductToDelete(null)
     } catch (err: any) {
       setError(err.message || 'Failed to delete product')
       console.error('Error deleting product:', err)
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -400,7 +412,7 @@ function ProductsManagement() {
                             Edit
                           </button>
                           <button
-                            onClick={() => handleDelete(product.id)}
+                            onClick={() => handleDeleteClick(product)}
                             className="text-red-600 hover:text-red-900 transition-colors"
                           >
                             Delete
@@ -474,6 +486,49 @@ function ProductsManagement() {
               </button>
             </div>
           </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteModalOpen && productToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="mx-4 w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+            <h3 className="text-lg font-bold text-slate-900 mb-2">Delete Product</h3>
+            <p className="text-sm text-slate-600 mb-1">
+              Are you sure you want to permanently delete this product?
+            </p>
+            <div className="flex items-center gap-3 my-4 rounded-lg bg-slate-50 p-3">
+              <img
+                src={productToDelete.image}
+                alt={productToDelete.name}
+                className="h-12 w-12 rounded-lg object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement
+                  target.src = '/images/placeholder.png'
+                }}
+              />
+              <div>
+                <p className="text-sm font-semibold text-slate-900">{productToDelete.name}</p>
+                <p className="text-xs text-slate-500">${productToDelete.price.toFixed(2)} • Stock: {productToDelete.stock}</p>
+              </div>
+            </div>
+            <p className="text-xs text-red-600 mb-4">This action cannot be undone. The product will be permanently removed.</p>
+            <div className="flex gap-3">
+              <button
+                onClick={handleDeleteConfirm}
+                disabled={deleting}
+                className="flex-1 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
+              >
+                {deleting ? 'Deleting...' : 'Delete Permanently'}
+              </button>
+              <button
+                onClick={() => { setDeleteModalOpen(false); setProductToDelete(null) }}
+                className="flex-1 rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Add/Edit Modal */}
