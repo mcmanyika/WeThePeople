@@ -13,7 +13,7 @@ export default function HeroSection({ onSupportClick }: HeroSectionProps) {
   const [showContent, setShowContent] = useState(false);
   const heroRef = useRef<HTMLElement>(null);
   
-  const backgroundImages = ['/images/banner-4.png', '/images/banner-2.png'];
+  const backgroundImages = ['/images/banner.png', '/images/banner-2.png'];
 
   // Text slides for the hero section - each slide contains title, subtitle, and description
   const textSlides = [
@@ -93,12 +93,9 @@ export default function HeroSection({ onSupportClick }: HeroSectionProps) {
       {backgroundImages.map((image, index) => (
         <div
           key={image}
-          className="absolute inset-0 z-0 transition-opacity duration-[3000ms] ease-in-out"
+          className="absolute inset-0 z-0 transition-opacity duration-[3000ms] ease-in-out bg-cover bg-no-repeat bg-[position:70%_center] sm:bg-center"
           style={{
             backgroundImage: `url(${image})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
             transform: `translateY(${parallaxOffset}px)`,
             willChange: 'transform, opacity',
             opacity: index === currentBgImage ? 1 : 0,

@@ -159,7 +159,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-white text-slate-900">
-      <Header onDonateClick={() => setDonationModalOpen(true)} />
+      <Header onDonateClick={() => setDonationModalOpen(true)} startAtBottom />
 
       <HeroSection onSupportClick={() => setDonationModalOpen(true)} />
 
@@ -522,6 +522,7 @@ export default function Home() {
               <div className="mb-3 h-4"></div>
               <ul className="space-y-1.5 text-xs text-slate-400">
                 <li><Link href="/shop" className="hover:text-white transition-colors">Shop</Link></li>
+                <li><Link href="/news" className="hover:text-white transition-colors">News</Link></li>
                 <li><a href="#contact" className="hover:text-white transition-colors">Contact</a></li>
               </ul>
             </div>

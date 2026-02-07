@@ -7,12 +7,13 @@ import Link from 'next/link';
 
 interface HeaderProps {
   onDonateClick?: () => void;
+  startAtBottom?: boolean;
 }
 
-export default function Header({ onDonateClick }: HeaderProps) {
+export default function Header({ onDonateClick, startAtBottom = false }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(!startAtBottom);
   const { user, userProfile, logout } = useAuth();
   const { getTotalItems } = useCart();
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -44,8 +45,10 @@ export default function Header({ onDonateClick }: HeaderProps) {
     };
   }, [userMenuOpen]);
 
-  // Handle scroll to switch header position from bottom to top
+  // Handle scroll to switch header position from bottom to top (only on landing page)
   useEffect(() => {
+    if (!startAtBottom) return; // Skip scroll handling if header should always be at top
+
     const handleScroll = () => {
       // Switch to top position after scrolling 100px
       if (window.scrollY > 100) {
@@ -57,7 +60,7 @@ export default function Header({ onDonateClick }: HeaderProps) {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [startAtBottom]);
 
   return (
     <header 
@@ -85,6 +88,7 @@ export default function Header({ onDonateClick }: HeaderProps) {
           <Link href="/" className="text-xs font-medium text-slate-300 hover:text-white transition-colors sm:text-sm">Home</Link>
           <Link href="/about" className="text-xs font-medium text-slate-300 hover:text-white transition-colors sm:text-sm">About</Link>
           <Link href="/petitions" className="text-xs font-medium text-slate-300 hover:text-white transition-colors sm:text-sm">Petitions</Link>
+          <Link href="/news" className="text-xs font-medium text-slate-300 hover:text-white transition-colors sm:text-sm">News</Link>
           <Link href="/shop" className="text-xs font-medium text-slate-300 hover:text-white transition-colors sm:text-sm">Shop</Link>
           <Link href="/#contact" className="text-xs font-medium text-slate-300 hover:text-white transition-colors sm:text-sm">Contact</Link>
         </nav>
@@ -229,6 +233,13 @@ export default function Header({ onDonateClick }: HeaderProps) {
               className="rounded-lg px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
             >
               Petitions
+            </Link>
+            <Link
+              href="/news"
+              onClick={() => setMobileMenuOpen(false)}
+              className="rounded-lg px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+            >
+              News
             </Link>
             <Link
               href="/shop"

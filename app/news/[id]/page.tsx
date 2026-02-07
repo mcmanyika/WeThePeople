@@ -64,13 +64,13 @@ export default function NewsDetailPage() {
       <div className="bg-slate-50 border-b">
         <div className="mx-auto max-w-4xl px-4 py-4 sm:px-6">
           <Link
-            href="/#updates"
+            href="/news"
             className="inline-flex items-center text-sm text-slate-600 hover:text-slate-900 transition-colors"
           >
             <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Back to Updates
+            Back to News
           </Link>
         </div>
       </div>
@@ -90,10 +90,10 @@ export default function NewsDetailPage() {
             <h1 className="text-2xl font-bold text-slate-900 mb-2">Article Not Found</h1>
             <p className="text-slate-600 mb-6">{error}</p>
             <Link
-              href="/#updates"
+              href="/news"
               className="inline-flex items-center rounded-lg bg-slate-900 px-6 py-3 text-sm font-semibold text-white hover:bg-slate-800 transition-colors"
             >
-              View All Updates
+              View All News
             </Link>
           </div>
         ) : news ? (
