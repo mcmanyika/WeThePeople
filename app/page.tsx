@@ -484,7 +484,7 @@ export default function Home() {
           <div className="mx-auto max-w-2xl">
             <div className="rounded-lg border bg-slate-50 p-4 sm:p-6">
               <p className="mb-4 text-center text-sm text-slate-600">
-                Have questions or want to get involved? Reach out to us through your local chapter or use the contact form below.
+                Have questions or want to get involved? Reach out to us through the contact form below.
               </p>
               <ContactForm />
             </div>
