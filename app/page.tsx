@@ -499,7 +499,7 @@ export default function Home() {
               <div>
                 <h3 className="mb-3 text-xs font-semibold">Get the App</h3>
                 <p className="mb-3 text-xs text-slate-400">
-                  Download our Android app for quick access on the go.
+                  Download our Android app for quick access.
                 </p>
                 <a
                   href="https://expo.dev/artifacts/eas/hopnYPS9wRJX8ugWGP9Uhz.apk"
