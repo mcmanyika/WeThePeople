@@ -7,10 +7,12 @@ import type { GalleryCategory, GalleryImage } from '@/types'
 
 const ITEMS_PER_PAGE = 12
 
-function ShareButtons({ imageUrl, title, size = 'sm' }: { imageUrl: string; title: string; size?: 'sm' | 'md' }) {
+const SITE_URL = 'https://dcpzim.com/gallery'
+
+function ShareButtons({ title, size = 'sm' }: { imageUrl?: string; title: string; size?: 'sm' | 'md' }) {
   const [copied, setCopied] = useState(false)
-  const shareText = encodeURIComponent(title || 'Check out this image from Defend the Constitution')
-  const shareUrl = encodeURIComponent(imageUrl)
+  const shareText = encodeURIComponent(`${title} – Defend the Constitution Platform`)
+  const shareUrl = encodeURIComponent(SITE_URL)
 
   const btnClass = size === 'sm'
     ? 'rounded-full bg-black/60 p-1.5 text-white hover:bg-black/80 transition-colors'
@@ -53,7 +55,7 @@ function ShareButtons({ imageUrl, title, size = 'sm' }: { imageUrl: string; titl
       <button
         onClick={(e) => {
           e.stopPropagation()
-          navigator.clipboard.writeText(imageUrl)
+          navigator.clipboard.writeText(SITE_URL)
           setCopied(true)
           setTimeout(() => setCopied(false), 2000)
         }}
