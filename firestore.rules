@@ -230,6 +230,30 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Gallery Categories collection
+    match /galleryCategories/{catId} {
+      // Everyone can read active categories
+      allow read: if resource.data.isActive == true;
+      // Admins can read all categories
+      allow read: if isAdmin();
+      // Only admins can create, update, or delete categories
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Gallery Images collection
+    match /galleryImages/{imgId} {
+      // Everyone can read published images
+      allow read: if resource.data.isPublished == true;
+      // Admins can read all images
+      allow read: if isAdmin();
+      // Only admins can create, update, or delete images
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
     // Newsletter subscriptions collection
     match /newsletterSubscriptions/{subscriptionId} {
       // Anyone can create newsletter subscriptions (authenticated or not)

@@ -22,6 +22,7 @@ const adminNavItems = [
   { href: '/dashboard/admin/petitions', label: 'Petitions', icon: '✍️' },
   { href: '/dashboard/admin/volunteers', label: 'Volunteers', icon: '🙋' },
   { href: '/dashboard/admin/banners', label: 'Banners', icon: '🖼️' },
+  { href: '/dashboard/admin/gallery', label: 'Gallery', icon: '📷' },
 ]
 
 export default function DashboardNav() {

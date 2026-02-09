@@ -170,6 +170,31 @@ export interface Banner {
   updatedAt: Timestamp | Date
 }
 
+export interface GalleryCategory {
+  id: string
+  name: string
+  slug: string
+  description?: string
+  coverImage?: string
+  order: number
+  isActive: boolean
+  createdAt: Timestamp | Date
+  updatedAt: Timestamp | Date
+}
+
+export interface GalleryImage {
+  id: string
+  imageUrl: string
+  title?: string
+  description?: string
+  categoryId: string
+  categoryName: string
+  isPublished: boolean
+  order: number
+  createdAt: Timestamp | Date
+  updatedAt: Timestamp | Date
+}
+
 // Ensure this file is treated as a module
 export { }
 

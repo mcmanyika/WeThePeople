@@ -13,7 +13,7 @@ import {
   Timestamp,
 } from 'firebase/firestore'
 import { db } from './config'
-import type { UserProfile, Donation, Membership, ContactSubmission, Purchase, Product, UserRole, News, CartItem, VolunteerApplication, VolunteerApplicationStatus, Petition, PetitionSignature, ShipmentStatus, NewsletterSubscription, Banner } from '@/types'
+import type { UserProfile, Donation, Membership, ContactSubmission, Purchase, Product, UserRole, News, CartItem, VolunteerApplication, VolunteerApplicationStatus, Petition, PetitionSignature, ShipmentStatus, NewsletterSubscription, Banner, GalleryCategory, GalleryImage } from '@/types'
 
 // Helper functions
 function requireDb() {
@@ -1428,5 +1428,206 @@ export async function updateBanner(bannerId: string, data: Partial<Banner>): Pro
 
 export async function deleteBanner(bannerId: string): Promise<void> {
   await deleteDoc(doc(requireDb(), 'banners', bannerId))
+}
+
+// Gallery Category operations
+export async function createGalleryCategory(
+  category: Omit<GalleryCategory, 'id' | 'createdAt' | 'updatedAt'>
+): Promise<string> {
+  const db = requireDb()
+  const catRef = doc(collection(db, 'galleryCategories'))
+
+  try {
+    const catData = {
+      name: category.name,
+      slug: category.slug,
+      description: category.description || null,
+      coverImage: category.coverImage || null,
+      order: category.order,
+      isActive: category.isActive,
+      id: catRef.id,
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+    }
+
+    await setDoc(catRef, catData)
+    return catRef.id
+  } catch (error: any) {
+    console.error('Error in createGalleryCategory:', error)
+    throw error
+  }
+}
+
+export async function getGalleryCategories(activeOnly: boolean = false): Promise<GalleryCategory[]> {
+  if (!db) {
+    console.warn('Firestore not initialized')
+    return []
+  }
+
+  try {
+    let q
+    if (activeOnly) {
+      q = query(
+        collection(db, 'galleryCategories'),
+        where('isActive', '==', true),
+        orderBy('order', 'asc')
+      )
+    } else {
+      q = query(
+        collection(db, 'galleryCategories'),
+        orderBy('order', 'asc')
+      )
+    }
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map((docSnap) => {
+      const data = docSnap.data()
+      return {
+        ...data,
+        id: docSnap.id,
+        createdAt: toDate(data.createdAt),
+        updatedAt: toDate(data.updatedAt),
+      } as GalleryCategory
+    })
+  } catch (error: any) {
+    if (error?.code === 'failed-precondition') {
+      console.warn('Composite index not ready for galleryCategories, using fallback')
+      try {
+        const snapshot = await getDocs(collection(db, 'galleryCategories'))
+        const categories = snapshot.docs.map((docSnap) => {
+          const data = docSnap.data()
+          return {
+            ...data,
+            id: docSnap.id,
+            createdAt: toDate(data.createdAt),
+            updatedAt: toDate(data.updatedAt),
+          } as GalleryCategory
+        })
+        const filtered = activeOnly ? categories.filter(c => c.isActive) : categories
+        return filtered.sort((a, b) => a.order - b.order)
+      } catch (fallbackError: any) {
+        console.error('Error in fallback galleryCategories query:', fallbackError)
+        return []
+      }
+    }
+    console.error('Error fetching gallery categories:', error)
+    return []
+  }
+}
+
+export async function updateGalleryCategory(categoryId: string, data: Partial<GalleryCategory>): Promise<void> {
+  const updateData: any = { updatedAt: Timestamp.now() }
+
+  if (data.name !== undefined) updateData.name = data.name
+  if (data.slug !== undefined) updateData.slug = data.slug
+  if (data.description !== undefined) updateData.description = data.description || null
+  if (data.coverImage !== undefined) updateData.coverImage = data.coverImage || null
+  if (data.isActive !== undefined) updateData.isActive = data.isActive
+  if (data.order !== undefined) updateData.order = data.order
+
+  await updateDoc(doc(requireDb(), 'galleryCategories', categoryId), updateData)
+}
+
+export async function deleteGalleryCategory(categoryId: string): Promise<void> {
+  await deleteDoc(doc(requireDb(), 'galleryCategories', categoryId))
+}
+
+// Gallery Image operations
+export async function createGalleryImage(
+  image: Omit<GalleryImage, 'id' | 'createdAt' | 'updatedAt'>
+): Promise<string> {
+  const db = requireDb()
+  const imgRef = doc(collection(db, 'galleryImages'))
+
+  try {
+    const imgData = {
+      imageUrl: image.imageUrl,
+      title: image.title || null,
+      description: image.description || null,
+      categoryId: image.categoryId,
+      categoryName: image.categoryName,
+      isPublished: image.isPublished,
+      order: image.order,
+      id: imgRef.id,
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+    }
+
+    await setDoc(imgRef, imgData)
+    return imgRef.id
+  } catch (error: any) {
+    console.error('Error in createGalleryImage:', error)
+    throw error
+  }
+}
+
+export async function getGalleryImages(publishedOnly: boolean = false, categoryId?: string): Promise<GalleryImage[]> {
+  if (!db) {
+    console.warn('Firestore not initialized')
+    return []
+  }
+
+  try {
+    let q = query(collection(db, 'galleryImages'), orderBy('order', 'asc'))
+
+    if (publishedOnly) {
+      q = query(q, where('isPublished', '==', true))
+    }
+    if (categoryId) {
+      q = query(q, where('categoryId', '==', categoryId))
+    }
+
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map((docSnap) => {
+      const data = docSnap.data()
+      return {
+        ...data,
+        id: docSnap.id,
+        createdAt: toDate(data.createdAt),
+        updatedAt: toDate(data.updatedAt),
+      } as GalleryImage
+    })
+  } catch (error: any) {
+    if (error?.code === 'failed-precondition') {
+      console.warn('Composite index not ready for galleryImages, using fallback')
+      try {
+        const snapshot = await getDocs(collection(db, 'galleryImages'))
+        let images = snapshot.docs.map((docSnap) => {
+          const data = docSnap.data()
+          return {
+            ...data,
+            id: docSnap.id,
+            createdAt: toDate(data.createdAt),
+            updatedAt: toDate(data.updatedAt),
+          } as GalleryImage
+        })
+        if (publishedOnly) images = images.filter(i => i.isPublished)
+        if (categoryId) images = images.filter(i => i.categoryId === categoryId)
+        return images.sort((a, b) => a.order - b.order)
+      } catch (fallbackError: any) {
+        console.error('Error in fallback galleryImages query:', fallbackError)
+        return []
+      }
+    }
+    console.error('Error fetching gallery images:', error)
+    return []
+  }
+}
+
+export async function updateGalleryImage(imageId: string, data: Partial<GalleryImage>): Promise<void> {
+  const updateData: any = { updatedAt: Timestamp.now() }
+
+  if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl
+  if (data.title !== undefined) updateData.title = data.title || null
+  if (data.description !== undefined) updateData.description = data.description || null
+  if (data.categoryId !== undefined) updateData.categoryId = data.categoryId
+  if (data.categoryName !== undefined) updateData.categoryName = data.categoryName
+  if (data.isPublished !== undefined) updateData.isPublished = data.isPublished
+  if (data.order !== undefined) updateData.order = data.order
+
+  await updateDoc(doc(requireDb(), 'galleryImages', imageId), updateData)
+}
+
+export async function deleteGalleryImage(imageId: string): Promise<void> {
+  await deleteDoc(doc(requireDb(), 'galleryImages', imageId))
 }
 
