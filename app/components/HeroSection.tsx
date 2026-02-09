@@ -7,7 +7,7 @@ interface HeroSectionProps {
   onSupportClick?: () => void
 }
 
-const FALLBACK_IMAGES = ['/images/banner.png', '/images/banner-3.png'];
+const FALLBACK_IMAGES = ['/images/banner.png'];
 
 export default function HeroSection({ onSupportClick }: HeroSectionProps) {
   const [scrollY, setScrollY] = useState(0);
