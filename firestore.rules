@@ -254,6 +254,36 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Surveys collection
+    match /surveys/{surveyId} {
+      // Everyone can read active surveys
+      allow read: if resource.data.status == 'active';
+      // Admins can read all surveys (any status)
+      allow read: if isAdmin();
+      // Only admins can create, update, or delete surveys
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+      // Allow authenticated users to update responseCount only
+      allow update: if isAuthenticated() &&
+                     request.resource.data.diff(resource.data).affectedKeys().hasOnly(['responseCount', 'updatedAt']);
+    }
+
+    // Survey Responses collection
+    match /surveyResponses/{responseId} {
+      // Authenticated users can create responses
+      allow create: if isAuthenticated();
+      // Public surveys allow unauthenticated responses with valid data
+      allow create: if request.resource.data.keys().hasAll(['surveyId', 'answers', 'isAnonymous']) &&
+                     request.resource.data.surveyId is string &&
+                     request.resource.data.answers is list &&
+                     request.resource.data.isAnonymous is bool;
+      // Users can read their own responses
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      // Admins can read all responses
+      allow read: if isAdmin();
+    }
+
     // Newsletter subscriptions collection
     match /newsletterSubscriptions/{subscriptionId} {
       // Anyone can create newsletter subscriptions (authenticated or not)

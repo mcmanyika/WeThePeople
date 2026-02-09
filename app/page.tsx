@@ -8,8 +8,8 @@ import HeroSection from './components/HeroSection';
 import ContactForm from './components/ContactForm';
 import DonationModal from './components/DonationModal';
 import Chatbot from './components/Chatbot';
-import { getNews, createNewsletterSubscription, getProducts, getProductById } from '@/lib/firebase/firestore';
-import type { News, Product } from '@/types';
+import { getNews, createNewsletterSubscription, getProducts, getProductById, getSurveys } from '@/lib/firebase/firestore';
+import type { News, Product, Survey, SurveyCategory } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import { useRouter } from 'next/navigation';
@@ -31,6 +31,8 @@ export default function Home() {
   const [newsletterLoading, setNewsletterLoading] = useState(false)
   const [newsletterSuccess, setNewsletterSuccess] = useState(false)
   const [newsletterError, setNewsletterError] = useState('')
+  const [activeSurveys, setActiveSurveys] = useState<Survey[]>([])
+  const [surveysLoading, setSurveysLoading] = useState(true)
 
   useEffect(() => {
     // Handle hash navigation to open modal
@@ -81,6 +83,21 @@ export default function Home() {
       }
     }
     loadProducts()
+  }, [])
+
+  useEffect(() => {
+    const loadSurveys = async () => {
+      try {
+        setSurveysLoading(true)
+        const surveys = await getSurveys(true)
+        setActiveSurveys(surveys.slice(0, 3))
+      } catch (error) {
+        console.error('Error loading surveys:', error)
+      } finally {
+        setSurveysLoading(false)
+      }
+    }
+    loadSurveys()
   }, [])
 
   const productsPerView = 4
@@ -231,6 +248,69 @@ export default function Home() {
             )}
           </div>
         </section>
+
+        {/* Have Your Say - Active Surveys */}
+        {!surveysLoading && activeSurveys.length > 0 && (
+          <section className="bg-slate-50 py-8 sm:py-12">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6">
+              <div className="mb-6 text-center">
+                <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Have Your Say</p>
+                <h2 className="text-2xl font-bold sm:text-3xl">Active Surveys</h2>
+                <p className="mt-2 text-sm text-slate-600">Your voice matters. Participate and help shape our priorities.</p>
+              </div>
+
+              <div className="grid gap-4 sm:gap-5 md:grid-cols-3">
+                {activeSurveys.map((survey) => {
+                  const progress = survey.responseGoal
+                    ? Math.min(100, Math.round((survey.responseCount / survey.responseGoal) * 100))
+                    : null
+                  const categoryColors: Record<SurveyCategory, string> = {
+                    governance: 'bg-blue-100 text-blue-700',
+                    rights: 'bg-purple-100 text-purple-700',
+                    community: 'bg-green-100 text-green-700',
+                    policy: 'bg-orange-100 text-orange-700',
+                    general: 'bg-slate-100 text-slate-700',
+                  }
+                  return (
+                    <Link
+                      key={survey.id}
+                      href={`/surveys/${survey.id}`}
+                      className="group block rounded-lg border border-slate-200 bg-white p-5 transition-all hover:border-slate-900 hover:shadow-md"
+                    >
+                      <span className={`inline-block rounded-full px-2.5 py-0.5 text-[10px] font-semibold mb-3 ${categoryColors[survey.category]}`}>
+                        {survey.category.charAt(0).toUpperCase() + survey.category.slice(1)}
+                      </span>
+                      <h3 className="mb-2 text-base font-bold line-clamp-2 group-hover:text-slate-900">{survey.title}</h3>
+                      <p className="mb-4 text-xs text-slate-600 line-clamp-2">{survey.description}</p>
+
+                      {progress !== null && (
+                        <div className="mb-3">
+                          <div className="flex items-center justify-between text-[10px] text-slate-500 mb-1">
+                            <span>{survey.responseCount} response{survey.responseCount !== 1 ? 's' : ''}</span>
+                            <span>Goal: {survey.responseGoal}</span>
+                          </div>
+                          <div className="h-1.5 w-full rounded-full bg-slate-100">
+                            <div className="h-1.5 rounded-full bg-slate-900 transition-all" style={{ width: `${progress}%` }} />
+                          </div>
+                        </div>
+                      )}
+
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-900 group-hover:underline">
+                        Take Survey →
+                      </span>
+                    </Link>
+                  )
+                })}
+              </div>
+
+              <div className="mt-6 text-center">
+                <Link href="/surveys" className="text-sm font-medium text-slate-900 hover:underline">
+                  View All Surveys →
+                </Link>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* CTA Section */}
         <section className="bg-gradient-to-r from-slate-900 to-slate-800 py-8 text-white sm:py-12">
@@ -519,6 +599,7 @@ export default function Home() {
                   <li><a href="#about" className="hover:text-white transition-colors">About Us</a></li>
                   <li><Link href="/our-work" className="hover:text-white transition-colors">Our Work</Link></li>
                   <li><Link href="/gallery" className="hover:text-white transition-colors">Gallery</Link></li>
+                  <li><Link href="/surveys" className="hover:text-white transition-colors">Surveys</Link></li>
                 </ul>
               </div>
 

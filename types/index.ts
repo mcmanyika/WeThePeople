@@ -195,6 +195,55 @@ export interface GalleryImage {
   updatedAt: Timestamp | Date
 }
 
+// Survey types
+export type SurveyStatus = 'draft' | 'active' | 'closed'
+export type SurveyCategory = 'governance' | 'rights' | 'community' | 'policy' | 'general'
+export type SurveyQuestionType = 'multiple_choice' | 'checkbox' | 'rating' | 'short_text' | 'long_text' | 'yes_no'
+
+export interface SurveyQuestion {
+  id: string
+  type: SurveyQuestionType
+  text: string
+  description?: string
+  required: boolean
+  order: number
+  options?: string[]         // For multiple_choice, checkbox
+  minRating?: number         // For rating (default 1)
+  maxRating?: number         // For rating (default 5)
+}
+
+export interface Survey {
+  id: string
+  title: string
+  description: string
+  category: SurveyCategory
+  status: SurveyStatus
+  isPublic: boolean          // Can non-authenticated users respond?
+  allowAnonymous: boolean    // Can users submit without identity?
+  showResults: boolean       // Are results publicly visible?
+  responseGoal?: number      // Target number of responses
+  responseCount: number
+  deadline?: Timestamp | Date
+  questions: SurveyQuestion[]
+  createdBy: string
+  createdAt: Timestamp | Date
+  updatedAt: Timestamp | Date
+}
+
+export interface SurveyAnswer {
+  questionId: string
+  value: string | string[] | number
+}
+
+export interface SurveyResponse {
+  id: string
+  surveyId: string
+  userId?: string
+  isAnonymous: boolean
+  answers: SurveyAnswer[]
+  submittedAt: Timestamp | Date
+}
+
 // Ensure this file is treated as a module
 export { }
 

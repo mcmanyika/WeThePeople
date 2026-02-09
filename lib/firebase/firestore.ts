@@ -13,7 +13,7 @@ import {
   Timestamp,
 } from 'firebase/firestore'
 import { db } from './config'
-import type { UserProfile, Donation, Membership, ContactSubmission, Purchase, Product, UserRole, News, CartItem, VolunteerApplication, VolunteerApplicationStatus, Petition, PetitionSignature, ShipmentStatus, NewsletterSubscription, Banner, GalleryCategory, GalleryImage } from '@/types'
+import type { UserProfile, Donation, Membership, ContactSubmission, Purchase, Product, UserRole, News, CartItem, VolunteerApplication, VolunteerApplicationStatus, Petition, PetitionSignature, ShipmentStatus, NewsletterSubscription, Banner, GalleryCategory, GalleryImage, Survey, SurveyResponse } from '@/types'
 
 // Helper functions
 function requireDb() {
@@ -1629,5 +1629,252 @@ export async function updateGalleryImage(imageId: string, data: Partial<GalleryI
 
 export async function deleteGalleryImage(imageId: string): Promise<void> {
   await deleteDoc(doc(requireDb(), 'galleryImages', imageId))
+}
+
+// Survey operations
+export async function createSurvey(
+  survey: Omit<Survey, 'id' | 'createdAt' | 'updatedAt' | 'responseCount'>
+): Promise<string> {
+  const db = requireDb()
+  const surveyRef = doc(collection(db, 'surveys'))
+
+  try {
+    const surveyData = {
+      title: survey.title,
+      description: survey.description,
+      category: survey.category,
+      status: survey.status,
+      isPublic: survey.isPublic,
+      allowAnonymous: survey.allowAnonymous,
+      showResults: survey.showResults,
+      responseGoal: survey.responseGoal || null,
+      responseCount: 0,
+      deadline: survey.deadline || null,
+      questions: survey.questions,
+      createdBy: survey.createdBy,
+      id: surveyRef.id,
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+    }
+
+    await setDoc(surveyRef, surveyData)
+    console.log('Survey created successfully:', surveyRef.id)
+    return surveyRef.id
+  } catch (error: any) {
+    console.error('Error in createSurvey:', error)
+    throw error
+  }
+}
+
+export async function getSurveys(activeOnly: boolean = false): Promise<Survey[]> {
+  if (!db) {
+    console.warn('Firestore not initialized')
+    return []
+  }
+
+  try {
+    let q
+    if (activeOnly) {
+      q = query(
+        collection(db, 'surveys'),
+        where('status', '==', 'active'),
+        orderBy('createdAt', 'desc')
+      )
+    } else {
+      q = query(
+        collection(db, 'surveys'),
+        orderBy('createdAt', 'desc')
+      )
+    }
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map((docSnap) => {
+      const data = docSnap.data()
+      return {
+        ...data,
+        id: docSnap.id,
+        createdAt: toDate(data.createdAt),
+        updatedAt: toDate(data.updatedAt),
+        deadline: data.deadline ? toDate(data.deadline) : undefined,
+      } as Survey
+    })
+  } catch (error: any) {
+    if (error?.code === 'failed-precondition') {
+      console.warn('Composite index not ready for surveys, using fallback')
+      try {
+        const snapshot = await getDocs(collection(db, 'surveys'))
+        const surveys = snapshot.docs.map((docSnap) => {
+          const data = docSnap.data()
+          return {
+            ...data,
+            id: docSnap.id,
+            createdAt: toDate(data.createdAt),
+            updatedAt: toDate(data.updatedAt),
+            deadline: data.deadline ? toDate(data.deadline) : undefined,
+          } as Survey
+        })
+        const filtered = activeOnly ? surveys.filter(s => s.status === 'active') : surveys
+        return filtered.sort((a, b) => {
+          const aDate = a.createdAt instanceof Date ? a.createdAt.getTime() : 0
+          const bDate = b.createdAt instanceof Date ? b.createdAt.getTime() : 0
+          return bDate - aDate
+        })
+      } catch (fallbackError: any) {
+        console.error('Error in fallback surveys query:', fallbackError)
+        return []
+      }
+    }
+    console.error('Error fetching surveys:', error)
+    return []
+  }
+}
+
+export async function getSurveyById(surveyId: string): Promise<Survey | null> {
+  const surveyDoc = await getDoc(doc(requireDb(), 'surveys', surveyId))
+  if (!surveyDoc.exists()) return null
+
+  const data = surveyDoc.data()
+  return {
+    ...data,
+    id: surveyDoc.id,
+    createdAt: toDate(data.createdAt),
+    updatedAt: toDate(data.updatedAt),
+    deadline: data.deadline ? toDate(data.deadline) : undefined,
+  } as Survey
+}
+
+export async function updateSurvey(surveyId: string, data: Partial<Survey>): Promise<void> {
+  const updateData: any = { updatedAt: Timestamp.now() }
+
+  if (data.title !== undefined) updateData.title = data.title
+  if (data.description !== undefined) updateData.description = data.description
+  if (data.category !== undefined) updateData.category = data.category
+  if (data.status !== undefined) updateData.status = data.status
+  if (data.isPublic !== undefined) updateData.isPublic = data.isPublic
+  if (data.allowAnonymous !== undefined) updateData.allowAnonymous = data.allowAnonymous
+  if (data.showResults !== undefined) updateData.showResults = data.showResults
+  if (data.responseGoal !== undefined) updateData.responseGoal = data.responseGoal || null
+  if (data.deadline !== undefined) {
+    if (data.deadline) {
+      updateData.deadline = data.deadline instanceof Date ? Timestamp.fromDate(data.deadline) : data.deadline
+    } else {
+      updateData.deadline = null
+    }
+  }
+  if (data.questions !== undefined) updateData.questions = data.questions
+
+  await updateDoc(doc(requireDb(), 'surveys', surveyId), updateData)
+}
+
+export async function deleteSurvey(surveyId: string): Promise<void> {
+  await deleteDoc(doc(requireDb(), 'surveys', surveyId))
+}
+
+// Survey Response operations
+export async function submitSurveyResponse(
+  response: Omit<SurveyResponse, 'id' | 'submittedAt'>
+): Promise<string> {
+  const db = requireDb()
+  const responseRef = doc(collection(db, 'surveyResponses'))
+
+  try {
+    const responseData = {
+      surveyId: response.surveyId,
+      userId: response.userId || null,
+      isAnonymous: response.isAnonymous,
+      answers: response.answers,
+      id: responseRef.id,
+      submittedAt: Timestamp.now(),
+    }
+
+    await setDoc(responseRef, responseData)
+
+    // Increment responseCount on the survey
+    const surveyRef = doc(db, 'surveys', response.surveyId)
+    const surveyDoc = await getDoc(surveyRef)
+    if (surveyDoc.exists()) {
+      const currentCount = surveyDoc.data().responseCount || 0
+      await updateDoc(surveyRef, {
+        responseCount: currentCount + 1,
+        updatedAt: Timestamp.now(),
+      })
+    }
+
+    console.log('Survey response submitted successfully:', responseRef.id)
+    return responseRef.id
+  } catch (error: any) {
+    console.error('Error in submitSurveyResponse:', error)
+    throw error
+  }
+}
+
+export async function getSurveyResponses(surveyId: string): Promise<SurveyResponse[]> {
+  if (!db) {
+    console.warn('Firestore not initialized')
+    return []
+  }
+
+  try {
+    const q = query(
+      collection(db, 'surveyResponses'),
+      where('surveyId', '==', surveyId),
+      orderBy('submittedAt', 'desc')
+    )
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map((docSnap) => {
+      const data = docSnap.data()
+      return {
+        ...data,
+        id: docSnap.id,
+        submittedAt: toDate(data.submittedAt),
+      } as SurveyResponse
+    })
+  } catch (error: any) {
+    if (error?.code === 'failed-precondition') {
+      console.warn('Composite index not ready for surveyResponses, using fallback')
+      try {
+        const q = query(
+          collection(db, 'surveyResponses'),
+          where('surveyId', '==', surveyId)
+        )
+        const snapshot = await getDocs(q)
+        const responses = snapshot.docs.map((docSnap) => {
+          const data = docSnap.data()
+          return {
+            ...data,
+            id: docSnap.id,
+            submittedAt: toDate(data.submittedAt),
+          } as SurveyResponse
+        })
+        return responses.sort((a, b) => {
+          const aDate = a.submittedAt instanceof Date ? a.submittedAt.getTime() : 0
+          const bDate = b.submittedAt instanceof Date ? b.submittedAt.getTime() : 0
+          return bDate - aDate
+        })
+      } catch (fallbackError: any) {
+        console.error('Error in fallback surveyResponses query:', fallbackError)
+        return []
+      }
+    }
+    console.error('Error fetching survey responses:', error)
+    return []
+  }
+}
+
+export async function hasUserRespondedToSurvey(surveyId: string, userId: string): Promise<boolean> {
+  if (!db) return false
+
+  try {
+    const q = query(
+      collection(db, 'surveyResponses'),
+      where('surveyId', '==', surveyId),
+      where('userId', '==', userId),
+      limit(1)
+    )
+    const snapshot = await getDocs(q)
+    return !snapshot.empty
+  } catch (error: any) {
+    console.error('Error checking survey response:', error)
+    return false
+  }
 }
 
