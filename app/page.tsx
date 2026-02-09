@@ -100,7 +100,26 @@ export default function Home() {
     loadSurveys()
   }, [])
 
-  const productsPerView = 4
+  // Responsive products per view: 1 on mobile, 2 on tablet, 4 on desktop
+  const [productsPerView, setProductsPerView] = useState(4)
+
+  useEffect(() => {
+    const updatePerView = () => {
+      const width = window.innerWidth
+      if (width < 640) setProductsPerView(1)
+      else if (width < 1024) setProductsPerView(2)
+      else setProductsPerView(4)
+    }
+    updatePerView()
+    window.addEventListener('resize', updatePerView)
+    return () => window.removeEventListener('resize', updatePerView)
+  }, [])
+
+  // Reset start index when productsPerView changes to avoid blank slides
+  useEffect(() => {
+    setProductStartIndex(0)
+  }, [productsPerView])
+
   const visibleProducts = products.slice(productStartIndex, productStartIndex + productsPerView)
   const canGoLeft = productStartIndex > 0
   const canGoRight = productStartIndex + productsPerView < products.length
