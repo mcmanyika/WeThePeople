@@ -7,10 +7,11 @@ import Link from 'next/link';
 
 interface HeaderProps {
   onDonateClick?: () => void;
+  onContactClick?: () => void;
   startAtBottom?: boolean;
 }
 
-export default function Header({ onDonateClick, startAtBottom = false }: HeaderProps) {
+export default function Header({ onDonateClick, onContactClick, startAtBottom = false }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(!startAtBottom);
@@ -92,7 +93,19 @@ export default function Header({ onDonateClick, startAtBottom = false }: HeaderP
           <Link href="/petitions" className="text-xs font-medium text-slate-300 hover:text-white transition-colors sm:text-sm">Petitions</Link>
           <Link href="/news" className="text-xs font-medium text-slate-300 hover:text-white transition-colors sm:text-sm">Articles</Link>
           <Link href="/shop" className="text-xs font-medium text-slate-300 hover:text-white transition-colors sm:text-sm">Shop</Link>
-          <Link href="/#contact" className="text-xs font-medium text-slate-300 hover:text-white transition-colors sm:text-sm">Contact</Link>
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              if (onContactClick) {
+                onContactClick();
+              } else {
+                window.location.href = '/#contact';
+              }
+            }}
+            className="text-xs font-medium text-slate-300 hover:text-white transition-colors sm:text-sm"
+          >
+            Contact
+          </button>
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
@@ -250,13 +263,19 @@ export default function Header({ onDonateClick, startAtBottom = false }: HeaderP
             >
               Shop
             </Link>
-            <Link
-              href="/#contact"
-              onClick={() => setMobileMenuOpen(false)}
-              className="rounded-lg px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                if (onContactClick) {
+                  onContactClick();
+                } else {
+                  window.location.href = '/#contact';
+                }
+              }}
+              className="rounded-lg px-4 py-3 text-left text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
             >
               Contact
-            </Link>
+            </button>
             {user ? (
               <>
                 <Link
