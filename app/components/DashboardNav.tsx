@@ -118,6 +118,14 @@ function IconCube({ className = 'h-5 w-5' }: { className?: string }) {
   )
 }
 
+function IconEnvelope({ className = 'h-5 w-5' }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+    </svg>
+  )
+}
+
 function IconUserGroup({ className = 'h-5 w-5' }: { className?: string }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
@@ -155,6 +163,7 @@ const adminManageItems: NavItem[] = [
   { href: '/dashboard/admin/products', label: 'Products', icon: <IconShoppingBag />, description: 'Shop inventory' },
   { href: '/dashboard/admin/orders', label: 'Orders', icon: <IconCube />, description: 'Order management' },
   { href: '/dashboard/admin/volunteers', label: 'Volunteers', icon: <IconUserGroup />, description: 'Applications' },
+  { href: '/dashboard/admin/contacts', label: 'Contact', icon: <IconEnvelope />, description: 'Messages received' },
 ]
 
 export default function DashboardNav() {
@@ -192,7 +201,7 @@ export default function DashboardNav() {
     <div ref={navRef} className="sticky top-0 z-40">
       {/* Top Bar */}
       <nav className="border-b bg-white shadow-sm">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex items-center justify-between h-12">
             {/* Left: Dashboard home */}
             <Link
@@ -260,9 +269,9 @@ export default function DashboardNav() {
                     {accountItems.map((item) => {
                       const isActive = pathname === item.href
                       return (
-                        <Link
-                          key={item.href}
-                          href={item.href}
+              <Link
+                key={item.href}
+                href={item.href}
                           className={`flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all ${
                             isActive
                               ? 'bg-slate-900 text-white shadow-sm'
@@ -276,14 +285,14 @@ export default function DashboardNav() {
                             <p className={`text-sm font-medium ${isActive ? 'text-white' : ''}`}>{item.label}</p>
                             <p className={`text-[11px] ${isActive ? 'text-slate-300' : 'text-slate-400'}`}>{item.description}</p>
                           </div>
-                        </Link>
+              </Link>
                       )
                     })}
                   </div>
                 </div>
 
                 {/* Admin Content Section */}
-                {isAdmin && (
+            {isAdmin && (
                   <div>
                     <h3 className="mb-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
                       <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -306,7 +315,7 @@ export default function DashboardNav() {
                           >
                             <span className={`shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`}>
                               {item.icon}
-                            </span>
+                </span>
                             <div className="min-w-0">
                               <p className={`text-sm font-medium ${isActive ? 'text-white' : ''}`}>{item.label}</p>
                               <p className={`text-[11px] ${isActive ? 'text-slate-300' : 'text-slate-400'}`}>{item.description}</p>
@@ -332,9 +341,9 @@ export default function DashboardNav() {
                       {adminManageItems.map((item) => {
                         const isActive = pathname === item.href
                         return (
-                          <Link
-                            key={item.href}
-                            href={item.href}
+                  <Link
+                    key={item.href}
+                    href={item.href}
                             className={`flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all ${
                               isActive
                                 ? 'bg-slate-900 text-white shadow-sm'
@@ -380,13 +389,13 @@ export default function DashboardNav() {
                           <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
                         </svg>
                         Back to Site
-                      </Link>
+                  </Link>
                     </div>
                   </div>
-                )}
-              </div>
-            </div>
+            )}
           </div>
+        </div>
+      </div>
         </>
       )}
     </div>

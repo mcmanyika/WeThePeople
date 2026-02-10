@@ -360,6 +360,51 @@ export async function createContactSubmission(
   return contactRef.id
 }
 
+export async function getContactSubmissions(): Promise<ContactSubmission[]> {
+  if (!db) {
+    console.warn('Firestore not initialized')
+    return []
+  }
+
+  try {
+    const q = query(collection(db, 'contacts'), orderBy('createdAt', 'desc'))
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map((docSnap) => {
+      const data = docSnap.data()
+      return {
+        ...data,
+        id: docSnap.id,
+        createdAt: toDate(data.createdAt),
+      } as ContactSubmission
+    })
+  } catch (error: any) {
+    if (error?.code === 'failed-precondition') {
+      console.warn('Index not ready for contacts, using fallback')
+      try {
+        const snapshot = await getDocs(collection(db, 'contacts'))
+        const submissions = snapshot.docs.map((docSnap) => {
+          const data = docSnap.data()
+          return {
+            ...data,
+            id: docSnap.id,
+            createdAt: toDate(data.createdAt),
+          } as ContactSubmission
+        })
+        return submissions.sort((a, b) => {
+          const aDate = a.createdAt instanceof Date ? a.createdAt.getTime() : 0
+          const bDate = b.createdAt instanceof Date ? b.createdAt.getTime() : 0
+          return bDate - aDate
+        })
+      } catch (fallbackError: any) {
+        console.error('Error in fallback contacts query:', fallbackError)
+        return []
+      }
+    }
+    console.error('Error fetching contact submissions:', error)
+    return []
+  }
+}
+
 // Volunteer Application operations
 export async function createVolunteerApplication(
   application: Omit<VolunteerApplication, 'id' | 'createdAt' | 'updatedAt' | 'status'>
