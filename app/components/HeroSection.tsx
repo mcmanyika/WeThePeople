@@ -16,19 +16,42 @@ export default function HeroSection({ onSupportClick }: HeroSectionProps) {
   const [showContent, setShowContent] = useState(false);
   const [heroInView, setHeroInView] = useState(true);
   const [backgroundImages, setBackgroundImages] = useState<string[]>(FALLBACK_IMAGES);
+  const [imagesReady, setImagesReady] = useState(false);
   const heroRef = useRef<HTMLElement>(null);
 
-  // Fetch banners from Firestore
+  // Fetch banners from Firestore, then preload images before showing
   useEffect(() => {
+    const preloadImages = (urls: string[]) => {
+      let loaded = 0;
+      if (urls.length === 0) {
+        setImagesReady(true);
+        return;
+      }
+      urls.forEach((url) => {
+        const img = new Image();
+        img.onload = img.onerror = () => {
+          loaded++;
+          if (loaded >= urls.length) {
+            setImagesReady(true);
+          }
+        };
+        img.src = url;
+      });
+    };
+
     const fetchBanners = async () => {
       try {
         const banners = await getBanners(true); // active only
         if (banners.length > 0) {
-          setBackgroundImages(banners.map(b => b.imageUrl));
+          const urls = banners.map(b => b.imageUrl);
+          setBackgroundImages(urls);
+          preloadImages(urls);
+        } else {
+          preloadImages(FALLBACK_IMAGES);
         }
       } catch (err) {
         console.error('Error fetching banners:', err);
-        // Keep fallback images
+        preloadImages(FALLBACK_IMAGES);
       }
     };
     fetchBanners();
@@ -108,7 +131,7 @@ export default function HeroSection({ onSupportClick }: HeroSectionProps) {
     <section
       ref={heroRef}
       id="intro"
-      className="relative flex min-h-screen items-end justify-center pb-20"
+      className={`relative flex min-h-screen items-end justify-center pb-20 transition-opacity duration-700 ${imagesReady ? 'opacity-100' : 'opacity-0'}`}
     >
       {/* Background with parallax - smooth crossfade */}
       {backgroundImages.map((image, index) => (

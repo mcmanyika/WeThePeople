@@ -13,7 +13,7 @@ import {
   Timestamp,
 } from 'firebase/firestore'
 import { db } from './config'
-import type { UserProfile, Donation, Membership, ContactSubmission, Purchase, Product, UserRole, News, CartItem, VolunteerApplication, VolunteerApplicationStatus, Petition, PetitionSignature, ShipmentStatus, NewsletterSubscription, Banner, GalleryCategory, GalleryImage, Survey, SurveyResponse } from '@/types'
+import type { UserProfile, Donation, Membership, ContactSubmission, Purchase, Product, UserRole, News, CartItem, VolunteerApplication, VolunteerApplicationStatus, Petition, PetitionSignature, ShipmentStatus, NewsletterSubscription, Banner, GalleryCategory, GalleryImage, Survey, SurveyResponse, MembershipApplication, MembershipApplicationStatus } from '@/types'
 
 // Helper functions
 function requireDb() {
@@ -1984,3 +1984,163 @@ export async function hasUserRespondedToSurvey(surveyId: string, userId: string)
   }
 }
 
+// ====================== Membership Application Operations ======================
+
+export async function createMembershipApplication(
+  application: Omit<MembershipApplication, 'id' | 'createdAt' | 'updatedAt' | 'status'>
+): Promise<string> {
+  const db = requireDb()
+  const appRef = doc(collection(db, 'membershipApplications'))
+
+  try {
+    // Filter out undefined values
+    const cleanApp: any = {}
+    Object.keys(application).forEach((key) => {
+      const value = (application as any)[key]
+      if (value !== undefined) {
+        cleanApp[key] = value
+      }
+    })
+
+    const appData = {
+      ...cleanApp,
+      status: 'pending' as MembershipApplicationStatus,
+      id: appRef.id,
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+    }
+
+    await setDoc(appRef, appData)
+    console.log('Membership application created successfully:', appRef.id)
+    return appRef.id
+  } catch (error: any) {
+    console.error('Error in createMembershipApplication:', {
+      error,
+      code: error?.code,
+      message: error?.message,
+    })
+    throw error
+  }
+}
+
+export async function getMembershipApplications(): Promise<MembershipApplication[]> {
+  if (!db) {
+    console.warn('Firestore not initialized')
+    return []
+  }
+
+  try {
+    const q = query(collection(db, 'membershipApplications'), orderBy('createdAt', 'desc'))
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map((docSnap) => {
+      const data = docSnap.data()
+      return {
+        ...data,
+        id: docSnap.id,
+        createdAt: toDate(data.createdAt),
+        updatedAt: toDate(data.updatedAt),
+      } as MembershipApplication
+    })
+  } catch (error: any) {
+    if (error?.code === 'failed-precondition') {
+      console.warn('Index not ready for membershipApplications, using fallback')
+      try {
+        const snapshot = await getDocs(collection(db, 'membershipApplications'))
+        const apps = snapshot.docs.map((docSnap) => {
+          const data = docSnap.data()
+          return {
+            ...data,
+            id: docSnap.id,
+            createdAt: toDate(data.createdAt),
+            updatedAt: toDate(data.updatedAt),
+          } as MembershipApplication
+        })
+        return apps.sort((a, b) => {
+          const aDate = a.createdAt instanceof Date ? a.createdAt.getTime() : 0
+          const bDate = b.createdAt instanceof Date ? b.createdAt.getTime() : 0
+          return bDate - aDate
+        })
+      } catch (fallbackError: any) {
+        console.error('Error in fallback membershipApplications query:', fallbackError)
+        return []
+      }
+    }
+    console.error('Error fetching membership applications:', error)
+    return []
+  }
+}
+
+export async function getMembershipApplicationByUser(userId: string): Promise<MembershipApplication | null> {
+  if (!db) {
+    console.warn('Firestore not initialized')
+    return null
+  }
+
+  try {
+    const q = query(
+      collection(db, 'membershipApplications'),
+      where('userId', '==', userId),
+      orderBy('createdAt', 'desc'),
+      limit(1)
+    )
+    const snapshot = await getDocs(q)
+    if (snapshot.empty) return null
+
+    const data = snapshot.docs[0].data()
+    return {
+      ...data,
+      id: snapshot.docs[0].id,
+      createdAt: toDate(data.createdAt),
+      updatedAt: toDate(data.updatedAt),
+    } as MembershipApplication
+  } catch (error: any) {
+    // Fallback without orderBy
+    try {
+      const q = query(
+        collection(db, 'membershipApplications'),
+        where('userId', '==', userId)
+      )
+      const snapshot = await getDocs(q)
+      if (snapshot.empty) return null
+
+      const apps = snapshot.docs.map((docSnap) => {
+        const data = docSnap.data()
+        return {
+          ...data,
+          id: docSnap.id,
+          createdAt: toDate(data.createdAt),
+          updatedAt: toDate(data.updatedAt),
+        } as MembershipApplication
+      })
+      apps.sort((a, b) => {
+        const aDate = a.createdAt instanceof Date ? a.createdAt.getTime() : 0
+        const bDate = b.createdAt instanceof Date ? b.createdAt.getTime() : 0
+        return bDate - aDate
+      })
+      return apps[0] || null
+    } catch (fallbackError: any) {
+      console.error('Error fetching membership application by user:', fallbackError)
+      return null
+    }
+  }
+}
+
+export async function updateMembershipApplication(
+  applicationId: string,
+  data: Partial<MembershipApplication>
+): Promise<void> {
+  const updateData: any = { updatedAt: Timestamp.now() }
+
+  if (data.status !== undefined) updateData.status = data.status
+  if (data.membershipNumber !== undefined) updateData.membershipNumber = data.membershipNumber
+  if (data.provinceAllocated !== undefined) updateData.provinceAllocated = data.provinceAllocated
+  if (data.dateReceived !== undefined) updateData.dateReceived = data.dateReceived
+  if (data.approvedBy !== undefined) updateData.approvedBy = data.approvedBy
+  if (data.reviewNotes !== undefined) updateData.reviewNotes = data.reviewNotes
+
+  await updateDoc(doc(requireDb(), 'membershipApplications', applicationId), updateData)
+}
+
+export async function deleteMembershipApplication(applicationId: string): Promise<void> {
+  await deleteDoc(doc(requireDb(), 'membershipApplications', applicationId))
+}

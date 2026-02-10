@@ -850,6 +850,7 @@ export default function Home() {
                 <li><Link href="/our-work" className="hover:text-white transition-colors">Our Work</Link></li>
                   <li><Link href="/gallery" className="hover:text-white transition-colors">Gallery</Link></li>
                   <li><Link href="/surveys" className="hover:text-white transition-colors">Surveys</Link></li>
+                  <li><Link href="/membership-application" className="hover:text-white transition-colors">Join DCP</Link></li>
               </ul>
             </div>
 

@@ -244,6 +244,60 @@ export interface SurveyResponse {
   submittedAt: Timestamp | Date
 }
 
+// Membership Application types
+export type MembershipApplicationType = 'individual' | 'institutional'
+export type MembershipApplicationStatus = 'pending' | 'approved' | 'rejected' | 'withdrawn'
+export type OrganisationType = 'civic' | 'labour' | 'faith' | 'student_youth' | 'professional' | 'community_residents' | 'liberation_veterans' | 'other'
+export type ParticipationArea = 'civic_education' | 'legal_constitutional' | 'parliamentary' | 'community_mobilisation' | 'research_policy' | 'communications_media' | 'other'
+
+export interface MembershipApplication {
+  id: string
+  type: MembershipApplicationType
+  status: MembershipApplicationStatus
+  userId?: string
+
+  // Section B: Individual Details
+  fullName?: string
+  nationalIdPassport?: string
+  gender?: string
+  dateOfBirth?: string
+  province?: string
+  district?: string
+  occupation?: string
+  mobileNumber?: string
+  emailAddress?: string
+  participationAreas?: ParticipationArea[]
+  participationOther?: string
+
+  // Section C: Institutional Details
+  organisationName?: string
+  organisationType?: OrganisationType
+  organisationTypeOther?: string
+  registrationStatus?: string
+  physicalAddress?: string
+  provincesOfOperation?: string
+  representativeName?: string
+  representativePosition?: string
+  representativeMobile?: string
+  representativeEmail?: string
+  alternateRepresentative?: string
+
+  // Section D: Declaration
+  declarationAccepted: boolean
+  signatureName?: string
+  signatureDate?: string
+
+  // Section E: Official Use Only
+  membershipNumber?: string
+  provinceAllocated?: string
+  dateReceived?: string
+  approvedBy?: string
+  reviewNotes?: string
+
+  createdAt: Timestamp | Date
+  updatedAt: Timestamp | Date
+}
+
 // Ensure this file is treated as a module
 export { }
 

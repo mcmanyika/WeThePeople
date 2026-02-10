@@ -284,6 +284,24 @@ service cloud.firestore {
       allow read: if isAdmin();
     }
 
+    // Membership Applications collection
+    match /membershipApplications/{appId} {
+      // Authenticated users can submit a membership application
+      allow create: if isAuthenticated();
+      // Unauthenticated users can also submit with valid data
+      allow create: if request.resource.data.keys().hasAll(['type', 'declarationAccepted', 'status']) &&
+                     request.resource.data.type in ['individual', 'institutional'] &&
+                     request.resource.data.declarationAccepted == true &&
+                     request.resource.data.status == 'pending';
+      // Users can read their own applications
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      // Admins can read all applications
+      allow read: if isAdmin();
+      // Admins can update and delete applications
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
     // Newsletter subscriptions collection
     match /newsletterSubscriptions/{subscriptionId} {
       // Anyone can create newsletter subscriptions (authenticated or not)
