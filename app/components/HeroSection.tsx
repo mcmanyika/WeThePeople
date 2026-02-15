@@ -21,17 +21,19 @@ export default function HeroSection({ onSupportClick }: HeroSectionProps) {
 
   // Fetch banners from Firestore, then preload images before showing
   useEffect(() => {
+    let mounted = true;
+
     const preloadImages = (urls: string[]) => {
       let loaded = 0;
       if (urls.length === 0) {
-        setImagesReady(true);
+        if (mounted) setImagesReady(true);
         return;
       }
       urls.forEach((url) => {
-        const img = new Image();
+        const img = new window.Image();
         img.onload = img.onerror = () => {
           loaded++;
-          if (loaded >= urls.length) {
+          if (loaded >= urls.length && mounted) {
             setImagesReady(true);
           }
         };
@@ -44,7 +46,7 @@ export default function HeroSection({ onSupportClick }: HeroSectionProps) {
         const banners = await getBanners(true); // active only
         if (banners.length > 0) {
           const urls = banners.map(b => b.imageUrl);
-          setBackgroundImages(urls);
+          if (mounted) setBackgroundImages(urls);
           preloadImages(urls);
         } else {
           preloadImages(FALLBACK_IMAGES);
@@ -55,6 +57,16 @@ export default function HeroSection({ onSupportClick }: HeroSectionProps) {
       }
     };
     fetchBanners();
+
+    // Safety timeout: force imagesReady after 4 seconds regardless
+    const timeout = setTimeout(() => {
+      if (mounted) setImagesReady(true);
+    }, 4000);
+
+    return () => {
+      mounted = false;
+      clearTimeout(timeout);
+    };
   }, []);
 
   // Text slides for the hero section - each slide contains title, subtitle, and description
@@ -131,20 +143,20 @@ export default function HeroSection({ onSupportClick }: HeroSectionProps) {
     <section
       ref={heroRef}
       id="intro"
-      className={`relative flex h-[100svh] items-end justify-center pb-20 overflow-hidden transition-opacity duration-700 ${imagesReady ? 'opacity-100' : 'opacity-0'}`}
+      className="relative flex h-[100svh] items-end justify-center pb-20 overflow-hidden bg-black"
     >
       {/* Background with parallax - smooth crossfade */}
       {backgroundImages.map((image, index) => (
         <div
           key={image}
-          className="absolute inset-0 z-0 transition-opacity duration-[3000ms] ease-in-out bg-cover bg-no-repeat bg-center"
+          className="absolute inset-0 z-0 bg-cover bg-no-repeat bg-center"
           style={{
             backgroundImage: `url(${image})`,
             transform: `translateY(${parallaxOffset}px)`,
             willChange: 'transform, opacity',
-            opacity: index === currentBgImage ? 1 : 0,
+            opacity: imagesReady && index === currentBgImage ? 1 : 0,
             pointerEvents: index === currentBgImage ? 'auto' : 'none',
-            transition: 'opacity 3s cubic-bezier(0.4, 0, 0.2, 1)',
+            transition: 'opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1)',
           }}
         />
       ))}
