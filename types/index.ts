@@ -342,6 +342,19 @@ export interface EmailLog {
   createdAt: Timestamp | Date
 }
 
+// Leadership types
+export interface Leader {
+  id: string
+  name: string
+  title: string
+  bio: string
+  imageUrl?: string
+  order: number
+  isActive: boolean
+  createdAt: Timestamp | Date
+  updatedAt: Timestamp | Date
+}
+
 // Ensure this file is treated as a module
 export { }
 

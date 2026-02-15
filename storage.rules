@@ -61,6 +61,18 @@ service firebase.storage {
       allow delete: if isAdmin();
     }
     
+    // Leader photos - only admins can upload/delete, everyone can read
+    match /leaders/{leaderId} {
+      // Anyone can read leader photos
+      allow read: if true;
+      // Only admins can upload leader photos
+      allow write: if isAdmin() && 
+                     request.resource.size < 5 * 1024 * 1024 && // 5MB max
+                     request.resource.contentType.matches('image/.*');
+      // Only admins can delete leader photos
+      allow delete: if isAdmin();
+    }
+    
     // Gallery images - only admins can upload/delete, everyone can read
     match /gallery/{imageId} {
       // Anyone can read gallery images

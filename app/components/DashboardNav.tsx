@@ -157,6 +157,7 @@ const adminContentItems: NavItem[] = [
   { href: '/dashboard/admin/surveys', label: 'Surveys', icon: <IconClipboard />, description: 'Manage surveys' },
   { href: '/dashboard/admin/banners', label: 'Banners', icon: <IconFlag />, description: 'Hero banners' },
   { href: '/dashboard/admin/gallery', label: 'Gallery', icon: <IconPhoto />, description: 'Image gallery' },
+  { href: '/dashboard/admin/leadership', label: 'Leadership', icon: <IconUserGroup />, description: 'Leadership team' },
 ]
 
 function IconIdentification({ className = 'h-5 w-5' }: { className?: string }) {

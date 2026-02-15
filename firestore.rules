@@ -330,6 +330,18 @@ service cloud.firestore {
       allow read: if isAdmin();
     }
 
+    // Leaders collection (leadership team)
+    match /leaders/{leaderId} {
+      // Everyone can read active leaders (for the public leadership page)
+      allow read: if resource.data.isActive == true;
+      // Admins can read all leaders (active and inactive)
+      allow read: if isAdmin();
+      // Only admins can create, update, or delete leaders
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
     // Newsletter subscriptions collection
     match /newsletterSubscriptions/{subscriptionId} {
       // Anyone can create newsletter subscriptions (authenticated or not)

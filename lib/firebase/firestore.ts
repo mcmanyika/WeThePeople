@@ -16,7 +16,7 @@ import {
   arrayUnion,
 } from 'firebase/firestore'
 import { db } from './config'
-import type { UserProfile, Donation, Membership, ContactSubmission, Purchase, Product, UserRole, News, CartItem, VolunteerApplication, VolunteerApplicationStatus, Petition, PetitionSignature, ShipmentStatus, NewsletterSubscription, Banner, GalleryCategory, GalleryImage, Survey, SurveyResponse, MembershipApplication, MembershipApplicationStatus, AdminNotification, NotificationType, NotificationAudience, EmailLog, EmailType, EmailStatus } from '@/types'
+import type { UserProfile, Donation, Membership, ContactSubmission, Purchase, Product, UserRole, News, CartItem, VolunteerApplication, VolunteerApplicationStatus, Petition, PetitionSignature, ShipmentStatus, NewsletterSubscription, Banner, GalleryCategory, GalleryImage, Survey, SurveyResponse, MembershipApplication, MembershipApplicationStatus, AdminNotification, NotificationType, NotificationAudience, EmailLog, EmailType, EmailStatus, Leader } from '@/types'
 
 // Helper functions
 function requireDb() {
@@ -2433,4 +2433,108 @@ export async function getEmailLogs(limitCount: number = 50): Promise<EmailLog[]>
     console.error('Error fetching email logs:', error)
     return []
   }
+}
+
+// ─── Leadership CRUD ───────────────────────────────────────────────────────────
+
+export async function createLeader(
+  leader: Omit<Leader, 'id' | 'createdAt' | 'updatedAt'>
+): Promise<string> {
+  const db = requireDb()
+  const leaderRef = doc(collection(db, 'leaders'))
+
+  try {
+    const leaderData = {
+      name: leader.name,
+      title: leader.title,
+      bio: leader.bio,
+      imageUrl: leader.imageUrl || null,
+      order: leader.order,
+      isActive: leader.isActive,
+      id: leaderRef.id,
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+    }
+
+    await setDoc(leaderRef, leaderData)
+    console.log('Leader created successfully:', leaderRef.id)
+    return leaderRef.id
+  } catch (error: any) {
+    console.error('Error in createLeader:', error)
+    throw error
+  }
+}
+
+export async function getLeaders(activeOnly: boolean = false): Promise<Leader[]> {
+  if (!db) {
+    console.warn('Firestore not initialized')
+    return []
+  }
+
+  try {
+    let q
+    if (activeOnly) {
+      q = query(
+        collection(db, 'leaders'),
+        where('isActive', '==', true),
+        orderBy('order', 'asc')
+      )
+    } else {
+      q = query(
+        collection(db, 'leaders'),
+        orderBy('order', 'asc')
+      )
+    }
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map((docSnap) => {
+      const data = docSnap.data()
+      return {
+        ...data,
+        id: docSnap.id,
+        createdAt: toDate(data.createdAt),
+        updatedAt: toDate(data.updatedAt),
+      } as Leader
+    })
+  } catch (error: any) {
+    // Fallback if composite index not ready
+    if (error?.code === 'failed-precondition') {
+      console.warn('Composite index not ready for leaders, using fallback')
+      try {
+        const snapshot = await getDocs(collection(db, 'leaders'))
+        const leaders = snapshot.docs.map((docSnap) => {
+          const data = docSnap.data()
+          return {
+            ...data,
+            id: docSnap.id,
+            createdAt: toDate(data.createdAt),
+            updatedAt: toDate(data.updatedAt),
+          } as Leader
+        })
+        const filtered = activeOnly ? leaders.filter(l => l.isActive) : leaders
+        return filtered.sort((a, b) => a.order - b.order)
+      } catch (fallbackError: any) {
+        console.error('Error in fallback leaders query:', fallbackError)
+        return []
+      }
+    }
+    console.error('Error fetching leaders:', error)
+    return []
+  }
+}
+
+export async function updateLeader(leaderId: string, data: Partial<Leader>): Promise<void> {
+  const updateData: any = { updatedAt: Timestamp.now() }
+
+  if (data.name !== undefined) updateData.name = data.name
+  if (data.title !== undefined) updateData.title = data.title
+  if (data.bio !== undefined) updateData.bio = data.bio
+  if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl || null
+  if (data.order !== undefined) updateData.order = data.order
+  if (data.isActive !== undefined) updateData.isActive = data.isActive
+
+  await updateDoc(doc(requireDb(), 'leaders', leaderId), updateData)
+}
+
+export async function deleteLeader(leaderId: string): Promise<void> {
+  await deleteDoc(doc(requireDb(), 'leaders', leaderId))
 }
