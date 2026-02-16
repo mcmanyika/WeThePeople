@@ -153,7 +153,7 @@ function IconShare({ className = 'h-5 w-5' }: { className?: string }) {
 const accountItems: NavItem[] = [
   { href: '/dashboard', label: 'Overview', icon: <IconChart />, description: 'Dashboard summary & stats' },
   { href: '/dashboard/profile', label: 'Profile', icon: <IconUser />, description: 'Your account settings' },
-  { href: '/dashboard/donations', label: 'Donations', icon: <IconHeart />, description: 'Donation history' },
+  { href: '/dashboard/donations', label: 'My Donations', icon: <IconHeart />, description: 'Donation history' },
   { href: '/dashboard/membership', label: 'Membership', icon: <IconStar />, description: 'Plan & billing' },
   { href: '/dashboard/membership-card', label: 'My Card', icon: <IconCreditCard />, description: 'View & print card' },
   { href: '/dashboard/referrals', label: 'Referrals', icon: <IconShare />, description: 'Invite friends & track' },
@@ -191,7 +191,7 @@ const adminManageItems: NavItem[] = [
   { href: '/dashboard/admin/membership-applications', label: 'Applications', icon: <IconIdentification />, description: 'Membership applications' },
   { href: '/dashboard/admin/membership-cards', label: 'Cards', icon: <IconCreditCard />, description: 'All membership cards' },
   { href: '/dashboard/admin/referrals', label: 'Referrals', icon: <IconShare />, description: 'Referral program' },
-  { href: '/dashboard/admin/donations', label: 'Donations', icon: <IconHeart />, description: 'All donations' },
+  { href: '/dashboard/admin/donations', label: 'All Donations', icon: <IconHeart />, description: 'All donations' },
   { href: '/dashboard/admin/products', label: 'Products', icon: <IconShoppingBag />, description: 'Shop inventory' },
   { href: '/dashboard/admin/orders', label: 'Orders', icon: <IconCube />, description: 'Order management' },
   { href: '/dashboard/admin/volunteers', label: 'Volunteers', icon: <IconUserGroup />, description: 'Applications' },
