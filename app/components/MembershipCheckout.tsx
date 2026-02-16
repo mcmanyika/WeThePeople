@@ -10,7 +10,7 @@ import { createMembership, getReferralByReferred, updateReferralStatus, createNo
 const MEMBERSHIP = {
   id: 'member',
   name: 'Member',
-  price: 120,
+  price: 60,
   features: [
     'Access to community forums',
     'Monthly newsletter',
@@ -239,7 +239,7 @@ function MembershipCheckoutContent({ onSuccess }: MembershipCheckoutContentProps
         disabled={loading || !clientSecret}
         className="w-full rounded-lg bg-slate-900 px-6 py-3 text-sm font-semibold text-white hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed sm:text-base"
       >
-        {loading ? 'Processing...' : 'Purchase Membership — $120/year'}
+        {loading ? 'Processing...' : 'Purchase Membership — $60/year'}
       </button>
     </form>
   )
