@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
 import { useCart } from '@/contexts/CartContext'
+import Header from '@/app/components/Header'
+import Footer from '@/app/components/Footer'
+import CTASection from '@/app/components/CTASection'
 import { getProductById } from '@/lib/firebase/firestore'
 
 export default function CartPage() {
@@ -78,69 +81,70 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-          <div className="mb-4">
-            <Link
-              href="/shop"
-              className="inline-flex items-center text-xs text-slate-500 hover:text-slate-900 transition-colors"
-            >
-              <svg className="mr-1.5 h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              Back to Shop
-            </Link>
+      <main className="min-h-screen bg-white text-slate-900">
+        <Header />
+        <section className="bg-gradient-to-r from-slate-900 to-slate-800 pt-24 pb-8 text-white sm:pb-12">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6">
+            <div className="text-center">
+              <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Your Cart</p>
+              <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Shopping Cart</h1>
+            </div>
           </div>
+        </section>
 
-          <div className="text-center py-12">
-            <svg
-              className="mx-auto h-16 w-16 text-slate-300"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
-            <h1 className="mt-3 text-xl font-bold text-slate-900">Your cart is empty</h1>
-            <p className="mt-1 text-sm text-slate-500">Add some items to your cart to get started.</p>
-            <Link
-              href="/shop"
-              className="mt-4 inline-flex items-center rounded-md bg-slate-900 px-5 py-2 text-xs font-semibold text-white hover:bg-slate-800 transition-colors"
-            >
-              Continue Shopping
-            </Link>
+        <section className="bg-white py-10 sm:py-16">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6">
+            <div className="text-center py-12">
+              <svg
+                className="mx-auto h-16 w-16 text-slate-300"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                />
+              </svg>
+              <h2 className="mt-3 text-xl font-bold text-slate-900">Your cart is empty</h2>
+              <p className="mt-1 text-sm text-slate-500">Add some items to your cart to get started.</p>
+              <Link
+                href="/shop"
+                className="mt-4 inline-flex items-center rounded-md bg-slate-900 px-5 py-2 text-xs font-semibold text-white hover:bg-slate-800 transition-colors"
+              >
+                Continue Shopping
+              </Link>
+            </div>
           </div>
-        </div>
-      </div>
+        </section>
+
+        <CTASection />
+        <Footer />
+      </main>
     )
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-        <div className="mb-4">
-          <Link
-            href="/shop"
-            className="inline-flex items-center text-xs text-slate-500 hover:text-slate-900 transition-colors"
-          >
-            <svg className="mr-1.5 h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back to Shop
-          </Link>
-        </div>
+    <main className="min-h-screen bg-white text-slate-900">
+      <Header />
 
-        <div className="mb-6 flex items-center justify-between border-b border-slate-200 pb-3">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900">Shopping Cart</h1>
-            <p className="mt-1 text-xs text-slate-500">{items.length} {items.length === 1 ? 'item' : 'items'}</p>
+      {/* Hero Section */}
+      <section className="bg-gradient-to-r from-slate-900 to-slate-800 pt-24 pb-8 text-white sm:pb-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="text-center">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Your Cart</p>
+            <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Shopping Cart</h1>
+            <p className="text-sm text-slate-300 sm:text-base">
+              {items.length} {items.length === 1 ? 'item' : 'items'}
+            </p>
           </div>
         </div>
+      </section>
+
+      <section className="bg-white py-10 sm:py-16">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
 
         {error && (
           <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
@@ -264,7 +268,14 @@ export default function CartPage() {
           </div>
         </div>
       </div>
-    </div>
+      </section>
+
+      {/* CTA Section */}
+      <CTASection />
+
+      {/* Footer */}
+      <Footer />
+    </main>
   )
 }
 

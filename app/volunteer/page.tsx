@@ -2,40 +2,41 @@
 
 import ProtectedRoute from '@/app/components/ProtectedRoute'
 import VolunteerApplicationForm from '@/app/components/VolunteerApplicationForm'
-import Link from 'next/link'
+import Header from '@/app/components/Header'
+import Footer from '@/app/components/Footer'
+import CTASection from '@/app/components/CTASection'
 
 export default function VolunteerPage() {
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-slate-50">
-        <div className="border-b bg-white">
-          <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-            <div className="flex items-center justify-between">
-              <h1 className="text-3xl font-bold">Become a Volunteer</h1>
-              <Link
-                href="/"
-                className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
-              >
-                ← Back to Home
-              </Link>
-            </div>
-          </div>
-        </div>
+      <main className="min-h-screen bg-white text-slate-900">
+        <Header />
 
-        <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-          <div className="mb-8 rounded-lg border border-slate-200 bg-white p-8">
-            <div className="mb-6">
-              <h2 className="mb-2 text-2xl font-bold">Join Our Volunteer Team</h2>
-              <p className="text-slate-600">
-                We're looking for passionate individuals who want to make a difference. 
+        {/* Hero */}
+        <section className="bg-gradient-to-r from-slate-900 to-slate-800 pt-24 pb-8 text-white sm:pb-12">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6">
+            <div className="text-center">
+              <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Make a Difference</p>
+              <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Become a Volunteer</h1>
+              <p className="text-sm text-slate-300 sm:text-base">
+                We&apos;re looking for passionate individuals who want to make a difference.
                 Fill out the form below to apply to become a volunteer with the Defend the Constitution Platform.
               </p>
             </div>
-
-            <VolunteerApplicationForm />
           </div>
-        </div>
-      </div>
+        </section>
+
+        <section className="bg-white py-10 sm:py-16">
+          <div className="mx-auto max-w-4xl px-4 sm:px-6">
+            <div className="rounded-xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+              <VolunteerApplicationForm />
+            </div>
+          </div>
+        </section>
+
+        <CTASection />
+        <Footer />
+      </main>
     </ProtectedRoute>
   )
 }

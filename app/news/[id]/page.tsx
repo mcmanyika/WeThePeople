@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Header from '@/app/components/Header'
+import Footer from '@/app/components/Footer'
+import CTASection from '@/app/components/CTASection'
 import { getNewsById } from '@/lib/firebase/firestore'
 import type { News } from '@/types'
 import Link from 'next/link'
@@ -325,14 +327,11 @@ export default function NewsDetailPage() {
         </div>
       )}
 
+      {/* CTA Section */}
+      <CTASection />
+
       {/* Footer */}
-      <footer className="border-t bg-slate-900 text-white">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 text-center">
-          <p className="text-sm text-slate-400">
-            © {new Date().getFullYear()} Defend the Constitution Platform. All rights reserved.
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </main>
   )
 }

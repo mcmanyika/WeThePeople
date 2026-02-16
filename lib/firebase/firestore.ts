@@ -215,6 +215,50 @@ export async function getAllDonations(): Promise<Donation[]> {
 }
 
 // Membership operations
+export async function getAllMemberships(): Promise<Membership[]> {
+  if (!db) {
+    console.warn('Firestore not initialized')
+    return []
+  }
+
+  try {
+    const q = query(collection(db, 'memberships'), orderBy('createdAt', 'desc'))
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map((docSnap) => {
+      const data = docSnap.data()
+      return {
+        ...data,
+        id: docSnap.id,
+        createdAt: toDate(data.createdAt),
+      } as Membership
+    })
+  } catch (error: any) {
+    if (error?.code === 'failed-precondition') {
+      try {
+        const snapshot = await getDocs(collection(db, 'memberships'))
+        const memberships = snapshot.docs.map((docSnap) => {
+          const data = docSnap.data()
+          return {
+            ...data,
+            id: docSnap.id,
+            createdAt: toDate(data.createdAt),
+          } as Membership
+        })
+        return memberships.sort((a, b) => {
+          const aDate = a.createdAt instanceof Date ? a.createdAt.getTime() : 0
+          const bDate = b.createdAt instanceof Date ? b.createdAt.getTime() : 0
+          return bDate - aDate
+        })
+      } catch (fallbackError: any) {
+        console.error('Error in fallback memberships query:', fallbackError)
+        return []
+      }
+    }
+    console.error('Error fetching all memberships:', error)
+    return []
+  }
+}
+
 export async function createMembership(
   membership: Omit<Membership, 'id' | 'createdAt'>
 ): Promise<string> {

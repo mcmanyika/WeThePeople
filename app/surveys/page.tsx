@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Header from '@/app/components/Header'
+import Footer from '@/app/components/Footer'
+import CTASection from '@/app/components/CTASection'
 import { getSurveys } from '@/lib/firebase/firestore'
 import type { Survey, SurveyCategory } from '@/types'
 
@@ -76,34 +78,50 @@ export default function SurveysPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <main className="min-h-screen bg-white text-slate-900">
         <Header />
-        <div className="pt-24 pb-12">
-          <div className="flex items-center justify-center">
+        <section className="bg-gradient-to-r from-slate-900 to-slate-800 pt-24 pb-8 text-white sm:pb-12">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6">
             <div className="text-center">
-              <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-slate-900 border-r-transparent"></div>
-              <p className="text-sm text-slate-500">Loading surveys...</p>
+              <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Have Your Say</p>
+              <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Surveys</h1>
+              <p className="text-sm text-slate-300 sm:text-base">
+                Your voice matters. Participate in our surveys to help shape policy priorities.
+              </p>
             </div>
           </div>
+        </section>
+        <div className="flex items-center justify-center py-16">
+          <div className="text-center">
+            <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-slate-900 border-r-transparent"></div>
+            <p className="text-sm text-slate-500">Loading surveys...</p>
+          </div>
         </div>
-      </div>
+        <CTASection />
+        <Footer />
+      </main>
     )
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-white text-slate-900">
       <Header />
 
-      <section className="pt-24 pb-12">
+      {/* Hero Section */}
+      <section className="bg-gradient-to-r from-slate-900 to-slate-800 pt-24 pb-8 text-white sm:pb-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          {/* Page Header */}
-          <div className="mb-8 text-center">
-            <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Have Your Say</p>
-            <h1 className="text-3xl font-bold sm:text-4xl">Surveys</h1>
-            <p className="mt-2 text-sm text-slate-600 sm:text-base">
+          <div className="text-center">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Have Your Say</p>
+            <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Surveys</h1>
+            <p className="text-sm text-slate-300 sm:text-base">
               Your voice matters. Participate in our surveys to help shape policy priorities.
             </p>
           </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-10 sm:py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
 
           {/* Filters */}
           <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -256,7 +274,13 @@ export default function SurveysPage() {
           )}
         </div>
       </section>
-    </div>
+
+      {/* CTA Section */}
+      <CTASection />
+
+      {/* Footer */}
+      <Footer />
+    </main>
   )
 }
 

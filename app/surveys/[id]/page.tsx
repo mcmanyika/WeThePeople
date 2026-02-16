@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/app/components/Header'
+import Footer from '@/app/components/Footer'
+import CTASection from '@/app/components/CTASection'
 import { getSurveyById, submitSurveyResponse, getSurveyResponses, hasUserRespondedToSurvey } from '@/lib/firebase/firestore'
 import { useAuth } from '@/contexts/AuthContext'
 import type { Survey, SurveyQuestion, SurveyAnswer, SurveyResponse, SurveyCategory } from '@/types'
@@ -242,43 +244,69 @@ export default function SurveyDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <main className="min-h-screen bg-white text-slate-900">
         <Header />
-        <div className="pt-24 pb-12">
-          <div className="flex items-center justify-center">
+        <section className="bg-gradient-to-r from-slate-900 to-slate-800 pt-24 pb-8 text-white sm:pb-12">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6">
             <div className="text-center">
-              <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-slate-900 border-r-transparent"></div>
-              <p className="text-sm text-slate-500">Loading survey...</p>
+              <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Have Your Say</p>
+              <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Survey</h1>
             </div>
           </div>
+        </section>
+        <div className="flex items-center justify-center py-16">
+          <div className="text-center">
+            <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-slate-900 border-r-transparent"></div>
+            <p className="text-sm text-slate-500">Loading survey...</p>
+          </div>
         </div>
-      </div>
+        <CTASection />
+        <Footer />
+      </main>
     )
   }
 
   if (!survey) {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <main className="min-h-screen bg-white text-slate-900">
         <Header />
-        <div className="pt-24 pb-12">
+        <section className="bg-gradient-to-r from-slate-900 to-slate-800 pt-24 pb-8 text-white sm:pb-12">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6">
+            <div className="text-center">
+              <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Have Your Say</p>
+              <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Survey Not Found</h1>
+            </div>
+          </div>
+        </section>
+        <section className="bg-white py-10 sm:py-16">
           <div className="mx-auto max-w-2xl px-4 text-center">
-            <h1 className="text-2xl font-bold mb-2">Survey Not Found</h1>
             <p className="text-sm text-slate-500 mb-4">This survey may have been removed or is no longer available.</p>
             <Link href="/surveys" className="text-sm font-medium text-slate-900 hover:underline">
               ← Back to Surveys
             </Link>
           </div>
-        </div>
-      </div>
+        </section>
+        <CTASection />
+        <Footer />
+      </main>
     )
   }
 
   // Results view
   if (showResults && survey.showResults) {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <main className="min-h-screen bg-white text-slate-900">
         <Header />
-        <div className="pt-24 pb-12">
+        <section className="bg-gradient-to-r from-slate-900 to-slate-800 pt-24 pb-8 text-white sm:pb-12">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6">
+            <div className="text-center">
+              <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Survey Results</p>
+              <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">{survey.title}</h1>
+              <p className="text-sm text-slate-300 sm:text-base">{survey.description}</p>
+            </div>
+          </div>
+        </section>
+        <section className="bg-white py-10 sm:py-16">
           <div className="mx-auto max-w-3xl px-4 sm:px-6">
             <Link href="/surveys" className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-900 mb-6">
               ← Back to Surveys
@@ -289,8 +317,6 @@ export default function SurveyDetailPage() {
                 <span className="inline-block rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-semibold text-slate-600 mb-2">
                   {categoryLabels[survey.category]}
                 </span>
-                <h1 className="text-2xl font-bold sm:text-3xl">{survey.title}</h1>
-                <p className="mt-2 text-sm text-slate-600">{survey.description}</p>
                 <p className="mt-2 text-xs text-slate-400">{survey.responseCount} response{survey.responseCount !== 1 ? 's' : ''}</p>
                 <div className="mt-4">
                   <ShareButtons title={survey.title} surveyId={surveyId} />
@@ -313,21 +339,31 @@ export default function SurveyDetailPage() {
               ))}
             </div>
           </div>
-        </div>
-      </div>
+        </section>
+        <CTASection />
+        <Footer />
+      </main>
     )
   }
 
   // Already responded view (no public results)
   if (hasResponded) {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <main className="min-h-screen bg-white text-slate-900">
         <Header />
-        <div className="pt-24 pb-12">
+        <section className="bg-gradient-to-r from-slate-900 to-slate-800 pt-24 pb-8 text-white sm:pb-12">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6">
+            <div className="text-center">
+              <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Have Your Say</p>
+              <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Survey</h1>
+            </div>
+          </div>
+        </section>
+        <section className="bg-white py-10 sm:py-16">
           <div className="mx-auto max-w-2xl px-4 text-center">
             <div className="rounded-lg border bg-white p-8">
               <div className="mb-4 text-4xl">✅</div>
-              <h1 className="text-2xl font-bold mb-2">Already Submitted</h1>
+              <h2 className="text-2xl font-bold mb-2">Already Submitted</h2>
               <p className="text-sm text-slate-500 mb-4">You have already responded to this survey. Thank you for your participation!</p>
               <div className="mb-4">
                 <ShareButtons title={survey.title} surveyId={surveyId} />
@@ -337,42 +373,62 @@ export default function SurveyDetailPage() {
               </Link>
             </div>
           </div>
-        </div>
-      </div>
+        </section>
+        <CTASection />
+        <Footer />
+      </main>
     )
   }
 
   // Closed survey view
   if (isClosed) {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <main className="min-h-screen bg-white text-slate-900">
         <Header />
-        <div className="pt-24 pb-12">
+        <section className="bg-gradient-to-r from-slate-900 to-slate-800 pt-24 pb-8 text-white sm:pb-12">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6">
+            <div className="text-center">
+              <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Have Your Say</p>
+              <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Survey Closed</h1>
+            </div>
+          </div>
+        </section>
+        <section className="bg-white py-10 sm:py-16">
           <div className="mx-auto max-w-2xl px-4 text-center">
             <div className="rounded-lg border bg-white p-8">
               <div className="mb-4 text-4xl">🔒</div>
-              <h1 className="text-2xl font-bold mb-2">Survey Closed</h1>
+              <h2 className="text-2xl font-bold mb-2">Survey Closed</h2>
               <p className="text-sm text-slate-500 mb-4">This survey is no longer accepting responses.</p>
               <Link href="/surveys" className="inline-flex rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800">
                 View Other Surveys
               </Link>
             </div>
           </div>
-        </div>
-      </div>
+        </section>
+        <CTASection />
+        <Footer />
+      </main>
     )
   }
 
   // Submitted success view
   if (submitted && !survey.showResults) {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <main className="min-h-screen bg-white text-slate-900">
         <Header />
-        <div className="pt-24 pb-12">
+        <section className="bg-gradient-to-r from-slate-900 to-slate-800 pt-24 pb-8 text-white sm:pb-12">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6">
+            <div className="text-center">
+              <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Have Your Say</p>
+              <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Thank You!</h1>
+            </div>
+          </div>
+        </section>
+        <section className="bg-white py-10 sm:py-16">
           <div className="mx-auto max-w-2xl px-4 text-center">
             <div className="rounded-lg border bg-white p-8">
               <div className="mb-4 text-4xl">🎉</div>
-              <h1 className="text-2xl font-bold mb-2">Thank You!</h1>
+              <h2 className="text-2xl font-bold mb-2">Response Recorded</h2>
               <p className="text-sm text-slate-500 mb-4">Your response has been recorded. Thank you for your participation!</p>
               <p className="text-xs text-slate-400 mb-3">Help spread the word:</p>
               <div className="mb-4">
@@ -383,8 +439,10 @@ export default function SurveyDetailPage() {
               </Link>
             </div>
           </div>
-        </div>
-      </div>
+        </section>
+        <CTASection />
+        <Footer />
+      </main>
     )
   }
 
@@ -394,26 +452,30 @@ export default function SurveyDetailPage() {
   const progress = sortedQuestions.length > 0 ? Math.round(((currentStep + 1) / sortedQuestions.length) * 100) : 0
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-white text-slate-900">
       <Header />
 
-      <div className="pt-24 pb-12">
+      {/* Hero */}
+      <section className="bg-gradient-to-r from-slate-900 to-slate-800 pt-24 pb-8 text-white sm:pb-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="text-center">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">{categoryLabels[survey.category]}</p>
+            <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">{survey.title}</h1>
+            <p className="text-sm text-slate-300 sm:text-base">{survey.description}</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-10 sm:py-16">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
           <Link href="/surveys" className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-900 mb-6">
             ← Back to Surveys
           </Link>
 
           <div className="rounded-lg border bg-white p-6 sm:p-8">
-            {/* Survey Header */}
+            {/* Share */}
             <div className="mb-6">
-              <span className="inline-block rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-semibold text-slate-600 mb-2">
-                {categoryLabels[survey.category]}
-              </span>
-              <h1 className="text-2xl font-bold sm:text-3xl">{survey.title}</h1>
-              <p className="mt-2 text-sm text-slate-600">{survey.description}</p>
-              <div className="mt-4">
-                <ShareButtons title={survey.title} surveyId={surveyId} />
-              </div>
+              <ShareButtons title={survey.title} surveyId={surveyId} />
             </div>
 
             {/* Progress Bar */}
@@ -501,8 +563,11 @@ export default function SurveyDetailPage() {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </section>
+
+      <CTASection />
+      <Footer />
+    </main>
   )
 }
 

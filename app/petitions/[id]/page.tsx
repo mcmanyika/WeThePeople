@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/app/components/Header'
+import Footer from '@/app/components/Footer'
+import CTASection from '@/app/components/CTASection'
 import { getPetitionById, signPetition } from '@/lib/firebase/firestore'
 import { useAuth } from '@/contexts/AuthContext'
 import type { Petition } from '@/types'
@@ -74,25 +76,41 @@ export default function PetitionDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <main className="min-h-screen bg-white text-slate-900">
         <Header />
-        <div className="pt-24 pb-12">
-          <div className="flex items-center justify-center">
+        <section className="bg-gradient-to-r from-slate-900 to-slate-800 pt-24 pb-8 text-white sm:pb-12">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6">
             <div className="text-center">
-              <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-slate-900 border-r-transparent"></div>
-              <p className="text-slate-600">Loading petition...</p>
+              <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Take Action</p>
+              <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Petition</h1>
             </div>
           </div>
+        </section>
+        <div className="flex items-center justify-center py-16">
+          <div className="text-center">
+            <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-slate-900 border-r-transparent"></div>
+            <p className="text-slate-600">Loading petition...</p>
+          </div>
         </div>
-      </div>
+        <CTASection />
+        <Footer />
+      </main>
     )
   }
 
   if (error || !petition) {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <main className="min-h-screen bg-white text-slate-900">
         <Header />
-        <div className="pt-24 pb-12">
+        <section className="bg-gradient-to-r from-slate-900 to-slate-800 pt-24 pb-8 text-white sm:pb-12">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6">
+            <div className="text-center">
+              <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Take Action</p>
+              <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Petition</h1>
+            </div>
+          </div>
+        </section>
+        <div className="py-16">
           <div className="mx-auto max-w-4xl px-4 sm:px-6">
             <div className="rounded-lg border border-red-200 bg-red-50 p-8 text-center">
               <p className="text-red-600 mb-4">{error || 'Petition not found'}</p>
@@ -105,7 +123,9 @@ export default function PetitionDetailPage() {
             </div>
           </div>
         </div>
-      </div>
+        <CTASection />
+        <Footer />
+      </main>
     )
   }
 
@@ -133,9 +153,21 @@ export default function PetitionDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-white text-slate-900">
       <Header />
-      <div className="pt-24 pb-12">
+
+      {/* Hero Section */}
+      <section className="bg-gradient-to-r from-slate-900 to-slate-800 pt-24 pb-8 text-white sm:pb-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="text-center">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Take Action</p>
+            <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Petition</h1>
+          </div>
+        </div>
+      </section>
+
+      {/* Content */}
+      <section className="bg-white py-10 sm:py-16">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
           <Link
             href="/petitions"
@@ -231,7 +263,7 @@ export default function PetitionDetailPage() {
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Sign Modal */}
       {showSignModal && (
@@ -320,7 +352,13 @@ export default function PetitionDetailPage() {
           </div>
         </div>
       )}
-    </div>
+
+      {/* CTA Section */}
+      <CTASection />
+
+      {/* Footer */}
+      <Footer />
+    </main>
   )
 }
 

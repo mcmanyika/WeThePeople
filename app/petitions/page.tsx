@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Header from '@/app/components/Header'
+import Footer from '@/app/components/Footer'
+import CTASection from '@/app/components/CTASection'
 import { getPetitions, getPetitionById, signPetition } from '@/lib/firebase/firestore'
 import { useAuth } from '@/contexts/AuthContext'
 import type { Petition } from '@/types'
@@ -32,32 +34,51 @@ export default function PetitionsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <main className="min-h-screen bg-white text-slate-900">
         <Header />
-        <div className="pt-24 pb-12">
-          <div className="flex items-center justify-center">
+        <section className="bg-gradient-to-r from-slate-900 to-slate-800 pt-24 pb-8 text-white sm:pb-12">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6">
             <div className="text-center">
-              <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-slate-900 border-r-transparent"></div>
-              <p className="text-slate-600">Loading petitions...</p>
+              <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Take Action</p>
+              <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Petitions</h1>
+              <p className="text-sm text-slate-300 sm:text-base">
+                Make your voice heard. Sign petitions that matter to you.
+              </p>
             </div>
           </div>
+        </section>
+        <div className="flex items-center justify-center py-16">
+          <div className="text-center">
+            <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-slate-900 border-r-transparent"></div>
+            <p className="text-slate-600">Loading petitions...</p>
+          </div>
         </div>
-      </div>
+        <CTASection />
+        <Footer />
+      </main>
     )
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-white text-slate-900">
       <Header />
-      <div className="pt-24 pb-12">
+
+      {/* Hero Section */}
+      <section className="bg-gradient-to-r from-slate-900 to-slate-800 pt-24 pb-8 text-white sm:pb-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="mb-8 text-center">
-            <h1 className="text-4xl font-bold mb-4">Petitions</h1>
-            <p className="text-slate-600">
+          <div className="text-center">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Take Action</p>
+            <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Petitions</h1>
+            <p className="text-sm text-slate-300 sm:text-base">
               Make your voice heard. Sign petitions that matter to you.
             </p>
           </div>
+        </div>
+      </section>
 
+      {/* Petitions Content */}
+      <section className="bg-white py-10 sm:py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
           {error && (
             <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
               {error}
@@ -76,8 +97,14 @@ export default function PetitionsPage() {
             </div>
           )}
         </div>
-      </div>
-    </div>
+      </section>
+
+      {/* CTA Section */}
+      <CTASection />
+
+      {/* Footer */}
+      <Footer />
+    </main>
   )
 }
 

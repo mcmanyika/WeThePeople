@@ -840,8 +840,9 @@ export default function Home() {
               <ul className="space-y-1.5 text-xs text-slate-400">
                 <li><a href="#about" className="hover:text-white transition-colors">About Us</a></li>
                 <li><Link href="/our-work" className="hover:text-white transition-colors">Our Work</Link></li>
-                  <li><Link href="/gallery" className="hover:text-white transition-colors">Gallery</Link></li>
-                  <li><Link href="/surveys" className="hover:text-white transition-colors">Surveys</Link></li>
+                <li><Link href="/leadership" className="hover:text-white transition-colors">Leadership</Link></li>
+                <li><Link href="/gallery" className="hover:text-white transition-colors">Gallery</Link></li>
+                <li><Link href="/surveys" className="hover:text-white transition-colors">Surveys</Link></li>
               </ul>
             </div>
 

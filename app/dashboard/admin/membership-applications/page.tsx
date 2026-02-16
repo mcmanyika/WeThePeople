@@ -105,9 +105,25 @@ export default function AdminMembershipApplicationsPage() {
     }
   }
 
+  const generateMembershipNumber = (app: MembershipApplication): string => {
+    // If already has a membership number, keep it
+    if (app.membershipNumber) return app.membershipNumber
+
+    const year = new Date().getFullYear()
+    // Count all applications that already have a membership number
+    const existingNumbers = applications
+      .filter(a => a.membershipNumber)
+      .map(a => {
+        const match = a.membershipNumber!.match(/DCP-\d{4}-(\d+)/)
+        return match ? parseInt(match[1], 10) : 0
+      })
+    const nextNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1
+    return `DCP-${year}-${String(nextNumber).padStart(3, '0')}`
+  }
+
   const openDetail = (app: MembershipApplication) => {
     setSelectedApp(app)
-    setMembershipNumber(app.membershipNumber || '')
+    setMembershipNumber(generateMembershipNumber(app))
     setProvinceAllocated(app.provinceAllocated || '')
     setReviewNotes(app.reviewNotes || '')
   }
@@ -397,13 +413,24 @@ export default function AdminMembershipApplicationsPage() {
                     <div className="grid gap-3 sm:grid-cols-2">
                       <div>
                         <label className="mb-1 block text-xs font-semibold text-slate-600">Membership Number</label>
-                        <input
-                          type="text"
-                          value={membershipNumber}
-                          onChange={(e) => setMembershipNumber(e.target.value)}
-                          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
-                          placeholder="e.g. DCP-2026-001"
-                        />
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={membershipNumber}
+                            onChange={(e) => setMembershipNumber(e.target.value)}
+                            className="w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm font-medium focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
+                            readOnly
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setMembershipNumber(generateMembershipNumber({ ...selectedApp!, membershipNumber: undefined } as MembershipApplication))}
+                            className="shrink-0 rounded-lg border border-slate-300 px-2.5 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors"
+                            title="Regenerate membership number"
+                          >
+                            ↻
+                          </button>
+                        </div>
+                        <p className="mt-1 text-[10px] text-slate-400">Auto-generated. Click ↻ to regenerate.</p>
                       </div>
                       <div>
                         <label className="mb-1 block text-xs font-semibold text-slate-600">Province / Desk Allocated</label>

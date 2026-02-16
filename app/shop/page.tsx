@@ -5,6 +5,9 @@ import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
 import { useCart } from '@/contexts/CartContext'
 import { useRouter } from 'next/navigation'
+import Header from '@/app/components/Header'
+import Footer from '@/app/components/Footer'
+import CTASection from '@/app/components/CTASection'
 import { getProducts, getProductById } from '@/lib/firebase/firestore'
 import type { Product } from '@/types'
 
@@ -187,27 +190,24 @@ export default function ShopPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pt-6 pb-12">
-      <section className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="mb-4 -mt-2">
-          <Link
-            href="/"
-            className="inline-flex items-center text-xs text-slate-500 hover:text-slate-900 transition-colors"
-          >
-            <svg className="mr-1.5 h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Home
-          </Link>
-        </div>
-        <div className="mb-6 flex items-center justify-between border-b border-slate-200 pb-4">
-          <div>
-            <h1 className="text-2xl font-bold sm:text-3xl">Shop</h1>
-            <p className="mt-1 text-xs text-slate-500 sm:text-sm">
-              {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'}
+    <main className="min-h-screen bg-white text-slate-900">
+      <Header />
+
+      {/* Hero Section */}
+      <section className="bg-gradient-to-r from-slate-900 to-slate-800 pt-24 pb-8 text-white sm:pb-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="text-center">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Our Store</p>
+            <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Shop</h1>
+            <p className="text-sm text-slate-300 sm:text-base">
+              {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'} available
             </p>
           </div>
         </div>
+      </section>
+
+      <section className="bg-white py-10 sm:py-16">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
 
         {error && (
           <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-600">
@@ -440,6 +440,8 @@ export default function ShopPage() {
 
         {/* Floating Cart Icon */}
         <FloatingCartIcon />
+      </div>
+      </section>
 
         {/* Product Detail Modal */}
         {selectedProduct && (
@@ -559,8 +561,13 @@ export default function ShopPage() {
             </div>
           </div>
         )}
-      </section>
-    </div>
+
+      {/* CTA Section */}
+      <CTASection />
+
+      {/* Footer */}
+      <Footer />
+    </main>
   )
 }
 

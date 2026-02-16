@@ -10,7 +10,7 @@ import { createMembership } from '@/lib/firebase/firestore'
 const MEMBERSHIP = {
   id: 'member',
   name: 'Member',
-  price: 25,
+  price: 120,
   features: [
     'Access to community forums',
     'Monthly newsletter',
@@ -164,7 +164,7 @@ function MembershipCheckoutContent({ onSuccess }: MembershipCheckoutContentProps
             <h3 className="mb-1 text-lg font-bold">{MEMBERSHIP.name}</h3>
             <div className="mb-4">
               <span className="text-4xl font-bold">${MEMBERSHIP.price}</span>
-              <span className="text-sm text-slate-500 ml-1">/ one-time</span>
+              <span className="text-sm text-slate-500 ml-1">/ year</span>
             </div>
             <ul className="mb-4 space-y-2 text-left text-sm text-slate-600">
               {MEMBERSHIP.features.map((feature, idx) => (
@@ -218,7 +218,7 @@ function MembershipCheckoutContent({ onSuccess }: MembershipCheckoutContentProps
         disabled={loading || !clientSecret}
         className="w-full rounded-lg bg-slate-900 px-6 py-3 text-sm font-semibold text-white hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed sm:text-base"
       >
-        {loading ? 'Processing...' : 'Purchase Membership — $25'}
+        {loading ? 'Processing...' : 'Purchase Membership — $120/year'}
       </button>
     </form>
   )

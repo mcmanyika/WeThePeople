@@ -147,6 +147,7 @@ const accountItems: NavItem[] = [
   { href: '/dashboard/profile', label: 'Profile', icon: <IconUser />, description: 'Your account settings' },
   { href: '/dashboard/donations', label: 'Donations', icon: <IconHeart />, description: 'Donation history' },
   { href: '/dashboard/membership', label: 'Membership', icon: <IconStar />, description: 'Plan & billing' },
+  { href: '/dashboard/membership-card', label: 'My Card', icon: <IconCreditCard />, description: 'View & print card' },
   { href: '/dashboard/volunteer', label: 'Volunteer', icon: <IconHandRaised />, description: 'Volunteer status' },
   { href: '/dashboard/resources', label: 'Resources', icon: <IconBook />, description: 'Guides & materials' },
 ]
@@ -168,9 +169,18 @@ function IconIdentification({ className = 'h-5 w-5' }: { className?: string }) {
   )
 }
 
+function IconCreditCard({ className = 'h-5 w-5' }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+    </svg>
+  )
+}
+
 const adminManageItems: NavItem[] = [
   { href: '/dashboard/admin/users', label: 'Users', icon: <IconUsers />, description: 'User accounts & roles' },
   { href: '/dashboard/admin/membership-applications', label: 'Applications', icon: <IconIdentification />, description: 'Membership applications' },
+  { href: '/dashboard/admin/membership-cards', label: 'Cards', icon: <IconCreditCard />, description: 'All membership cards' },
   { href: '/dashboard/admin/donations', label: 'Donations', icon: <IconHeart />, description: 'All donations' },
   { href: '/dashboard/admin/products', label: 'Products', icon: <IconShoppingBag />, description: 'Shop inventory' },
   { href: '/dashboard/admin/orders', label: 'Orders', icon: <IconCube />, description: 'Order management' },
