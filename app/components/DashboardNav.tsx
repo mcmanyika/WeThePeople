@@ -289,7 +289,7 @@ export default function DashboardNav() {
           {/* Backdrop */}
           <div className="fixed inset-0 bg-black/10 backdrop-blur-[1px] z-[-1]" />
 
-          <div className="absolute left-0 right-0 border-b bg-white shadow-xl animate-in slide-in-from-top-2 duration-200">
+          <div className="absolute left-0 right-0 border-b bg-white shadow-xl animate-in slide-in-from-top-2 duration-200 max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain">
             <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-6">
               <div className="grid gap-6 md:grid-cols-4">
 
