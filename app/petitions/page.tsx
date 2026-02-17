@@ -157,9 +157,16 @@ function PetitionCard({ petition, onSign }: { petition: Petition; onSign: () => 
     }
   }
 
+  const stripHtml = (html: string) => {
+    const tmp = document.createElement('div')
+    tmp.innerHTML = html
+    return tmp.textContent || tmp.innerText || ''
+  }
+
   const handleWhatsAppShare = () => {
     const url = `${window.location.origin}/petitions/${petition.id}`
-    const text = `${petition.title}\n\n${petition.description || 'Sign this petition'}\n\n${url}`
+    const plainDesc = stripHtml(petition.description || 'Sign this petition')
+    const text = `${petition.title}\n\n${plainDesc}\n\n${url}`
     const encodedText = encodeURIComponent(text)
     const whatsappUrl = `https://wa.me/?text=${encodedText}`
     window.open(whatsappUrl, '_blank')

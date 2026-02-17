@@ -187,11 +187,8 @@ service cloud.firestore {
 
     // Petitions collection
     match /petitions/{petitionId} {
-      // Everyone can read published and active petitions
-      allow read: if resource.data.isPublished == true && 
-                   resource.data.isActive == true;
-      // Admins can read all petitions
-      allow read: if isAdmin();
+      // Everyone can read petitions (public listing page filters by published/active)
+      allow read: if true;
       // Only admins can create, update, or delete petitions
       allow create: if isAdmin() &&
                      request.resource.data.keys().hasAll(['title', 'description', 'goal', 'isActive', 'isPublished', 'createdBy', 'currentSignatures', 'signatures']) &&
