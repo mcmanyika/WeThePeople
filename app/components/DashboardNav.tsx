@@ -203,11 +203,19 @@ export default function DashboardNav() {
   const pathname = usePathname()
   const { userProfile } = useAuth()
   const isAdmin = userProfile?.role === 'admin'
+  const accessLevel = userProfile?.accessLevel || 1
   const [megaOpen, setMegaOpen] = useState(false)
   const navRef = useRef<HTMLDivElement>(null)
 
+  // Filter admin manage items based on access level
+  const filteredManageItems = adminManageItems.filter((item) => {
+    if (item.href === '/dashboard/admin/donations' && accessLevel < 5) return false
+    if (item.href === '/dashboard/admin/users' && accessLevel < 5) return false
+    return true
+  })
+
   const allItems = isAdmin
-    ? [...accountItems, ...adminContentItems, ...adminManageItems]
+    ? [...accountItems, ...adminContentItems, ...filteredManageItems]
     : accountItems
   const activeItem = allItems.find(item => item.href === pathname)
   const activeLabel = activeItem?.label || 'Dashboard'
@@ -354,7 +362,7 @@ export default function DashboardNav() {
                         Management
                       </h3>
                       <div className="space-y-0.5">
-                        {adminManageItems.slice(0, Math.ceil(adminManageItems.length / 2)).map((item) => {
+                        {filteredManageItems.slice(0, Math.ceil(filteredManageItems.length / 2)).map((item) => {
                           const isActive = pathname === item.href
                           return (
                             <Link key={item.href} href={item.href} className={`flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all ${isActive ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-50'}`}>
@@ -374,7 +382,7 @@ export default function DashboardNav() {
                       {/* Spacer to align with heading in col 3 */}
                       <div className="mb-3 h-[18px]" />
                       <div className="space-y-0.5">
-                        {adminManageItems.slice(Math.ceil(adminManageItems.length / 2)).map((item) => {
+                        {filteredManageItems.slice(Math.ceil(filteredManageItems.length / 2)).map((item) => {
                           const isActive = pathname === item.href
                           return (
                             <Link key={item.href} href={item.href} className={`flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all ${isActive ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-50'}`}>

@@ -18,6 +18,7 @@ export interface UserProfile {
   photoURL?: string
   referralCode?: string       // unique short code, e.g. "DCP-A7K3X"
   referredBy?: string         // referral code of the user who referred this user
+  accessLevel?: number        // admin-assigned access level 1-5
 }
 
 export interface Donation {
@@ -370,6 +371,19 @@ export interface Referral {
   status: ReferralStatus     // tracks progress through the funnel
   createdAt: Timestamp | Date
   updatedAt: Timestamp | Date
+}
+
+export interface Resource {
+  id: string
+  title: string
+  description?: string
+  fileName: string
+  fileUrl: string
+  storagePath: string
+  fileSize: number        // bytes
+  uploadedBy: string      // user uid
+  uploadedByName?: string
+  createdAt: Timestamp | Date
 }
 
 // Ensure this file is treated as a module

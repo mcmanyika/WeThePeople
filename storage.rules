@@ -85,6 +85,17 @@ service firebase.storage {
       allow delete: if isAdmin();
     }
     
+    // Resource files (PDFs/documents) - only admins can upload/delete, authenticated users can read
+    match /resources/{resourceId} {
+      // Authenticated users can read/download resources
+      allow read: if isAuthenticated();
+      // Only admins can upload resource files
+      allow write: if isAdmin() && 
+                     request.resource.size < 20 * 1024 * 1024; // 20MB max
+      // Only admins can delete resource files
+      allow delete: if isAdmin();
+    }
+    
     // Default: deny all other access
     match /{allPaths=**} {
       allow read, write: if false;

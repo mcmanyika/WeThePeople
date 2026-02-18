@@ -279,12 +279,14 @@ export default function AdminMembershipApplicationsPage() {
                         </td>
                         <td className="px-4 py-3 text-sm text-slate-500">{formatDate(app.createdAt)}</td>
                         <td className="px-4 py-3 text-right">
-                          <button
-                            onClick={(e) => { e.stopPropagation(); handleDelete(app.id) }}
-                            className="text-xs text-red-600 hover:text-red-800 font-medium"
-                          >
-                            Delete
-                          </button>
+                          {userProfile?.accessLevel === 5 && (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleDelete(app.id) }}
+                              className="text-xs text-red-600 hover:text-red-800 font-medium"
+                            >
+                              Delete
+                            </button>
+                          )}
                         </td>
                       </tr>
                     )

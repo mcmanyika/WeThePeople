@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import DashboardNav from '@/app/components/DashboardNav'
@@ -35,6 +35,8 @@ interface CardData {
   applicationStatus: string
 }
 
+const PAGE_SIZE = 10
+
 export default function AdminMembershipCardsPage() {
   const { userProfile } = useAuth()
   const router = useRouter()
@@ -43,6 +45,7 @@ export default function AdminMembershipCardsPage() {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<'all' | 'paid' | 'unpaid'>('all')
   const [previewCard, setPreviewCard] = useState<CardData | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
 
   useEffect(() => {
     if (userProfile && userProfile.role !== 'admin') {
@@ -158,6 +161,18 @@ export default function AdminMembershipCardsPage() {
       (card.province && card.province.toLowerCase().includes(q))
     )
   })
+
+  // Pagination
+  const totalPages = Math.max(1, Math.ceil(filteredCards.length / PAGE_SIZE))
+  const paginatedCards = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE
+    return filteredCards.slice(start, start + PAGE_SIZE)
+  }, [filteredCards, currentPage])
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [search, filter])
 
   const handlePrintCard = (card: CardData) => {
     const printWindow = window.open('', '_blank')
@@ -462,7 +477,7 @@ export default function AdminMembershipCardsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {filteredCards.map((card) => (
+                  {paginatedCards.map((card) => (
                     <tr key={card.userId} className="hover:bg-slate-50 transition-colors">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
@@ -536,6 +551,59 @@ export default function AdminMembershipCardsPage() {
                   ))}
                 </tbody>
               </table>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between border-t border-slate-200 bg-white px-4 py-3">
+                  <p className="text-sm text-slate-600">
+                    Showing {((currentPage - 1) * PAGE_SIZE) + 1}–{Math.min(currentPage * PAGE_SIZE, filteredCards.length)} of {filteredCards.length}
+                  </p>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Previous
+                    </button>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                      .filter((page) => {
+                        if (page === 1 || page === totalPages) return true
+                        if (Math.abs(page - currentPage) <= 1) return true
+                        return false
+                      })
+                      .reduce<(number | string)[]>((acc, page, idx, arr) => {
+                        if (idx > 0 && page - (arr[idx - 1] as number) > 1) acc.push('...')
+                        acc.push(page)
+                        return acc
+                      }, [])
+                      .map((item, idx) =>
+                        typeof item === 'string' ? (
+                          <span key={`ellipsis-${idx}`} className="px-2 text-sm text-slate-400">…</span>
+                        ) : (
+                          <button
+                            key={item}
+                            onClick={() => setCurrentPage(item)}
+                            className={`rounded-lg px-3 py-1.5 text-sm font-medium ${
+                              currentPage === item
+                                ? 'bg-slate-900 text-white'
+                                : 'border border-slate-300 text-slate-700 hover:bg-slate-50'
+                            }`}
+                          >
+                            {item}
+                          </button>
+                        )
+                      )}
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                      className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </>
         )}

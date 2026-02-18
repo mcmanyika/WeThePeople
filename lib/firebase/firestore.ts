@@ -16,7 +16,7 @@ import {
   arrayUnion,
 } from 'firebase/firestore'
 import { db } from './config'
-import type { UserProfile, Donation, Membership, ContactSubmission, Purchase, Product, UserRole, News, CartItem, VolunteerApplication, VolunteerApplicationStatus, Petition, PetitionSignature, ShipmentStatus, NewsletterSubscription, Banner, GalleryCategory, GalleryImage, Survey, SurveyResponse, MembershipApplication, MembershipApplicationStatus, AdminNotification, NotificationType, NotificationAudience, EmailLog, EmailType, EmailStatus, Leader, Referral, ReferralStatus } from '@/types'
+import type { UserProfile, Donation, Membership, ContactSubmission, Purchase, Product, UserRole, News, CartItem, VolunteerApplication, VolunteerApplicationStatus, Petition, PetitionSignature, ShipmentStatus, NewsletterSubscription, Banner, GalleryCategory, GalleryImage, Survey, SurveyResponse, MembershipApplication, MembershipApplicationStatus, AdminNotification, NotificationType, NotificationAudience, EmailLog, EmailType, EmailStatus, Leader, Referral, ReferralStatus, Resource } from '@/types'
 
 // Helper functions
 function requireDb() {
@@ -54,6 +54,11 @@ export async function getAllUsers(): Promise<UserProfile[]> {
 
 export async function updateUserRole(userId: string, role: UserRole): Promise<void> {
   await setDoc(doc(requireDb(), 'users', userId), { role }, { merge: true })
+}
+
+export async function updateUserAccessLevel(userId: string, accessLevel: number): Promise<void> {
+  const level = Math.min(5, Math.max(1, Math.round(accessLevel)))
+  await setDoc(doc(requireDb(), 'users', userId), { accessLevel: level }, { merge: true })
 }
 
 export async function createStripeCustomerId(
@@ -2802,4 +2807,44 @@ export async function getAllReferrals(): Promise<Referral[]> {
     console.error('Error fetching all referrals:', error)
     return []
   }
+}
+
+// ===== Resource operations =====
+
+export async function createResource(
+  resource: Omit<Resource, 'id' | 'createdAt'>
+): Promise<string> {
+  const db = requireDb()
+  const resourceRef = doc(collection(db, 'resources'))
+  const resourceData: Record<string, any> = {
+    title: resource.title,
+    description: resource.description || '',
+    fileName: resource.fileName,
+    fileUrl: resource.fileUrl,
+    storagePath: resource.storagePath,
+    fileSize: resource.fileSize,
+    uploadedBy: resource.uploadedBy,
+    uploadedByName: resource.uploadedByName || '',
+    id: resourceRef.id,
+    createdAt: Timestamp.now(),
+  }
+  await setDoc(resourceRef, resourceData)
+  return resourceRef.id
+}
+
+export async function getResources(): Promise<Resource[]> {
+  const db = requireDb()
+  try {
+    const q = query(collection(db, 'resources'), orderBy('createdAt', 'desc'))
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Resource))
+  } catch (error) {
+    console.error('Error fetching resources:', error)
+    return []
+  }
+}
+
+export async function deleteResource(resourceId: string): Promise<void> {
+  const db = requireDb()
+  await deleteDoc(doc(db, 'resources', resourceId))
 }

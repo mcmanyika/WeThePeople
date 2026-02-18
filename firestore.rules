@@ -376,5 +376,15 @@ service cloud.firestore {
       // Admins can read all subscriptions
       allow read: if isAdmin();
     }
+
+    // Resources collection (downloadable PDFs/documents)
+    match /resources/{resourceId} {
+      // Any authenticated user can read resources
+      allow read: if isAuthenticated();
+      // Only admins can create, update, or delete resources
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
   }
 }

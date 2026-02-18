@@ -1,12 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import ProtectedRoute from '@/app/components/ProtectedRoute'
 import AdminRoute from '@/app/components/AdminRoute'
 import DashboardNav from '@/app/components/DashboardNav'
 import Link from 'next/link'
-import { getAllUsers, updateUserRole } from '@/lib/firebase/firestore'
+import { getAllUsers, updateUserRole, updateUserAccessLevel } from '@/lib/firebase/firestore'
 import type { UserProfile, UserRole } from '@/types'
+
+const PAGE_SIZE = 10
 
 export default function AdminUsersPage() {
   return (
@@ -43,6 +45,8 @@ function UsersManagement() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [updating, setUpdating] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
 
   const loadUsers = async () => {
     try {
@@ -66,7 +70,7 @@ function UsersManagement() {
     try {
       setUpdating(userId)
       await updateUserRole(userId, newRole)
-      await loadUsers() // Reload to show updated role
+      await loadUsers()
     } catch (err: any) {
       setError(err.message || 'Failed to update user role')
       console.error('Error updating role:', err)
@@ -75,7 +79,44 @@ function UsersManagement() {
     }
   }
 
+  const handleAccessLevelChange = async (userId: string, level: number) => {
+    try {
+      setUpdating(userId)
+      await updateUserAccessLevel(userId, level)
+      await loadUsers()
+    } catch (err: any) {
+      setError(err.message || 'Failed to update access level')
+      console.error('Error updating access level:', err)
+    } finally {
+      setUpdating(null)
+    }
+  }
+
   const roles: UserRole[] = ['supporter', 'member', 'moderator', 'admin']
+
+  // Filter users by search query
+  const filteredUsers = useMemo(() => {
+    if (!searchQuery.trim()) return users
+    const term = searchQuery.toLowerCase()
+    return users.filter((u) =>
+      (u.email?.toLowerCase() || '').includes(term) ||
+      (u.name?.toLowerCase() || '').includes(term) ||
+      (u.role?.toLowerCase() || '').includes(term) ||
+      (u.membershipTier?.toLowerCase() || '').includes(term)
+    )
+  }, [users, searchQuery])
+
+  // Pagination
+  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / PAGE_SIZE))
+  const paginatedUsers = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE
+    return filteredUsers.slice(start, start + PAGE_SIZE)
+  }, [filteredUsers, currentPage])
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchQuery])
 
   if (loading) {
     return (
@@ -90,11 +131,35 @@ function UsersManagement() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">All Users</h2>
-        <p className="mt-1 text-sm text-slate-600">
-          Manage user roles and permissions
-        </p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">All Users</h2>
+          <p className="mt-1 text-sm text-slate-600">
+            {filteredUsers.length} user{filteredUsers.length !== 1 ? 's' : ''}{searchQuery && ` matching "${searchQuery}"`}
+          </p>
+        </div>
+        <div className="relative w-full sm:w-72">
+          <svg className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+          </svg>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by name, email, role…"
+            className="w-full rounded-lg border border-slate-300 bg-white py-2 pl-10 pr-4 text-sm placeholder:text-slate-400 focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+            >
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
 
       {error && (
@@ -127,19 +192,22 @@ function UsersManagement() {
                   Role
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500">
+                  Access Level
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-slate-200">
-              {users.length === 0 ? (
+              {paginatedUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-4 text-center text-sm text-slate-500">
-                    No users found
+                  <td colSpan={6} className="px-6 py-8 text-center text-sm text-slate-500">
+                    {searchQuery ? `No users matching "${searchQuery}"` : 'No users found'}
                   </td>
                 </tr>
               ) : (
-                users.map((user) => (
+                paginatedUsers.map((user) => (
                   <tr key={user.uid} className="hover:bg-slate-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
                       {user.email}
@@ -154,6 +222,38 @@ function UsersManagement() {
                       <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize bg-slate-100 text-slate-800">
                         {user.role}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      {(() => {
+                        const level = user.accessLevel || 1
+                        const color = level >= 5 ? 'bg-red-500'
+                          : level >= 4 ? 'bg-amber-500'
+                          : level >= 3 ? 'bg-green-500'
+                          : level >= 2 ? 'bg-blue-500'
+                          : 'bg-slate-300'
+                        return (
+                          <div className="flex items-center gap-2">
+                            <div className="flex gap-0.5">
+                              {[1, 2, 3, 4, 5].map((i) => (
+                                <div
+                                  key={i}
+                                  className={`h-2 w-3 rounded-sm ${i <= level ? color : 'bg-slate-200'}`}
+                                />
+                              ))}
+                            </div>
+                            <select
+                              value={level}
+                              onChange={(e) => handleAccessLevelChange(user.uid, Number(e.target.value))}
+                              disabled={updating === user.uid}
+                              className="rounded border border-slate-300 bg-white px-1.5 py-0.5 text-xs font-semibold text-slate-600 focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              {[1, 2, 3, 4, 5].map((v) => (
+                                <option key={v} value={v}>{v}</option>
+                              ))}
+                            </select>
+                          </div>
+                        )
+                      })()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <select
@@ -175,8 +275,61 @@ function UsersManagement() {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between border-t border-slate-200 bg-white px-6 py-3">
+            <p className="text-sm text-slate-600">
+              Showing {((currentPage - 1) * PAGE_SIZE) + 1}–{Math.min(currentPage * PAGE_SIZE, filteredUsers.length)} of {filteredUsers.length}
+            </p>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Previous
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter((page) => {
+                  // Show first, last, current, and neighbors
+                  if (page === 1 || page === totalPages) return true
+                  if (Math.abs(page - currentPage) <= 1) return true
+                  return false
+                })
+                .reduce<(number | string)[]>((acc, page, idx, arr) => {
+                  if (idx > 0 && page - (arr[idx - 1] as number) > 1) acc.push('...')
+                  acc.push(page)
+                  return acc
+                }, [])
+                .map((item, idx) =>
+                  typeof item === 'string' ? (
+                    <span key={`ellipsis-${idx}`} className="px-2 text-sm text-slate-400">…</span>
+                  ) : (
+                    <button
+                      key={item}
+                      onClick={() => setCurrentPage(item)}
+                      className={`rounded-lg px-3 py-1.5 text-sm font-medium ${
+                        currentPage === item
+                          ? 'bg-slate-900 text-white'
+                          : 'border border-slate-300 text-slate-700 hover:bg-slate-50'
+                      }`}
+                    >
+                      {item}
+                    </button>
+                  )
+                )}
+              <button
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
 }
-
