@@ -397,12 +397,6 @@ function PetitionManagement() {
                       >
                         Edit
                       </button>
-                      <button
-                        onClick={() => handleDelete(petition.id)}
-                        className="text-red-600 hover:text-red-900 transition-colors"
-                      >
-                        Delete
-                      </button>
                     </div>
                   </td>
                 </tr>
