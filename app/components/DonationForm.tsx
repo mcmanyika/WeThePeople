@@ -23,7 +23,7 @@ function DonationFormContent({ onSuccess }: DonationFormContentProps) {
   const stripe = useStripe()
   const elements = useElements()
 
-  const presetAmounts = [25, 50, 100, 250, 500]
+  const presetAmounts = [5, 10, 25, 50, 100]
 
   useEffect(() => {
     // Create payment intent when amount is selected
