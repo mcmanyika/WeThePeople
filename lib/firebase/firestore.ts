@@ -14,6 +14,7 @@ import {
   writeBatch,
   onSnapshot,
   arrayUnion,
+  increment,
 } from 'firebase/firestore'
 import { db } from './config'
 import type { UserProfile, Donation, Membership, ContactSubmission, Purchase, Product, UserRole, News, CartItem, VolunteerApplication, VolunteerApplicationStatus, Petition, PetitionSignature, ShipmentStatus, NewsletterSubscription, Banner, GalleryCategory, GalleryImage, Survey, SurveyResponse, MembershipApplication, MembershipApplicationStatus, AdminNotification, NotificationType, NotificationAudience, EmailLog, EmailType, EmailStatus, Leader, Referral, ReferralStatus, Resource } from '@/types'
@@ -2847,4 +2848,77 @@ export async function getResources(): Promise<Resource[]> {
 export async function deleteResource(resourceId: string): Promise<void> {
   const db = requireDb()
   await deleteDoc(doc(db, 'resources', resourceId))
+}
+
+// ===== Download Tracking =====
+
+export async function trackDownload(documentId: string, label?: string): Promise<void> {
+  const db = requireDb()
+  const ref = doc(db, 'analytics', documentId)
+
+  try {
+    const snap = await getDoc(ref)
+    if (snap.exists()) {
+      const updateData: Record<string, any> = {
+        count: increment(1),
+        lastDownloadedAt: Timestamp.now(),
+      }
+      if (label) updateData.label = label
+      await updateDoc(ref, updateData)
+    } else {
+      await setDoc(ref, {
+        id: documentId,
+        label: label || documentId,
+        count: 1,
+        createdAt: Timestamp.now(),
+        lastDownloadedAt: Timestamp.now(),
+      })
+    }
+  } catch (error) {
+    console.error('Error tracking download:', error)
+  }
+}
+
+export async function getDownloadCount(documentId: string): Promise<number> {
+  if (!db) return 0
+
+  try {
+    const snap = await getDoc(doc(db, 'analytics', documentId))
+    if (snap.exists()) {
+      return snap.data().count || 0
+    }
+    return 0
+  } catch (error) {
+    console.error('Error fetching download count:', error)
+    return 0
+  }
+}
+
+export interface DownloadStat {
+  id: string
+  label: string
+  count: number
+  createdAt: Date
+  lastDownloadedAt: Date
+}
+
+export async function getAllDownloadStats(): Promise<DownloadStat[]> {
+  if (!db) return []
+
+  try {
+    const snapshot = await getDocs(collection(db, 'analytics'))
+    return snapshot.docs.map((docSnap) => {
+      const data = docSnap.data()
+      return {
+        id: docSnap.id,
+        label: data.label || docSnap.id,
+        count: data.count || 0,
+        createdAt: toDate(data.createdAt),
+        lastDownloadedAt: toDate(data.lastDownloadedAt),
+      }
+    }).sort((a, b) => b.count - a.count)
+  } catch (error) {
+    console.error('Error fetching all download stats:', error)
+    return []
+  }
 }

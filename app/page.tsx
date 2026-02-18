@@ -8,7 +8,7 @@ import HeroSection from './components/HeroSection';
 import ContactForm from './components/ContactForm';
 import DonationModal from './components/DonationModal';
 import Chatbot from './components/Chatbot';
-import { getNews, createNewsletterSubscription, getProducts, getProductById, getSurveys, getGalleryImages } from '@/lib/firebase/firestore';
+import { getNews, createNewsletterSubscription, getProducts, getProductById, getSurveys, getGalleryImages, trackDownload, getDownloadCount } from '@/lib/firebase/firestore';
 import type { News, Product, Survey, SurveyCategory, GalleryImage } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
@@ -36,6 +36,7 @@ export default function Home() {
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([])
   const [galleryLoading, setGalleryLoading] = useState(true)
   const [galleryLightbox, setGalleryLightbox] = useState<number | null>(null)
+  const [billDownloadCount, setBillDownloadCount] = useState(0)
   const [contactOpen, setContactOpen] = useState(false)
 
   useEffect(() => {
@@ -138,6 +139,19 @@ export default function Home() {
   useEffect(() => {
     setProductStartIndex(0)
   }, [productsPerView])
+
+  useEffect(() => {
+    getDownloadCount('amendment-bill-no3').then(setBillDownloadCount)
+  }, [])
+
+  const handleBillDownload = async () => {
+    try {
+      await trackDownload('amendment-bill-no3', 'Constitution of Zimbabwe Amendment (No. 3) Bill, 2026')
+      setBillDownloadCount((prev) => prev + 1)
+    } catch (err) {
+      console.error('Error tracking download:', err)
+    }
+  }
 
   const visibleProducts = products.slice(productStartIndex, productStartIndex + productsPerView)
   const canGoLeft = productStartIndex > 0
@@ -293,24 +307,40 @@ export default function Home() {
         {/* Civic Engagement Stripe */}
         <section className="bg-gradient-to-r from-emerald-900 to-slate-900 py-8 sm:py-10">
           <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
-            <h2 className="mb-2 text-xl font-bold text-white sm:text-2xl">Your Voice. Your Constitution. Your Future.</h2>
+            <div className="mb-3 flex justify-center">
+              <svg className="h-10 w-10 text-emerald-300 sm:h-12 sm:w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <h2 className="mb-2 text-xl font-bold text-white sm:text-2xl">Download the Proposed Amendment Bill No. 3</h2>
             <p className="text-sm text-emerald-200/80 sm:text-base">
-              Democracy thrives when citizens participate. Share your views, sign petitions, and stand with us.
+              Read the full PDF version of the Constitution of Zimbabwe Amendment (No. 3) Bill, 2026.
             </p>
             <div className="mt-5 flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-3">
+              <a
+                href="https://firebasestorage.googleapis.com/v0/b/defend-constitution-plat-dba4c.firebasestorage.app/o/resources%2F1771394376305-H.B.%201%2C%202026%20Constitution%20of%20Zimbabwe%20Amendment%20(No.%203)%202026.pdf?alt=media&token=7ba8167f-39ae-4e06-b2d2-b957dca04042"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={handleBillDownload}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-white px-5 py-2.5 text-xs font-semibold text-slate-900 hover:bg-slate-100 transition-colors sm:w-auto sm:px-6 sm:py-3 sm:text-sm"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Download PDF
+              </a>
               <Link
                 href="/petitions"
-                className="inline-flex w-full items-center justify-center rounded-md bg-white px-5 py-2.5 text-xs font-semibold text-slate-900 hover:bg-slate-100 transition-colors sm:w-auto sm:px-6 sm:py-3 sm:text-sm"
+                className="inline-flex w-full items-center justify-center rounded-md border-2 border-white px-5 py-2.5 text-xs font-semibold text-white hover:bg-white/10 transition-colors sm:w-auto sm:px-6 sm:py-3 sm:text-sm"
               >
                 Sign a Petition
               </Link>
-              <Link
-                href="/surveys"
-                className="inline-flex w-full items-center justify-center rounded-md border-2 border-white px-5 py-2.5 text-xs font-semibold text-white hover:bg-white/10 transition-colors sm:w-auto sm:px-6 sm:py-3 sm:text-sm"
-              >
-                Take a Survey
-              </Link>
             </div>
+            {billDownloadCount > 0 && (
+              <p className="mt-4 text-xs text-emerald-300/70">
+                <span className="font-semibold text-emerald-200">{billDownloadCount.toLocaleString()}</span> {billDownloadCount === 1 ? 'download' : 'downloads'}
+              </p>
+            )}
           </div>
         </section>
 

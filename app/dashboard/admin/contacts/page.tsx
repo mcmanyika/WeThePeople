@@ -13,6 +13,25 @@ export default function AdminContactsPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [selectedMessage, setSelectedMessage] = useState<ContactSubmission | null>(null)
+  const [copiedId, setCopiedId] = useState<string | null>(null)
+
+  const handleCopy = async (text: string, id: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopiedId(id)
+      setTimeout(() => setCopiedId(null), 2000)
+    } catch {
+      // Fallback
+      const textarea = document.createElement('textarea')
+      textarea.value = text
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textarea)
+      setCopiedId(id)
+      setTimeout(() => setCopiedId(null), 2000)
+    }
+  }
 
   useEffect(() => {
     if (!user || userProfile?.role !== 'admin') {
@@ -190,7 +209,7 @@ export default function AdminContactsPage() {
                   <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">
                     {submission.message}
                   </p>
-                  <div className="mt-4 flex gap-2">
+                    <div className="mt-4 flex gap-2">
                     <a
                       href={`mailto:${submission.email}?subject=Re: Your message to DCP`}
                       onClick={(e) => e.stopPropagation()}
@@ -201,6 +220,29 @@ export default function AdminContactsPage() {
                       </svg>
                       Reply via Email
                     </a>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleCopy(submission.message, submission.id)
+                      }}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                    >
+                      {copiedId === submission.id ? (
+                        <>
+                          <svg className="h-3.5 w-3.5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          <span className="text-green-600">Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                          Copy Message
+                        </>
+                      )}
+                    </button>
                   </div>
                 </div>
               )}

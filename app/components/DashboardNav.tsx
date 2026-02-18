@@ -186,6 +186,14 @@ function IconCreditCard({ className = 'h-5 w-5' }: { className?: string }) {
   )
 }
 
+function IconArrowDownTray({ className = 'h-5 w-5' }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+    </svg>
+  )
+}
+
 const adminManageItems: NavItem[] = [
   { href: '/dashboard/admin/users', label: 'Users', icon: <IconUsers />, description: 'User accounts & roles' },
   { href: '/dashboard/admin/membership-applications', label: 'Applications', icon: <IconIdentification />, description: 'Membership applications' },
@@ -197,6 +205,7 @@ const adminManageItems: NavItem[] = [
   { href: '/dashboard/admin/volunteers', label: 'Volunteers', icon: <IconUserGroup />, description: 'Applications' },
   { href: '/dashboard/admin/contacts', label: 'Contact', icon: <IconEnvelope />, description: 'Messages received' },
   { href: '/dashboard/admin/emails', label: 'Emails', icon: <IconEnvelope />, description: 'Sent email logs' },
+  { href: '/dashboard/admin/downloads', label: 'Downloads', icon: <IconArrowDownTray />, description: 'Download tracking' },
 ]
 
 export default function DashboardNav() {

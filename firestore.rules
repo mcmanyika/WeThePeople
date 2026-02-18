@@ -386,5 +386,14 @@ service cloud.firestore {
       allow update: if isAdmin();
       allow delete: if isAdmin();
     }
+
+    // ─── Analytics (download tracking) ─────────────────────────────
+    match /analytics/{docId} {
+      // Anyone can read download counts (public display)
+      allow read: if true;
+      // Anyone can create or update (to track downloads without requiring auth)
+      allow create: if true;
+      allow update: if true;
+    }
   }
 }

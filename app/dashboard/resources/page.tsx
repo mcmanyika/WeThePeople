@@ -5,7 +5,7 @@ import ProtectedRoute from '@/app/components/ProtectedRoute'
 import DashboardNav from '@/app/components/DashboardNav'
 import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
-import { createResource, getResources, deleteResource } from '@/lib/firebase/firestore'
+import { createResource, getResources, deleteResource, trackDownload } from '@/lib/firebase/firestore'
 import { uploadFile, deleteFile } from '@/lib/firebase/storage'
 import type { Resource } from '@/types'
 
@@ -197,6 +197,7 @@ export default function ResourcesPage() {
                           href={resource.fileUrl}
                           target="_blank"
                           rel="noopener noreferrer"
+                          onClick={() => trackDownload(`resource-${resource.id}`, resource.title)}
                           className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors"
                         >
                           <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
