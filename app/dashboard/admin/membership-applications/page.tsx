@@ -45,6 +45,8 @@ export default function AdminMembershipApplicationsPage() {
   const [search, setSearch] = useState('')
   const [selectedApp, setSelectedApp] = useState<MembershipApplication | null>(null)
   const [actionLoading, setActionLoading] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const ITEMS_PER_PAGE = 10
 
   // Section E fields
   const [membershipNumber, setMembershipNumber] = useState('')
@@ -138,6 +140,15 @@ export default function AdminMembershipApplicationsPage() {
     }
     return true
   })
+
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+  const paginatedApps = filtered.slice(startIndex, startIndex + ITEMS_PER_PAGE)
+
+  // Reset page when filter/search changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [filter, search])
 
   const formatDate = (date: any): string => {
     if (!date) return '—'
@@ -255,7 +266,7 @@ export default function AdminMembershipApplicationsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {filtered.map((app) => {
+                  {paginatedApps.map((app) => {
                     const name = app.type === 'individual' ? app.fullName : app.organisationName
                     const email = app.emailAddress || app.representativeEmail
                     const province = app.type === 'individual' ? app.province : app.provincesOfOperation
@@ -282,6 +293,55 @@ export default function AdminMembershipApplicationsPage() {
                   })}
                 </tbody>
               </table>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-4 py-3">
+                  <p className="text-xs text-slate-500">
+                    Showing {startIndex + 1}–{Math.min(startIndex + ITEMS_PER_PAGE, filtered.length)} of {filtered.length}
+                  </p>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Previous
+                    </button>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                      if (page === 1 || page === totalPages || (page >= currentPage - 2 && page <= currentPage + 2)) {
+                        return (
+                          <button
+                            key={page}
+                            onClick={() => setCurrentPage(page)}
+                            className={`rounded-lg px-3 py-1.5 text-xs font-medium ${
+                              currentPage === page
+                                ? 'bg-slate-900 text-white'
+                                : 'text-slate-700 hover:bg-slate-100'
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        )
+                      }
+                      if (
+                        (page === currentPage - 3 && currentPage > 4) ||
+                        (page === currentPage + 3 && currentPage < totalPages - 3)
+                      ) {
+                        return <span key={page} className="px-2 text-xs text-slate-400">…</span>
+                      }
+                      return null
+                    })}
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                      className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
