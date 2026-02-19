@@ -330,7 +330,7 @@ export interface AdminNotification {
 }
 
 // Email Log types
-export type EmailType = 'welcome' | 'membership_approved' | 'membership_rejected' | 'general'
+export type EmailType = 'welcome' | 'membership_approved' | 'membership_rejected' | 'general' | 'custom'
 export type EmailStatus = 'sent' | 'failed'
 
 export interface EmailLog {

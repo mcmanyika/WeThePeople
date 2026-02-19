@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Header from '@/app/components/Header'
 import Footer from '@/app/components/Footer'
 import CTASection from '@/app/components/CTASection'
+import DonationModal from '@/app/components/DonationModal'
 import { getPetitions, getPetitionById, signPetition } from '@/lib/firebase/firestore'
 import { useAuth } from '@/contexts/AuthContext'
 import type { Petition } from '@/types'
@@ -114,6 +115,8 @@ function PetitionCard({ petition, onSign }: { petition: Petition; onSign: () => 
   const [signing, setSigning] = useState(false)
   const [signError, setSignError] = useState('')
   const [shareSuccess, setShareSuccess] = useState(false)
+  const [showThankYou, setShowThankYou] = useState(false)
+  const [showDonationModal, setShowDonationModal] = useState(false)
   const [signData, setSignData] = useState({
     name: userProfile?.name || user?.displayName || '',
     email: user?.email || '',
@@ -136,6 +139,7 @@ function PetitionCard({ petition, onSign }: { petition: Petition; onSign: () => 
         anonymous: signData.anonymous,
       })
       setShowSignModal(false)
+      setShowThankYou(true)
       onSign()
     } catch (err: any) {
       setSignError(err.message || 'Failed to sign petition')
@@ -351,6 +355,53 @@ function PetitionCard({ petition, onSign }: { petition: Petition; onSign: () => 
           </div>
         </div>
       )}
+
+      {/* Thank You + Donate Appeal Modal */}
+      {showThankYou && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+            {/* Green header */}
+            <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 px-6 py-8 text-center text-white">
+              <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-white/20">
+                <svg className="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold">Thank You for Signing!</h3>
+              <p className="mt-1 text-sm text-emerald-100">Your signature makes a difference</p>
+            </div>
+            {/* Body */}
+            <div className="px-6 py-6 text-center">
+              <p className="mb-2 text-sm text-slate-600">
+                Want to go further? A small donation helps us defend Zimbabwe&apos;s Constitution, fund civic education, and hold leaders accountable.
+              </p>
+              <p className="mb-6 text-xs text-slate-400">
+                No amount is too small — every contribution counts.
+              </p>
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={() => {
+                    setShowThankYou(false)
+                    setShowDonationModal(true)
+                  }}
+                  className="w-full rounded-lg bg-emerald-600 px-6 py-3 text-sm font-semibold text-white hover:bg-emerald-700 transition-colors"
+                >
+                  Donate Now
+                </button>
+                <button
+                  onClick={() => setShowThankYou(false)}
+                  className="w-full rounded-lg border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
+                >
+                  Maybe Later
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Donation Modal */}
+      <DonationModal isOpen={showDonationModal} onClose={() => setShowDonationModal(false)} />
     </>
   )
 }
