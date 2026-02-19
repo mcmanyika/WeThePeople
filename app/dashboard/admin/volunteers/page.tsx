@@ -1,13 +1,31 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import ProtectedRoute from '@/app/components/ProtectedRoute'
 import AdminRoute from '@/app/components/AdminRoute'
 import DashboardNav from '@/app/components/DashboardNav'
-import { getAllVolunteerApplications, updateVolunteerApplicationStatus } from '@/lib/firebase/firestore'
+import { getAllVolunteerApplications, updateVolunteerApplicationStatus, markVolunteerEmailed } from '@/lib/firebase/firestore'
 import { useAuth } from '@/contexts/AuthContext'
 import type { VolunteerApplication, VolunteerApplicationStatus } from '@/types'
 import Link from 'next/link'
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts'
+
+const STATUS_COLORS: Record<string, string> = {
+  pending: '#f59e0b',
+  approved: '#10b981',
+  rejected: '#ef4444',
+  withdrawn: '#94a3b8',
+}
+const SKILL_COLORS = ['#0f172a', '#10b981', '#f59e0b', '#6366f1', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#64748b']
+
+type SortField = 'name' | 'email' | 'submitted' | 'status'
+type SortDir = 'asc' | 'desc'
 
 function toDate(date: Date | any): Date | null {
   if (!date) return null
@@ -68,6 +86,33 @@ function VolunteerApplicationsManagement() {
   const [reviewNotes, setReviewNotes] = useState('')
   const [reviewStatus, setReviewStatus] = useState<VolunteerApplicationStatus>('approved')
   const [processing, setProcessing] = useState(false)
+  const [sortField, setSortField] = useState<SortField>('submitted')
+  const [sortDir, setSortDir] = useState<SortDir>('desc')
+
+  // Email modal state
+  const [showEmailModal, setShowEmailModal] = useState(false)
+  const [emailTarget, setEmailTarget] = useState<VolunteerApplication | null>(null)
+  const [emailSubject, setEmailSubject] = useState('')
+  const [emailBody, setEmailBody] = useState('')
+  const [emailSending, setEmailSending] = useState(false)
+  const [emailSuccess, setEmailSuccess] = useState('')
+  const [emailError, setEmailError] = useState('')
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
+    } else {
+      setSortField(field)
+      setSortDir('asc')
+    }
+  }
+
+  const SortIcon = ({ field }: { field: SortField }) => (
+    <span className="ml-1 inline-flex flex-col leading-none">
+      <svg className={`h-2 w-2 ${sortField === field && sortDir === 'asc' ? 'text-slate-900' : 'text-slate-300'}`} viewBox="0 0 8 5" fill="currentColor"><path d="M4 0l4 5H0z" /></svg>
+      <svg className={`h-2 w-2 ${sortField === field && sortDir === 'desc' ? 'text-slate-900' : 'text-slate-300'}`} viewBox="0 0 8 5" fill="currentColor"><path d="M4 5L0 0h8z" /></svg>
+    </span>
+  )
 
   useEffect(() => {
     loadApplications()
@@ -122,9 +167,87 @@ function VolunteerApplicationsManagement() {
     }
   }
 
+  const openEmailModal = (app: VolunteerApplication) => {
+    setEmailTarget(app)
+    setEmailSubject(`Your Volunteer Application — Defend the Constitution Platform`)
+    setEmailBody(
+      `Thank you for submitting your volunteer application to the Defend the Constitution Platform (DCP). We truly appreciate your willingness to contribute your time and skills to this important cause.\n\nWe have reviewed your application and are pleased to inform you that we would like to explore how best to engage you within our programmes. A member of our team will be in touch to discuss next steps.\n\nIn the meantime, please feel free to visit our website at www.dcpzim.com to stay updated on our latest activities and initiatives.\n\nOnce again, thank you for standing with us in defence of Zimbabwe's Constitution.`
+    )
+    setEmailSuccess('')
+    setEmailError('')
+    setShowEmailModal(true)
+  }
+
+  const handleSendEmail = async () => {
+    if (!emailTarget || !emailSubject.trim() || !emailBody.trim()) {
+      setEmailError('Subject and message are required.')
+      return
+    }
+    setEmailSending(true)
+    setEmailError('')
+    setEmailSuccess('')
+    try {
+      const res = await fetch('/api/email/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: emailTarget.email,
+          name: emailTarget.name,
+          subject: emailSubject.trim(),
+          body: emailBody.trim(),
+          userId: emailTarget.userId || undefined,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to send email')
+      }
+      // Mark as emailed in Firestore
+      try {
+        await markVolunteerEmailed(emailTarget.id)
+        await loadApplications()
+      } catch (e) { /* non-critical */ }
+      setEmailSuccess(`Email sent to ${emailTarget.email}`)
+      setTimeout(() => {
+        setShowEmailModal(false)
+        setEmailTarget(null)
+      }, 2000)
+    } catch (err: any) {
+      setEmailError(err.message || 'Failed to send email')
+    } finally {
+      setEmailSending(false)
+    }
+  }
+
   const filteredApplications = statusFilter === 'all'
     ? applications
     : applications.filter((app) => app.status === statusFilter)
+
+  const sortedApplications = useMemo(() => {
+    const arr = [...filteredApplications]
+    arr.sort((a, b) => {
+      let cmp = 0
+      switch (sortField) {
+        case 'name':
+          cmp = (a.name || '').toLowerCase().localeCompare((b.name || '').toLowerCase())
+          break
+        case 'email':
+          cmp = (a.email || '').toLowerCase().localeCompare((b.email || '').toLowerCase())
+          break
+        case 'submitted': {
+          const dateA = toDate(a.createdAt)?.getTime() || 0
+          const dateB = toDate(b.createdAt)?.getTime() || 0
+          cmp = dateA - dateB
+          break
+        }
+        case 'status':
+          cmp = (a.status || '').localeCompare(b.status || '')
+          break
+      }
+      return sortDir === 'asc' ? cmp : -cmp
+    })
+    return arr
+  }, [filteredApplications, sortField, sortDir])
 
   const statusCounts = {
     all: applications.length,
@@ -132,6 +255,70 @@ function VolunteerApplicationsManagement() {
     approved: applications.filter((app) => app.status === 'approved').length,
     rejected: applications.filter((app) => app.status === 'rejected').length,
     withdrawn: applications.filter((app) => app.status === 'withdrawn').length,
+  }
+
+  // Chart: Status distribution
+  const statusChartData = useMemo(() => {
+    return Object.entries(statusCounts)
+      .filter(([key]) => key !== 'all')
+      .map(([name, value]) => ({
+        name: name.charAt(0).toUpperCase() + name.slice(1),
+        value,
+        color: STATUS_COLORS[name] || '#94a3b8',
+        total: applications.length,
+      }))
+      .filter((d) => d.value > 0)
+  }, [applications, statusCounts])
+
+  // Chart: Top skills
+  const skillsChartData = useMemo(() => {
+    const skillMap: Record<string, number> = {}
+    applications.forEach((app) => {
+      app.skills.forEach((skill) => {
+        skillMap[skill] = (skillMap[skill] || 0) + 1
+      })
+    })
+    return Object.entries(skillMap)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8)
+      .map(([name, value], i) => ({
+        name,
+        value,
+        color: SKILL_COLORS[i % SKILL_COLORS.length],
+        total: applications.length,
+      }))
+  }, [applications])
+
+  // Chart: Availability
+  const availabilityChartData = useMemo(() => {
+    const availMap: Record<string, number> = {}
+    applications.forEach((app) => {
+      const key = app.availability || 'Unknown'
+      availMap[key] = (availMap[key] || 0) + 1
+    })
+    return Object.entries(availMap)
+      .sort((a, b) => b[1] - a[1])
+      .map(([name, value], i) => ({
+        name: name.charAt(0).toUpperCase() + name.slice(1),
+        value,
+        color: SKILL_COLORS[i % SKILL_COLORS.length],
+        total: applications.length,
+      }))
+      .filter((d) => d.value > 0)
+  }, [applications])
+
+  const PieTooltip = ({ active, payload }: any) => {
+    if (active && payload?.length) {
+      const d = payload[0].payload
+      const pct = d.total > 0 ? ((d.value / d.total) * 100).toFixed(1) : '0'
+      return (
+        <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs shadow-lg">
+          <p className="font-semibold text-slate-900">{d.name}</p>
+          <p className="text-slate-600">{d.value} ({pct}%)</p>
+        </div>
+      )
+    }
+    return null
   }
 
   if (loading) {
@@ -167,6 +354,122 @@ function VolunteerApplicationsManagement() {
         </div>
       </div>
 
+      {/* Charts */}
+      {applications.length > 0 && (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          {/* Status Distribution */}
+          <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+            <h3 className="mb-4 text-sm font-bold text-slate-900">Status Distribution</h3>
+            <div className="h-48">
+              {statusChartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={statusChartData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={40}
+                      outerRadius={70}
+                      paddingAngle={3}
+                      dataKey="value"
+                    >
+                      {statusChartData.map((entry, i) => (
+                        <Cell key={i} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<PieTooltip />} />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex h-full items-center justify-center text-sm text-slate-400">No data</div>
+              )}
+            </div>
+            <div className="mt-2 flex flex-wrap justify-center gap-3">
+              {statusChartData.map((d, i) => (
+                <div key={i} className="flex items-center gap-1.5">
+                  <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: d.color }} />
+                  <span className="text-xs text-slate-600">{d.name} ({d.value})</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Top Skills */}
+          <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+            <h3 className="mb-4 text-sm font-bold text-slate-900">Top Skills</h3>
+            <div className="h-48">
+              {skillsChartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={skillsChartData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={40}
+                      outerRadius={70}
+                      paddingAngle={3}
+                      dataKey="value"
+                    >
+                      {skillsChartData.map((entry, i) => (
+                        <Cell key={i} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<PieTooltip />} />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex h-full items-center justify-center text-sm text-slate-400">No data</div>
+              )}
+            </div>
+            <div className="mt-2 flex flex-wrap justify-center gap-3">
+              {skillsChartData.map((d, i) => (
+                <div key={i} className="flex items-center gap-1.5">
+                  <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: d.color }} />
+                  <span className="text-xs text-slate-600">{d.name} ({d.value})</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Availability */}
+          <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+            <h3 className="mb-4 text-sm font-bold text-slate-900">Availability</h3>
+            <div className="h-48">
+              {availabilityChartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={availabilityChartData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={40}
+                      outerRadius={70}
+                      paddingAngle={3}
+                      dataKey="value"
+                    >
+                      {availabilityChartData.map((entry, i) => (
+                        <Cell key={i} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<PieTooltip />} />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex h-full items-center justify-center text-sm text-slate-400">No data</div>
+              )}
+            </div>
+            <div className="mt-2 flex flex-wrap justify-center gap-3">
+              {availabilityChartData.map((d, i) => (
+                <div key={i} className="flex items-center gap-1.5">
+                  <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: d.color }} />
+                  <span className="text-xs text-slate-600">{d.name} ({d.value})</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {error && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-600">
           {error}
@@ -179,20 +482,32 @@ function VolunteerApplicationsManagement() {
           <table className="w-full">
             <thead className="bg-slate-50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-700">
-                  Name
+                <th
+                  className="cursor-pointer select-none px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-700 hover:text-slate-900"
+                  onClick={() => handleSort('name')}
+                >
+                  <span className="inline-flex items-center">Name <SortIcon field="name" /></span>
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-700">
-                  Email
+                <th
+                  className="cursor-pointer select-none px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-700 hover:text-slate-900"
+                  onClick={() => handleSort('email')}
+                >
+                  <span className="inline-flex items-center">Email <SortIcon field="email" /></span>
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-700">
                   Skills
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-700">
-                  Submitted
+                <th
+                  className="cursor-pointer select-none px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-700 hover:text-slate-900"
+                  onClick={() => handleSort('submitted')}
+                >
+                  <span className="inline-flex items-center">Submitted <SortIcon field="submitted" /></span>
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-700">
-                  Status
+                <th
+                  className="cursor-pointer select-none px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-700 hover:text-slate-900"
+                  onClick={() => handleSort('status')}
+                >
+                  <span className="inline-flex items-center">Status <SortIcon field="status" /></span>
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-700">
                   Actions
@@ -200,14 +515,14 @@ function VolunteerApplicationsManagement() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
-              {filteredApplications.length === 0 ? (
+              {sortedApplications.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-4 py-12 text-center text-slate-600">
                     No applications found
                   </td>
                 </tr>
               ) : (
-                filteredApplications.map((application) => {
+                sortedApplications.map((application) => {
                   const createdAt = toDate(application.createdAt)
                   const statusColors = {
                     pending: 'bg-yellow-100 text-yellow-700',
@@ -245,21 +560,43 @@ function VolunteerApplicationsManagement() {
                         {formatDate(createdAt)}
                       </td>
                       <td className="px-4 py-3">
-                        <span
-                          className={`inline-block rounded-full px-2 py-1 text-xs font-semibold capitalize ${
-                            statusColors[application.status]
-                          }`}
-                        >
-                          {application.status}
-                        </span>
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span
+                            className={`inline-block rounded-full px-2 py-1 text-xs font-semibold capitalize ${
+                              statusColors[application.status]
+                            }`}
+                          >
+                            {application.status}
+                          </span>
+                          {application.emailedAt && (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-1 text-[10px] font-semibold text-blue-600" title={`Emailed ${formatDate(toDate(application.emailedAt))}`}>
+                              <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                              </svg>
+                              Responded
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-4 py-3">
-                        <button
-                          onClick={() => handleReview(application)}
-                          className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
-                        >
-                          Review
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleReview(application)}
+                            className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+                          >
+                            Review
+                          </button>
+                          <button
+                            onClick={() => openEmailModal(application)}
+                            className="rounded-lg border border-blue-300 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100 transition-colors"
+                            title={`Email ${application.name}`}
+                          >
+                            <svg className="inline-block h-3.5 w-3.5 mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            Email
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   )
@@ -269,6 +606,79 @@ function VolunteerApplicationsManagement() {
           </table>
         </div>
       </div>
+
+      {/* Email Compose Modal */}
+      {showEmailModal && emailTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="w-full max-w-lg rounded-lg border border-slate-200 bg-white p-6 shadow-xl">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-bold">Email Volunteer</h2>
+              <button
+                onClick={() => { setShowEmailModal(false); setEmailTarget(null) }}
+                className="text-slate-400 hover:text-slate-600"
+              >
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="mb-4 rounded-lg bg-slate-50 p-3 text-sm">
+              <p className="text-slate-500">To:</p>
+              <p className="font-medium text-slate-900">{emailTarget.name} &lt;{emailTarget.email}&gt;</p>
+            </div>
+
+            {emailSuccess && (
+              <div className="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+                {emailSuccess}
+              </div>
+            )}
+            {emailError && (
+              <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                {emailError}
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <div>
+                <label className="mb-1 block text-sm font-semibold text-slate-900">Subject</label>
+                <input
+                  type="text"
+                  value={emailSubject}
+                  onChange={(e) => setEmailSubject(e.target.value)}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  placeholder="Email subject..."
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-semibold text-slate-900">Message</label>
+                <textarea
+                  rows={8}
+                  value={emailBody}
+                  onChange={(e) => setEmailBody(e.target.value)}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  placeholder="Write your message..."
+                />
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleSendEmail}
+                  disabled={emailSending || !emailSubject.trim() || !emailBody.trim()}
+                  className="flex-1 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {emailSending ? 'Sending...' : 'Send Email'}
+                </button>
+                <button
+                  onClick={() => { setShowEmailModal(false); setEmailTarget(null) }}
+                  className="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Review Modal */}
       {showModal && selectedApplication && (

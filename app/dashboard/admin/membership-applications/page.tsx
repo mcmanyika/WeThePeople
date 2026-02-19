@@ -511,35 +511,44 @@ export default function AdminMembershipApplicationsPage() {
                   </div>
                 </div>
 
+                {/* Change Status */}
+                <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                  <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-400">Change Status</label>
+                  <div className="flex flex-wrap gap-2">
+                    {(['pending', 'approved', 'rejected', 'withdrawn'] as MembershipApplicationStatus[]).map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => handleStatusUpdate(selectedApp.id, s)}
+                        disabled={actionLoading}
+                        className={`rounded-lg px-4 py-2 text-sm font-semibold capitalize transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                          selectedApp.status === s
+                            ? s === 'approved' ? 'bg-green-600 text-white ring-2 ring-green-300'
+                            : s === 'rejected' ? 'bg-red-600 text-white ring-2 ring-red-300'
+                            : s === 'pending' ? 'bg-amber-500 text-white ring-2 ring-amber-300'
+                            : 'bg-slate-600 text-white ring-2 ring-slate-300'
+                            : 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-100'
+                        }`}
+                      >
+                        {actionLoading ? '...' : s}
+                      </button>
+                    ))}
+                  </div>
+                  {selectedApp.status !== 'pending' && (
+                    <p className="mt-2 text-[10px] text-slate-400">
+                      Current status: <span className="font-semibold capitalize">{selectedApp.status}</span>. Click a button above to change.
+                    </p>
+                  )}
+                </div>
+
                 {/* Action Buttons */}
                 <div className="flex flex-wrap gap-3 pt-2">
-                  {selectedApp.status === 'pending' && (
-                    <>
-                      <button
-                        onClick={() => handleStatusUpdate(selectedApp.id, 'approved')}
-                        disabled={actionLoading}
-                        className="flex-1 rounded-lg bg-green-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-green-700 transition-colors disabled:opacity-50"
-                      >
-                        {actionLoading ? 'Processing...' : 'Approve'}
-                      </button>
-                      <button
-                        onClick={() => handleStatusUpdate(selectedApp.id, 'rejected')}
-                        disabled={actionLoading}
-                        className="flex-1 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 transition-colors disabled:opacity-50"
-                      >
-                        Reject
-                      </button>
-                    </>
-                  )}
-                  {selectedApp.status !== 'pending' && (
-                    <button
-                      onClick={() => handleStatusUpdate(selectedApp.id, selectedApp.status)}
-                      disabled={actionLoading}
-                      className="flex-1 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 transition-colors disabled:opacity-50"
-                    >
-                      {actionLoading ? 'Saving...' : 'Save Changes'}
-                    </button>
-                  )}
+                  <button
+                    onClick={() => handleStatusUpdate(selectedApp.id, selectedApp.status)}
+                    disabled={actionLoading}
+                    className="flex-1 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 transition-colors disabled:opacity-50"
+                  >
+                    {actionLoading ? 'Saving...' : 'Save Changes'}
+                  </button>
                   <button
                     onClick={() => setSelectedApp(null)}
                     className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"

@@ -124,6 +124,7 @@ export interface VolunteerApplication {
   notes?: string
   reviewedBy?: string
   reviewedAt?: Timestamp | Date
+  emailedAt?: Timestamp | Date
   createdAt: Timestamp | Date
   updatedAt: Timestamp | Date
 }

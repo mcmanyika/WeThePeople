@@ -654,6 +654,14 @@ export async function updateVolunteerApplicationStatus(
   await updateDoc(doc(db, 'volunteers', applicationId), updateData)
 }
 
+export async function markVolunteerEmailed(applicationId: string): Promise<void> {
+  const db = requireDb()
+  await updateDoc(doc(db, 'volunteers', applicationId), {
+    emailedAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  })
+}
+
 // Purchase operations
 export async function createPurchase(purchase: Omit<Purchase, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
   const db = requireDb()

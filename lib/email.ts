@@ -37,6 +37,101 @@ export async function sendWelcomeEmail({
   }
 }
 
+// ─── Generic / Custom Email ──────────────────────────────────────
+export async function sendCustomEmail({
+  to,
+  name,
+  subject,
+  body,
+}: {
+  to: string
+  name: string
+  subject: string
+  body: string
+}) {
+  try {
+    const { data, error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [to],
+      subject,
+      html: buildCustomEmailHtml({ name, subject, body }),
+    })
+
+    if (error) {
+      console.error('Resend error sending custom email:', error)
+      return { success: false, error }
+    }
+
+    console.log('Custom email sent successfully:', data?.id)
+    return { success: true, id: data?.id }
+  } catch (err: any) {
+    console.error('Failed to send custom email:', err)
+    return { success: false, error: err.message }
+  }
+}
+
+function buildCustomEmailHtml({ name, subject, body }: { name: string; subject: string; body: string }) {
+  // Convert newlines to <br> for plain-text body
+  const htmlBody = body.replace(/\n/g, '<br />')
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${subject}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8fafc;padding:40px 20px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+          <!-- Header -->
+          <tr>
+            <td style="background-color:#0f172a;border-radius:12px 12px 0 0;padding:32px 40px;text-align:center;">
+              <img src="${APP_URL}/images/logo.png" alt="DCP Logo" width="60" height="60" style="border-radius:8px;" />
+              <h1 style="color:#ffffff;font-size:22px;margin:16px 0 0;font-weight:700;">
+                ${APP_NAME}
+              </h1>
+            </td>
+          </tr>
+          <!-- Body -->
+          <tr>
+            <td style="background-color:#ffffff;padding:40px;">
+              <p style="color:#475569;font-size:15px;line-height:1.7;margin:0 0 20px;">
+                Dear <strong style="color:#0f172a;">${name}</strong>,
+              </p>
+              <div style="color:#475569;font-size:15px;line-height:1.7;margin:0 0 24px;">
+                ${htmlBody}
+              </div>
+              <p style="color:#475569;font-size:15px;line-height:1.7;margin:0 0 4px;">
+                Warm regards,
+              </p>
+              <p style="color:#0f172a;font-size:15px;line-height:1.5;margin:0 0 2px;">
+                <strong>Defend the Constitution Platform</strong>
+              </p>
+              <p style="color:#64748b;font-size:13px;line-height:1.5;margin:0;">
+                <a href="${APP_URL}" style="color:#0f172a;text-decoration:underline;">www.dcpzim.com</a>
+              </p>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="background-color:#f1f5f9;border-radius:0 0 12px 12px;padding:24px 40px;text-align:center;">
+              <p style="color:#94a3b8;font-size:11px;margin:0;">
+                © ${new Date().getFullYear()} ${APP_NAME}. All rights reserved.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `.trim()
+}
+
 // ─── HTML Template Builder ────────────────────────────────────────
 function buildWelcomeEmailHtml({
   firstName,
