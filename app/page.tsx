@@ -644,13 +644,7 @@ export default function Home() {
 
         {/* Gallery Section */}
         {!galleryLoading && galleryImages.length > 0 && (
-          <section className="bg-slate-900 pt-10 sm:pt-14">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6">
-              <div className="mb-6 text-center sm:mb-8">
-                <Link href="/gallery" className="text-2xl font-bold text-white sm:text-3xl md:text-4xl hover:text-slate-300 transition-colors">Gallery</Link>
-                <p className="mt-2 text-sm text-slate-400">Feel free to download and share</p>
-              </div>
-            </div>
+          <section className="bg-slate-900 pt-px">
 
             {/* Full-width image grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
