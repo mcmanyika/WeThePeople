@@ -7,15 +7,19 @@ import { getMembershipByUser } from '@/lib/firebase/firestore'
 export default function UserProfile() {
   const { user, userProfile, updateProfile } = useAuth()
   const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [address, setAddress] = useState('')
   const [membershipTier, setMembershipTier] = useState<string>('free')
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
 
-  // Sync name with userProfile when it loads
+  // Sync fields with userProfile when it loads
   useEffect(() => {
-    if (userProfile?.name) {
-      setName(userProfile.name)
+    if (userProfile) {
+      setName(userProfile.name || '')
+      setPhone(userProfile.phone || '')
+      setAddress(userProfile.address || '')
     }
   }, [userProfile])
 
@@ -57,7 +61,11 @@ export default function UserProfile() {
     setError('')
 
     try {
-      await updateProfile({ name: name.trim() || undefined })
+      await updateProfile({
+        name: name.trim() || undefined,
+        phone: phone.trim() || '',
+        address: address.trim() || '',
+      })
       setSuccess(true)
       setTimeout(() => setSuccess(false), 3000)
     } catch (error: any) {
@@ -119,20 +127,28 @@ export default function UserProfile() {
 
         <div>
           <label className="mb-2 block text-sm font-semibold text-slate-900">
-            Membership Tier
+            Phone
           </label>
-          <div className="rounded-lg border border-slate-300 bg-slate-50 px-4 py-3 text-sm capitalize text-slate-600 sm:text-base">
-            {membershipTier === 'free' ? 'Free' : membershipTier}
-          </div>
+          <input
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="e.g. +263 77 123 4567"
+            className="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 sm:text-base"
+          />
         </div>
 
         <div>
           <label className="mb-2 block text-sm font-semibold text-slate-900">
-            Role
+            Address
           </label>
-          <div className="rounded-lg border border-slate-300 bg-slate-50 px-4 py-3 text-sm capitalize text-slate-600 sm:text-base">
-            {userProfile?.role || 'Supporter'}
-          </div>
+          <input
+            type="text"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="e.g. 123 Main St, Harare"
+            className="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 sm:text-base"
+          />
         </div>
 
         <button

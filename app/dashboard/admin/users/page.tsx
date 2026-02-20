@@ -431,11 +431,11 @@ function UsersManagement() {
                 </div>
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Phone</p>
-                  <p className="mt-0.5 text-sm text-slate-700">{userMembershipApp?.mobileNumber || '—'}</p>
+                  <p className="mt-0.5 text-sm text-slate-700">{selectedUser.phone || userMembershipApp?.mobileNumber || '—'}</p>
                 </div>
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Address</p>
-                  <p className="mt-0.5 text-sm text-slate-700">{userMembershipApp?.physicalAddress || '—'}</p>
+                  <p className="mt-0.5 text-sm text-slate-700">{selectedUser.address || userMembershipApp?.physicalAddress || '—'}</p>
                 </div>
                 {(userMembershipApp?.province || userMembershipApp?.district) && (
                   <>

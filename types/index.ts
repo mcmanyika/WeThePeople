@@ -10,6 +10,8 @@ export interface UserProfile {
   uid: string
   email: string
   name?: string
+  phone?: string
+  address?: string
   membershipTier: MembershipTier
   role: UserRole
   createdAt: Timestamp | Date
