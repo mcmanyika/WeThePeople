@@ -5,8 +5,8 @@ import ProtectedRoute from '@/app/components/ProtectedRoute'
 import AdminRoute from '@/app/components/AdminRoute'
 import DashboardNav from '@/app/components/DashboardNav'
 import Link from 'next/link'
-import { getAllUsers, updateUserRole, updateUserAccessLevel } from '@/lib/firebase/firestore'
-import type { UserProfile, UserRole } from '@/types'
+import { getAllUsers, updateUserRole, updateUserAccessLevel, getDonationsByUser, getMembershipApplicationByUser, getMembershipByUser, getPurchasesByUser } from '@/lib/firebase/firestore'
+import type { UserProfile, UserRole, Donation, MembershipApplication, Membership, Purchase } from '@/types'
 
 const PAGE_SIZE = 10
 
@@ -40,6 +40,18 @@ export default function AdminUsersPage() {
   )
 }
 
+function toDate(date: Date | any): Date | null {
+  if (!date) return null
+  if (date instanceof Date) return date
+  if (date && typeof date === 'object' && 'toDate' in date) return (date as any).toDate()
+  return new Date(date as string | number)
+}
+
+function formatDate(date: Date | null): string {
+  if (!date) return 'N/A'
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+}
+
 function UsersManagement() {
   const [users, setUsers] = useState<UserProfile[]>([])
   const [loading, setLoading] = useState(true)
@@ -47,6 +59,14 @@ function UsersManagement() {
   const [updating, setUpdating] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
+
+  // User detail modal
+  const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null)
+  const [userDonations, setUserDonations] = useState<Donation[]>([])
+  const [userMembershipApp, setUserMembershipApp] = useState<MembershipApplication | null>(null)
+  const [userMembership, setUserMembership] = useState<Membership | null>(null)
+  const [userPurchases, setUserPurchases] = useState<Purchase[]>([])
+  const [detailLoading, setDetailLoading] = useState(false)
 
   const loadUsers = async () => {
     try {
@@ -89,6 +109,31 @@ function UsersManagement() {
       console.error('Error updating access level:', err)
     } finally {
       setUpdating(null)
+    }
+  }
+
+  const openUserDetail = async (user: UserProfile) => {
+    setSelectedUser(user)
+    setDetailLoading(true)
+    setUserDonations([])
+    setUserMembershipApp(null)
+    setUserMembership(null)
+    setUserPurchases([])
+    try {
+      const [donations, membershipApp, membership, purchases] = await Promise.all([
+        getDonationsByUser(user.uid).catch(() => []),
+        getMembershipApplicationByUser(user.uid).catch(() => null),
+        getMembershipByUser(user.uid).catch(() => null),
+        getPurchasesByUser(user.uid).catch(() => []),
+      ])
+      setUserDonations(donations)
+      setUserMembershipApp(membershipApp)
+      setUserMembership(membership)
+      setUserPurchases(purchases)
+    } catch (err) {
+      console.error('Error loading user details:', err)
+    } finally {
+      setDetailLoading(false)
     }
   }
 
@@ -208,7 +253,7 @@ function UsersManagement() {
                 </tr>
               ) : (
                 paginatedUsers.map((user) => (
-                  <tr key={user.uid} className="hover:bg-slate-50">
+                  <tr key={user.uid} className="hover:bg-slate-50 cursor-pointer" onClick={() => openUserDetail(user)}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
                       {user.email}
                     </td>
@@ -223,7 +268,7 @@ function UsersManagement() {
                         {user.role}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" onClick={(e) => e.stopPropagation()}>
                       {(() => {
                         const level = user.accessLevel || 1
                         const color = level >= 5 ? 'bg-red-500'
@@ -255,7 +300,7 @@ function UsersManagement() {
                         )
                       })()}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" onClick={(e) => e.stopPropagation()}>
                       <select
                         value={user.role}
                         onChange={(e) => handleRoleChange(user.uid, e.target.value as UserRole)}
@@ -330,6 +375,247 @@ function UsersManagement() {
           </div>
         )}
       </div>
+
+      {/* User Detail Modal */}
+      {selectedUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-2xl">
+            {/* Header */}
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4">
+              <h2 className="text-xl font-bold">User Details</h2>
+              <button
+                onClick={() => setSelectedUser(null)}
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+              >
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Profile Overview */}
+              <div className="flex items-center gap-4">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-900 text-xl font-bold text-white">
+                  {(selectedUser.name || selectedUser.email || '?').charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900">{selectedUser.name || 'No name'}</h3>
+                  <p className="text-sm text-slate-500">{selectedUser.email}</p>
+                  <div className="mt-1 flex items-center gap-2">
+                    <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium capitalize text-slate-800">
+                      {selectedUser.role}
+                    </span>
+                    <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium capitalize text-blue-700">
+                      {selectedUser.membershipTier}
+                    </span>
+                    {selectedUser.emailVerified && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700">
+                        <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                        Verified
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Info Grid */}
+              <div className="grid grid-cols-2 gap-4 rounded-lg bg-slate-50 p-4">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">User ID</p>
+                  <p className="mt-0.5 text-xs font-mono text-slate-700 break-all">{selectedUser.uid}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Joined</p>
+                  <p className="mt-0.5 text-sm text-slate-700">{formatDate(toDate(selectedUser.createdAt))}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Phone</p>
+                  <p className="mt-0.5 text-sm text-slate-700">{userMembershipApp?.mobileNumber || '—'}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Address</p>
+                  <p className="mt-0.5 text-sm text-slate-700">{userMembershipApp?.physicalAddress || '—'}</p>
+                </div>
+                {(userMembershipApp?.province || userMembershipApp?.district) && (
+                  <>
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Province</p>
+                      <p className="mt-0.5 text-sm text-slate-700">{userMembershipApp?.province || '—'}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">District</p>
+                      <p className="mt-0.5 text-sm text-slate-700">{userMembershipApp?.district || '—'}</p>
+                    </div>
+                  </>
+                )}
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Access Level</p>
+                  <p className="mt-0.5 text-sm font-semibold text-slate-700">{selectedUser.accessLevel || 1} / 5</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Referral Code</p>
+                  <p className="mt-0.5 text-sm font-mono text-slate-700">{selectedUser.referralCode || '—'}</p>
+                </div>
+                {selectedUser.referredBy && (
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Referred By</p>
+                    <p className="mt-0.5 text-sm font-mono text-slate-700">{selectedUser.referredBy}</p>
+                  </div>
+                )}
+                {selectedUser.stripeCustomerId && (
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Stripe Customer</p>
+                    <p className="mt-0.5 text-xs font-mono text-slate-700 break-all">{selectedUser.stripeCustomerId}</p>
+                  </div>
+                )}
+              </div>
+
+              {detailLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="h-6 w-6 animate-spin rounded-full border-3 border-slate-900 border-r-transparent" />
+                </div>
+              ) : (
+                <>
+                  {/* Membership Application */}
+                  <div>
+                    <h4 className="mb-2 text-sm font-bold text-slate-900">Membership Application</h4>
+                    {userMembershipApp ? (
+                      <div className="rounded-lg border border-slate-200 p-3 text-sm">
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-600">Status</span>
+                          <span className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${
+                            userMembershipApp.status === 'approved' ? 'bg-green-100 text-green-700'
+                            : userMembershipApp.status === 'rejected' ? 'bg-red-100 text-red-700'
+                            : userMembershipApp.status === 'pending' ? 'bg-yellow-100 text-yellow-700'
+                            : 'bg-slate-100 text-slate-700'
+                          }`}>
+                            {userMembershipApp.status}
+                          </span>
+                        </div>
+                        {userMembershipApp.membershipNumber && (
+                          <div className="mt-1 flex items-center justify-between">
+                            <span className="text-slate-600">Membership #</span>
+                            <span className="font-mono text-xs font-semibold">{userMembershipApp.membershipNumber}</span>
+                          </div>
+                        )}
+                        {userMembershipApp.province && (
+                          <div className="mt-1 flex items-center justify-between">
+                            <span className="text-slate-600">Province</span>
+                            <span className="text-xs">{userMembershipApp.province}</span>
+                          </div>
+                        )}
+                        <div className="mt-1 flex items-center justify-between">
+                          <span className="text-slate-600">Applied</span>
+                          <span className="text-xs">{formatDate(toDate(userMembershipApp.createdAt))}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-slate-400">No application submitted</p>
+                    )}
+                  </div>
+
+                  {/* Membership Payment */}
+                  <div>
+                    <h4 className="mb-2 text-sm font-bold text-slate-900">Membership Payment</h4>
+                    {userMembership ? (
+                      <div className="rounded-lg border border-slate-200 p-3 text-sm">
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-600">Status</span>
+                          <span className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${
+                            userMembership.status === 'succeeded' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                          }`}>
+                            {userMembership.status}
+                          </span>
+                        </div>
+                        <div className="mt-1 flex items-center justify-between">
+                          <span className="text-slate-600">Paid</span>
+                          <span className="text-xs">{formatDate(toDate(userMembership.createdAt))}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-slate-400">No membership payment</p>
+                    )}
+                  </div>
+
+                  {/* Donations */}
+                  <div>
+                    <h4 className="mb-2 text-sm font-bold text-slate-900">
+                      Donations
+                      {userDonations.length > 0 && (
+                        <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">{userDonations.length}</span>
+                      )}
+                    </h4>
+                    {userDonations.length > 0 ? (
+                      <div className="space-y-2">
+                        {userDonations.slice(0, 5).map((d) => (
+                          <div key={d.id} className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-sm">
+                            <span className="font-semibold text-slate-900">${d.amount.toFixed(2)}</span>
+                            <div className="flex items-center gap-2">
+                              <span className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${
+                                d.status === 'succeeded' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                              }`}>{d.status}</span>
+                              <span className="text-xs text-slate-500">{formatDate(toDate(d.createdAt))}</span>
+                            </div>
+                          </div>
+                        ))}
+                        {userDonations.length > 5 && (
+                          <p className="text-center text-xs text-slate-400">+ {userDonations.length - 5} more</p>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-slate-400">No donations</p>
+                    )}
+                  </div>
+
+                  {/* Purchases */}
+                  <div>
+                    <h4 className="mb-2 text-sm font-bold text-slate-900">
+                      Purchases
+                      {userPurchases.length > 0 && (
+                        <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">{userPurchases.length}</span>
+                      )}
+                    </h4>
+                    {userPurchases.length > 0 ? (
+                      <div className="space-y-2">
+                        {userPurchases.slice(0, 5).map((p) => (
+                          <div key={p.id} className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-sm">
+                            <div>
+                              <span className="font-medium text-slate-900">{p.productName}</span>
+                              <span className="ml-2 text-slate-500">${p.amount.toFixed(2)}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${
+                                p.status === 'succeeded' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                              }`}>{p.status}</span>
+                              <span className="text-xs text-slate-500">{formatDate(toDate(p.createdAt))}</span>
+                            </div>
+                          </div>
+                        ))}
+                        {userPurchases.length > 5 && (
+                          <p className="text-center text-xs text-slate-400">+ {userPurchases.length - 5} more</p>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-slate-400">No purchases</p>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="sticky bottom-0 border-t border-slate-200 bg-white px-6 py-3">
+              <button
+                onClick={() => setSelectedUser(null)}
+                className="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -5,8 +5,8 @@ import ProtectedRoute from '@/app/components/ProtectedRoute'
 import AdminRoute from '@/app/components/AdminRoute'
 import DashboardNav from '@/app/components/DashboardNav'
 import Link from 'next/link'
-import { getAllPurchases, updatePurchase, getProductById, createNotification } from '@/lib/firebase/firestore'
-import type { Purchase, PaymentStatus, ShipmentStatus } from '@/types'
+import { getAllPurchases, updatePurchase, getProductById, getUserProfile, createNotification } from '@/lib/firebase/firestore'
+import type { Purchase, PaymentStatus, ShipmentStatus, UserProfile } from '@/types'
 
 function toDate(date: Date | any): Date | null {
   if (!date) return null
@@ -66,6 +66,7 @@ function OrdersManagement() {
   const [selectedOrder, setSelectedOrder] = useState<Purchase | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [productImages, setProductImages] = useState<Record<string, string>>({})
+  const [userProfiles, setUserProfiles] = useState<Record<string, UserProfile>>({})
   const [formData, setFormData] = useState({
     status: 'succeeded' as PaymentStatus,
     shipmentStatus: 'pending' as ShipmentStatus,
@@ -84,8 +85,9 @@ function OrdersManagement() {
       const allOrders = await getAllPurchases()
       setOrders(allOrders)
 
-      // Fetch product images
+      // Fetch product images and user profiles
       const imageMap: Record<string, string> = {}
+      const profileMap: Record<string, UserProfile> = {}
       for (const order of allOrders) {
         if (order.productId && !imageMap[order.productId]) {
           try {
@@ -97,8 +99,19 @@ function OrdersManagement() {
             console.error(`Error fetching product ${order.productId}:`, err)
           }
         }
+        if (order.userId && !profileMap[order.userId]) {
+          try {
+            const profile = await getUserProfile(order.userId)
+            if (profile) {
+              profileMap[order.userId] = profile
+            }
+          } catch (err) {
+            console.error(`Error fetching user ${order.userId}:`, err)
+          }
+        }
       }
       setProductImages(imageMap)
+      setUserProfiles(profileMap)
     } catch (err: any) {
       setError(err.message || 'Failed to load orders')
       console.error('Error loading orders:', err)
@@ -335,8 +348,15 @@ function OrdersManagement() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-xs text-slate-600">
-                        {order.userId.slice(0, 8)}...
+                      <td className="px-4 py-3">
+                        {userProfiles[order.userId] ? (
+                          <div>
+                            <div className="text-xs font-medium text-slate-900">{userProfiles[order.userId].name}</div>
+                            <div className="text-[11px] text-slate-500">{userProfiles[order.userId].email}</div>
+                          </div>
+                        ) : (
+                          <div className="text-xs text-slate-600">{order.userId.slice(0, 8)}...</div>
+                        )}
                       </td>
                       <td className="px-4 py-3">
                         <div className="text-xs font-medium text-slate-900">{order.productName}</div>
