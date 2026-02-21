@@ -63,8 +63,8 @@ export default function Home() {
       try {
         setNewsLoading(true)
         const publishedNews = await getNews(true) // Get only published news
-        // Limit to 3 most recent
-        setNews(publishedNews.slice(0, 3))
+        // Limit to 4 most recent
+        setNews(publishedNews.slice(0, 4))
       } catch (error) {
         console.error('Error loading news:', error)
       } finally {
@@ -222,85 +222,80 @@ export default function Home() {
         {/* Countdown Section */}
         <CountdownBanner />
 
-        {/* App Identity — visible to Google for branding verification */}
-        <section className="bg-gradient-to-b from-white to-slate-50 py-12 sm:py-16 border-b">
-          <div className="mx-auto max-w-5xl px-4 text-center sm:px-6">
-            <div className="mb-4 flex items-center justify-center gap-2">
-              <div className="h-px w-8 bg-slate-300 sm:w-12" />
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400 sm:text-xs">Our Mission</p>
-              <div className="h-px w-8 bg-slate-300 sm:w-12" />
-            </div>
-            <h1 className="mb-4 text-2xl font-bold text-slate-900 sm:text-3xl md:text-4xl">
-              Defend The Constitution Platform
-            </h1>
-            <p className="mx-auto max-w-2xl text-sm leading-relaxed text-slate-500 sm:text-base">
-              A non-partisan, inclusive civic engagement platform dedicated to defending Zimbabwe&apos;s Constitution,
-              promoting citizen participation, and opposing unconstitutional amendments.
-            </p>
-          </div>
-        </section>
-
-        {/* Stats Section - Hidden for now */}
-        {/* <section className="border-y bg-white py-8 sm:py-12">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3">
-            <StatCard value="40+" label="Communities Reached" />
-            <StatCard value="120+" label="Civic Sessions" />
-            <StatCard value="300+" label="Volunteers" />
-          </div>
-        </div>
-      </section> */}
-
-        {/* Updates Section */}
-        <section id="updates" className="bg-slate-50 py-8 sm:py-12">
+        {/* Mission & Updates — side by side */}
+        <section id="updates" className="bg-gradient-to-b from-white to-slate-50 py-10 sm:py-14 border-b">
           <div className="mx-auto max-w-7xl px-4 sm:px-6">
-            <div className="mb-6 text-center sm:mb-8">
-            </div>
+            <div className="grid gap-8 md:grid-cols-[1fr_1.5fr] md:gap-10 lg:gap-14">
 
-            {newsLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="text-center">
-                  <div className="mb-3 inline-block h-6 w-6 animate-spin rounded-full border-3 border-solid border-slate-900 border-r-transparent"></div>
-                  <p className="text-sm text-slate-500">Loading...</p>
+              {/* Left — Our Mission */}
+              <div className="flex flex-col justify-center">
+                <div className="mb-4 flex items-center gap-2">
+                  <div className="h-px w-8 bg-slate-300" />
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400 sm:text-xs">Our Mission</p>
                 </div>
+                <h1 className="mb-4 text-2xl font-bold text-slate-900 sm:text-3xl">
+                  Defend The Constitution Platform
+                </h1>
+                <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
+                  A non-partisan, inclusive civic engagement platform dedicated to defending Zimbabwe&apos;s Constitution,
+                  promoting citizen participation, and opposing unconstitutional amendments.
+                </p>
               </div>
-            ) : news.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-sm text-slate-500">No articles at the moment.</p>
+
+              {/* Right — Articles */}
+              <div>
+                <div className="mb-4 flex items-center justify-center gap-2">
+                  <div className="h-px w-8 bg-slate-300 sm:w-12" />
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400 sm:text-xs">Latest Articles</p>
+                  <div className="h-px w-8 bg-slate-300 sm:w-12" />
+                </div>
+                {newsLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="text-center">
+                      <div className="mb-3 inline-block h-6 w-6 animate-spin rounded-full border-3 border-solid border-slate-900 border-r-transparent"></div>
+                      <p className="text-sm text-slate-500">Loading...</p>
+                    </div>
+                  </div>
+                ) : news.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-sm text-slate-500">No articles at the moment.</p>
+                  </div>
+                ) : (
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {news.slice(0, 4).map((newsItem) => (
+                      <UpdateCard
+                        key={newsItem.id}
+                        id={newsItem.id}
+                        title={newsItem.title}
+                        description={newsItem.description}
+                        date={
+                          newsItem.publishedAt
+                            ? new Date(
+                              newsItem.publishedAt instanceof Date
+                                ? newsItem.publishedAt.getTime()
+                                : (newsItem.publishedAt as any)?.toMillis?.() || 0
+                            ).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                            })
+                            : new Date(
+                              newsItem.createdAt instanceof Date
+                                ? newsItem.createdAt.getTime()
+                                : (newsItem.createdAt as any)?.toMillis?.() || 0
+                            ).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                            })
+                        }
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="grid gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-3">
-                {news.map((newsItem) => (
-                  <UpdateCard
-                    key={newsItem.id}
-                    id={newsItem.id}
-                    title={newsItem.title}
-                    description={newsItem.description}
-                    date={
-                      newsItem.publishedAt
-                        ? new Date(
-                          newsItem.publishedAt instanceof Date
-                            ? newsItem.publishedAt.getTime()
-                            : (newsItem.publishedAt as any)?.toMillis?.() || 0
-                        ).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                        })
-                        : new Date(
-                          newsItem.createdAt instanceof Date
-                            ? newsItem.createdAt.getTime()
-                            : (newsItem.createdAt as any)?.toMillis?.() || 0
-                        ).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                        })
-                    }
-                  />
-                ))}
-              </div>
-            )}
+
+            </div>
           </div>
         </section>
 
