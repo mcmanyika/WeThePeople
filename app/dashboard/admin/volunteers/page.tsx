@@ -532,12 +532,18 @@ function VolunteerApplicationsManagement() {
                   }
 
                   return (
-                    <tr key={application.id} className="hover:bg-slate-50">
+                    <tr key={application.id} className={`hover:bg-slate-50 ${application.emailedAt ? 'bg-blue-50/50 border-l-2 border-l-blue-400' : ''}`}>
                       <td className="px-4 py-3 text-sm font-medium text-slate-900">
                         {application.name}
                       </td>
-                      <td className="px-4 py-3 text-sm text-slate-600">
-                        {application.email}
+                      <td className="px-4 py-3 text-sm">
+                        <a
+                          href={`mailto:${application.email}`}
+                          className="text-blue-600 hover:underline"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {application.email}
+                        </a>
                       </td>
                       <td className="px-4 py-3 text-sm text-slate-600">
                         <div className="flex flex-wrap gap-1">

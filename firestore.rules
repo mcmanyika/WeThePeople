@@ -180,9 +180,9 @@ service cloud.firestore {
                      request.resource.data.availability.size() > 0 &&
                      request.resource.data.experience.size() > 0 &&
                      request.resource.data.motivation.size() > 0;
-      // Admins can update status and review fields
+      // Admins can update status, review fields, and email tracking
       allow update: if isAdmin() &&
-                     request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'notes', 'reviewedBy', 'reviewedAt', 'updatedAt']);
+                     request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'notes', 'reviewedBy', 'reviewedAt', 'updatedAt', 'emailedAt']);
     }
 
     // Petitions collection
