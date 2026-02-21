@@ -219,20 +219,26 @@ export default function Home() {
       {/* All content below hero - sits above hero with z-index */}
       <div className="relative z-10 pt-20 md:pt-0">
 
+        {/* Countdown Section */}
+        <CountdownBanner />
+
         {/* App Identity — visible to Google for branding verification */}
-        <section className="bg-white py-8 sm:py-12 border-b">
-          <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
-            <h1 className="mb-3 text-2xl font-bold text-slate-900 sm:text-3xl">Defend The Constitution Platform</h1>
-            <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
+        <section className="bg-gradient-to-b from-white to-slate-50 py-12 sm:py-16 border-b">
+          <div className="mx-auto max-w-5xl px-4 text-center sm:px-6">
+            <div className="mb-4 flex items-center justify-center gap-2">
+              <div className="h-px w-8 bg-slate-300 sm:w-12" />
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400 sm:text-xs">Our Mission</p>
+              <div className="h-px w-8 bg-slate-300 sm:w-12" />
+            </div>
+            <h1 className="mb-4 text-2xl font-bold text-slate-900 sm:text-3xl md:text-4xl">
+              Defend The Constitution Platform
+            </h1>
+            <p className="mx-auto max-w-2xl text-sm leading-relaxed text-slate-500 sm:text-base">
               A non-partisan, inclusive civic engagement platform dedicated to defending Zimbabwe&apos;s Constitution,
-              promoting citizen participation, and opposing unconstitutional amendments. We empower citizens through
-              civic education, petitions, community mobilisation, and constitutional defence work.
+              promoting citizen participation, and opposing unconstitutional amendments.
             </p>
           </div>
         </section>
-
-        {/* Countdown Section */}
-        <CountdownBanner />
 
         {/* Stats Section - Hidden for now */}
         {/* <section className="border-y bg-white py-8 sm:py-12">
@@ -249,8 +255,6 @@ export default function Home() {
         <section id="updates" className="bg-slate-50 py-8 sm:py-12">
           <div className="mx-auto max-w-7xl px-4 sm:px-6">
             <div className="mb-6 text-center sm:mb-8">
-              <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Latest Articles</p>
-              <h2 className="text-2xl font-bold sm:text-3xl md:text-4xl">Updates & Announcements</h2>
             </div>
 
             {newsLoading ? (
