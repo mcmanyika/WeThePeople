@@ -422,12 +422,15 @@ function VolunteerApplicationsManagement() {
               )}
             </div>
             <div className="mt-2 flex flex-wrap justify-center gap-3">
-              {skillsChartData.map((d, i) => (
+              {skillsChartData.slice(0, 4).map((d, i) => (
                 <div key={i} className="flex items-center gap-1.5">
                   <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: d.color }} />
                   <span className="text-xs text-slate-600">{d.name} ({d.value})</span>
                 </div>
               ))}
+              {skillsChartData.length > 4 && (
+                <span className="text-xs text-slate-400">+{skillsChartData.length - 4} more</span>
+              )}
             </div>
           </div>
 
@@ -459,12 +462,15 @@ function VolunteerApplicationsManagement() {
               )}
             </div>
             <div className="mt-2 flex flex-wrap justify-center gap-3">
-              {availabilityChartData.map((d, i) => (
+              {availabilityChartData.slice(0, 4).map((d, i) => (
                 <div key={i} className="flex items-center gap-1.5">
                   <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: d.color }} />
                   <span className="text-xs text-slate-600">{d.name} ({d.value})</span>
                 </div>
               ))}
+              {availabilityChartData.length > 4 && (
+                <span className="text-xs text-slate-400">+{availabilityChartData.length - 4} more</span>
+              )}
             </div>
           </div>
         </div>
@@ -613,74 +619,86 @@ function VolunteerApplicationsManagement() {
         </div>
       </div>
 
-      {/* Email Compose Modal */}
+      {/* Email Compose Slide-over */}
       {showEmailModal && emailTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="w-full max-w-lg rounded-lg border border-slate-200 bg-white p-6 shadow-xl">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-bold">Email Volunteer</h2>
+        <div className="fixed inset-0 z-50 flex justify-end">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/40 transition-opacity"
+            onClick={() => { setShowEmailModal(false); setEmailTarget(null) }}
+          />
+          {/* Panel */}
+          <div className="relative w-full max-w-[50%] animate-slide-in-right flex flex-col border-l border-slate-200 bg-white shadow-2xl">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+              <h2 className="text-lg font-bold text-slate-900">Email Volunteer</h2>
               <button
                 onClick={() => { setShowEmailModal(false); setEmailTarget(null) }}
-                className="text-slate-400 hover:text-slate-600"
+                className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
               >
-                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
 
-            <div className="mb-4 rounded-lg bg-slate-50 p-3 text-sm">
-              <p className="text-slate-500">To:</p>
-              <p className="font-medium text-slate-900">{emailTarget.name} &lt;{emailTarget.email}&gt;</p>
+            {/* Body */}
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              <div className="mb-5 rounded-lg bg-slate-50 p-3 text-sm">
+                <p className="text-slate-500">To:</p>
+                <p className="font-medium text-slate-900">{emailTarget.name} &lt;{emailTarget.email}&gt;</p>
+              </div>
+
+              {emailSuccess && (
+                <div className="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+                  {emailSuccess}
+                </div>
+              )}
+              {emailError && (
+                <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                  {emailError}
+                </div>
+              )}
+
+              <div className="space-y-4">
+                <div>
+                  <label className="mb-1 block text-sm font-semibold text-slate-900">Subject</label>
+                  <input
+                    type="text"
+                    value={emailSubject}
+                    onChange={(e) => setEmailSubject(e.target.value)}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
+                    placeholder="Email subject..."
+                  />
+                </div>
+                <div className="flex flex-col flex-1">
+                  <label className="mb-1 block text-sm font-semibold text-slate-900">Message</label>
+                  <textarea
+                    rows={14}
+                    value={emailBody}
+                    onChange={(e) => setEmailBody(e.target.value)}
+                    className="w-full flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
+                    placeholder="Write your message..."
+                  />
+                </div>
+              </div>
             </div>
 
-            {emailSuccess && (
-              <div className="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-                {emailSuccess}
-              </div>
-            )}
-            {emailError && (
-              <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-                {emailError}
-              </div>
-            )}
-
-            <div className="space-y-4">
-              <div>
-                <label className="mb-1 block text-sm font-semibold text-slate-900">Subject</label>
-                <input
-                  type="text"
-                  value={emailSubject}
-                  onChange={(e) => setEmailSubject(e.target.value)}
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
-                  placeholder="Email subject..."
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-semibold text-slate-900">Message</label>
-                <textarea
-                  rows={8}
-                  value={emailBody}
-                  onChange={(e) => setEmailBody(e.target.value)}
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
-                  placeholder="Write your message..."
-                />
-              </div>
-              <div className="flex gap-3">
-                <button
-                  onClick={handleSendEmail}
-                  disabled={emailSending || !emailSubject.trim() || !emailBody.trim()}
-                  className="flex-1 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {emailSending ? 'Sending...' : 'Send Email'}
-                </button>
-                <button
-                  onClick={() => { setShowEmailModal(false); setEmailTarget(null) }}
-                  className="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
-                >
-                  Cancel
-                </button>
-              </div>
+            {/* Footer */}
+            <div className="border-t border-slate-200 px-6 py-4 flex gap-3">
+              <button
+                onClick={handleSendEmail}
+                disabled={emailSending || !emailSubject.trim() || !emailBody.trim()}
+                className="flex-1 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {emailSending ? 'Sending...' : 'Send Email'}
+              </button>
+              <button
+                onClick={() => { setShowEmailModal(false); setEmailTarget(null) }}
+                className="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
