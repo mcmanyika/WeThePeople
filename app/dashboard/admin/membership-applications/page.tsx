@@ -158,7 +158,7 @@ export default function AdminMembershipApplicationsPage() {
     // No draft — use default template
     setEmailSubject(`Your DCP Membership Application – Next Step`)
     setEmailBody(
-      `Thank you for submitting your membership application to the Defend the Constitution Platform (DCP). We sincerely appreciate your commitment to defending Zimbabwe's Constitution and strengthening citizen participation.\n\nWe are pleased to inform you that your application has been received. The next step to activate your membership is the membership contribution, which can be made as either:\n\n• $5 per month, or\n• $60 per year\n\nThis contribution supports our civic education, mobilisation, petition outreach, and constitutional defence work across Zimbabwe.\n\nOnce your payment is received, your membership will be formally activated, and you will begin receiving updates, invitations, and opportunities to actively participate in DCP initiatives.\n\nYou can complete your membership payment by visiting:\nwww.dcpzim.com\n\nThank you for standing with us in defence of the Constitution and the future of Zimbabwe.\n\nKind regards,\nDefend the Constitution Platform (DCP)\nwww.dcpzim.com`
+      `Thank you for submitting your membership application to the Defend the Constitution Platform (DCP). We sincerely appreciate your commitment to defending Zimbabwe's Constitution and strengthening citizen participation.\n\nWe are pleased to inform you that your application has been received. The next step to activate your membership is the membership contribution, which can be made as either:\n\n• $5 per month, or\n• $60 per year\n\nThis contribution supports our civic education, mobilisation, petition outreach, and constitutional defence work across Zimbabwe.\n\nOnce your payment is received, your membership will be formally activated, and you will begin receiving updates, invitations, and opportunities to actively participate in DCP initiatives.\n\nYou can complete your membership payment by visiting:\nwww.dcpzim.com\n\nThank you for standing with us in defence of the Constitution and the future of Zimbabwe.\n\nFor inquiries, please do not hesitate to reach out.\n\nKind regards,\nDefend the Constitution Platform (DCP)\nwww.dcpzim.com`
     )
   }
 
@@ -748,10 +748,19 @@ export default function AdminMembershipApplicationsPage() {
                   <div className="flex flex-col flex-1">
                     <label className="mb-1 block text-sm font-semibold text-slate-900">Message</label>
                     <textarea
-                      rows={22}
+                      ref={(el) => {
+                        if (el) {
+                          el.style.height = 'auto'
+                          el.style.height = el.scrollHeight + 'px'
+                        }
+                      }}
                       value={emailBody}
-                      onChange={(e) => setEmailBody(e.target.value)}
-                      className="w-full flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
+                      onChange={(e) => {
+                        setEmailBody(e.target.value)
+                        e.target.style.height = 'auto'
+                        e.target.style.height = e.target.scrollHeight + 'px'
+                      }}
+                      className="w-full min-h-[200px] rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none overflow-hidden"
                       placeholder="Write your message..."
                     />
                   </div>
