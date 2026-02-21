@@ -320,9 +320,7 @@ export default function ShopPage() {
                 <div
                   key={product.id}
                   onClick={() => setSelectedProduct(product)}
-                  className={`group rounded-lg border border-slate-200 bg-white overflow-hidden transition-all hover:border-slate-900 hover:shadow-md cursor-pointer ${
-                    isOutOfStock ? 'opacity-60' : ''
-                  }`}
+                  className="group rounded-lg border border-slate-200 bg-white overflow-hidden transition-all hover:border-slate-900 hover:shadow-md cursor-pointer"
                 >
                   <div className="aspect-square bg-slate-100 flex items-center justify-center overflow-hidden relative">
                     <img
@@ -330,13 +328,6 @@ export default function ShopPage() {
                       alt={product.name}
                       className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
-                    {isOutOfStock && (
-                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                        <span className="bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold">
-                          Out of Stock
-                        </span>
-                      </div>
-                    )}
                     {isLowStock && !isOutOfStock && (
                       <div className="absolute top-2 right-2 bg-yellow-500 text-white text-xs font-semibold px-2 py-0.5 rounded">
                         {product.stock} left
