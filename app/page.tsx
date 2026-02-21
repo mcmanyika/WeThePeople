@@ -219,6 +219,18 @@ export default function Home() {
       {/* All content below hero - sits above hero with z-index */}
       <div className="relative z-10 pt-20 md:pt-0">
 
+        {/* App Identity — visible to Google for branding verification */}
+        <section className="bg-white py-8 sm:py-12 border-b">
+          <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
+            <h1 className="mb-3 text-2xl font-bold text-slate-900 sm:text-3xl">Defend The Constitution Platform</h1>
+            <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
+              A non-partisan, inclusive civic engagement platform dedicated to defending Zimbabwe&apos;s Constitution,
+              promoting citizen participation, and opposing unconstitutional amendments. We empower citizens through
+              civic education, petitions, community mobilisation, and constitutional defence work.
+            </p>
+          </div>
+        </section>
+
         {/* Countdown Section */}
         <CountdownBanner />
 
@@ -913,6 +925,11 @@ export default function Home() {
 
             <div className="mt-6 border-t border-slate-800 pt-4 text-center text-[10px] text-slate-400 sm:text-xs">
               <p>© 2026 Defend the Constitution Platform. All rights reserved.</p>
+              <p className="mt-1">
+                <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+                <span className="mx-1.5">·</span>
+                <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+              </p>
             </div>
           </div>
         </footer>
