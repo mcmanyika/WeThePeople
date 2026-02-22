@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import Header from './components/Header';
@@ -9,8 +9,8 @@ import ContactForm from './components/ContactForm';
 import DonationModal from './components/DonationModal';
 import Chatbot from './components/Chatbot';
 import TwitterEmbed from './components/TwitterEmbed';
-import { getNews, createNewsletterSubscription, getProducts, getProductById, getGalleryImages, trackDownload, getDownloadCount } from '@/lib/firebase/firestore';
-import type { News, Product, GalleryImage } from '@/types';
+import { createNewsletterSubscription, getProducts, getProductById, getGalleryImages, trackDownload, getDownloadCount } from '@/lib/firebase/firestore';
+import type { Product, GalleryImage } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import { useRouter } from 'next/navigation';
@@ -20,8 +20,6 @@ export default function Home() {
   const { addToCart } = useCart()
   const router = useRouter()
   const [donationModalOpen, setDonationModalOpen] = useState(false)
-  const [news, setNews] = useState<News[]>([])
-  const [newsLoading, setNewsLoading] = useState(true)
   const [products, setProducts] = useState<Product[]>([])
   const [productsLoading, setProductsLoading] = useState(true)
   const [productStartIndex, setProductStartIndex] = useState(0)
@@ -37,6 +35,21 @@ export default function Home() {
   const [galleryLightbox, setGalleryLightbox] = useState<number | null>(null)
   const [billDownloadCount, setBillDownloadCount] = useState(0)
   const [contactOpen, setContactOpen] = useState(false)
+
+  // Declaration cards scroll-in animation
+  const declarationCardsRef = useRef<HTMLDivElement>(null)
+  const [cardsVisible, setCardsVisible] = useState(false)
+
+  useEffect(() => {
+    const el = declarationCardsRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setCardsVisible(true); observer.disconnect() } },
+      { threshold: 0.15 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
     // Handle hash navigation to open modal
@@ -58,21 +71,6 @@ export default function Home() {
     return () => window.removeEventListener('hashchange', handleHashChange)
   }, [])
 
-  useEffect(() => {
-    const loadNews = async () => {
-      try {
-        setNewsLoading(true)
-        const publishedNews = await getNews(true) // Get only published news
-        // Limit to 4 most recent
-        setNews(publishedNews.slice(0, 4))
-      } catch (error) {
-        console.error('Error loading news:', error)
-      } finally {
-        setNewsLoading(false)
-      }
-    }
-    loadNews()
-  }, [])
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -227,72 +225,63 @@ export default function Home() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6">
             <div className="grid gap-8 md:grid-cols-[1fr_1.5fr] md:gap-10 lg:gap-14">
 
-              {/* Left — Our Mission */}
+              {/* Left — National Referendum Declaration */}
               <div className="flex flex-col justify-center">
                 <div className="mb-4 flex items-center gap-2">
                   <div className="h-px w-8 bg-slate-300" />
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400 sm:text-xs">Our Mission</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400 sm:text-xs">National Referendum Declaration</p>
                 </div>
-                <h1 className="mb-4 text-2xl font-bold text-slate-900 sm:text-3xl">
-                  Defend The Constitution Platform
-                </h1>
-                <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
-                  A non-partisan, inclusive civic engagement platform dedicated to defending Zimbabwe&apos;s Constitution,
-                  promoting citizen participation, and opposing unconstitutional amendments.
+                <p className="mb-4 text-sm leading-relaxed text-slate-600 sm:text-base">
+                  Zimbabwe stands at a defining constitutional moment. A proposed constitutional amendment seeks to extend presidential and parliamentary tenure without direct approval by the citizens of Zimbabwe.
                 </p>
+                <p className="mb-6 text-sm leading-relaxed text-slate-600 sm:text-base">
+                  This is not a minor procedural reform. It alters the sovereign right of the people to choose their leaders at regular constitutional intervals. The Constitution of Zimbabwe (2013) was adopted by referendum. Any change affecting the people&apos;s right to elect and replace leadership must therefore return to the people.
+                </p>
+                <div>
+                  <Link
+                    href="/petitions"
+                    className="group inline-flex items-center gap-2.5 rounded-full bg-emerald-600 px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-600/25 transition-all duration-200 hover:bg-emerald-500 hover:shadow-xl hover:shadow-emerald-600/30 hover:-translate-y-0.5 active:translate-y-0"
+                  >
+                    <span>Sign Petition</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </Link>
+                </div>
               </div>
 
-              {/* Right — Articles */}
+              {/* Right — Declaration */}
               <div>
                 <div className="mb-4 flex items-center justify-center gap-2">
                   <div className="h-px w-8 bg-slate-300 sm:w-12" />
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400 sm:text-xs">Latest Articles</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400 sm:text-xs">Declaration</p>
                   <div className="h-px w-8 bg-slate-300 sm:w-12" />
                 </div>
-                {newsLoading ? (
-                  <div className="flex items-center justify-center py-8">
-                    <div className="text-center">
-                      <div className="mb-3 inline-block h-6 w-6 animate-spin rounded-full border-3 border-solid border-slate-900 border-r-transparent"></div>
-                      <p className="text-sm text-slate-500">Loading...</p>
+                <p className="mb-4 text-center text-sm font-medium text-slate-600">We therefore affirm and declare:</p>
+                <div ref={declarationCardsRef} className="grid gap-4 sm:grid-cols-2">
+                  {[
+                    { num: 1, title: 'Sovereignty Resides in the People', text: 'The Constitution is a covenant between citizens and the State. No alteration to presidential or parliamentary tenure can be made without returning to the people.' },
+                    { num: 2, title: 'Tenure Affects the Right to Vote', text: "Changing the duration of elected office directly affects the citizen\u2019s right to elect and replace leadership. Such decisions cannot be made by representatives alone." },
+                    { num: 3, title: 'Parliament Cannot Replace the People', text: 'Parliament derives its authority from the Constitution. It cannot substitute itself for the electorate in matters that alter democratic succession.' },
+                    { num: 4, title: 'No Referendum — No Legitimacy', text: 'Any tenure extension enacted without a referendum will lack constitutional legitimacy, democratic consent, and moral authority.' },
+                  ].map((d, i) => (
+                    <div
+                      key={d.num}
+                      className="group rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-700 ease-out hover:shadow-md hover:border-slate-300"
+                      style={{
+                        opacity: cardsVisible ? 1 : 0,
+                        transform: cardsVisible ? 'translateY(0)' : 'translateY(24px)',
+                        transitionDelay: `${i * 150}ms`,
+                      }}
+                    >
+                      <div className="mb-2 flex items-center gap-2">
+                        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">{d.num}</span>
+                        <h3 className="text-sm font-bold text-slate-900">{d.title}</h3>
+                      </div>
+                      <p className="text-xs leading-relaxed text-slate-600">{d.text}</p>
                     </div>
-                  </div>
-                ) : news.length === 0 ? (
-                  <div className="text-center py-8">
-                    <p className="text-sm text-slate-500">No articles at the moment.</p>
-                  </div>
-                ) : (
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    {news.slice(0, 4).map((newsItem) => (
-                      <UpdateCard
-                        key={newsItem.id}
-                        id={newsItem.id}
-                        title={newsItem.title}
-                        description={newsItem.description}
-                        date={
-                          newsItem.publishedAt
-                            ? new Date(
-                              newsItem.publishedAt instanceof Date
-                                ? newsItem.publishedAt.getTime()
-                                : (newsItem.publishedAt as any)?.toMillis?.() || 0
-                            ).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric',
-                            })
-                            : new Date(
-                              newsItem.createdAt instanceof Date
-                                ? newsItem.createdAt.getTime()
-                                : (newsItem.createdAt as any)?.toMillis?.() || 0
-                            ).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric',
-                            })
-                        }
-                      />
-                    ))}
-                  </div>
-                )}
+                  ))}
+                </div>
               </div>
 
             </div>
@@ -1035,18 +1024,5 @@ function FocusCard({ title, description }: { title: string; description: string 
       <h3 className="mb-2 text-base font-bold transition-colors duration-300 group-hover:text-slate-900 sm:text-lg">{title}</h3>
       <p className="text-xs text-slate-600 transition-colors duration-300 group-hover:text-slate-700 sm:text-sm">{description}</p>
     </div>
-  );
-}
-
-function UpdateCard({ id, title, description, date }: { id: string; title: string; description: string; date: string }) {
-  return (
-    <Link
-      href={`/news/${id}`}
-      className="group block rounded-lg border border-slate-200 bg-white p-4 transition-all duration-300 hover:border-slate-900 hover:shadow-md sm:p-5"
-    >
-      <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500 transition-colors duration-300 group-hover:text-slate-600">{date}</p>
-      <h3 className="mb-2 text-sm font-bold transition-colors duration-300 group-hover:text-slate-900 sm:text-base">{title}</h3>
-      <p className="text-xs text-slate-600 transition-colors duration-300 group-hover:text-slate-700 line-clamp-3">{description}</p>
-    </Link>
   );
 }
