@@ -220,70 +220,73 @@ export default function Home() {
         {/* Countdown Section */}
         <CountdownBanner />
 
-        {/* Mission & Updates — side by side */}
-        <section id="updates" className="bg-gradient-to-b from-white to-slate-50 py-10 sm:py-14 border-b">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6">
-            <div className="grid gap-8 md:grid-cols-[1fr_1.5fr] md:gap-10 lg:gap-14">
+        {/* National Referendum Declaration */}
+        <section id="updates" className="relative overflow-hidden bg-gradient-to-b from-white via-slate-50 to-emerald-50/40 py-16 sm:py-20">
+          {/* Background decorations */}
+          <div className="pointer-events-none absolute inset-0">
+            <div className="absolute -left-40 -top-40 h-80 w-80 rounded-full bg-emerald-200/30 blur-3xl" />
+            <div className="absolute -bottom-40 -right-40 h-80 w-80 rounded-full bg-emerald-100/30 blur-3xl" />
+          </div>
 
-              {/* Left — National Referendum Declaration */}
-              <div className="flex flex-col justify-center">
-                <div className="mb-4 flex items-center gap-2">
-                  <div className="h-px w-8 bg-slate-300" />
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400 sm:text-xs">National Referendum Declaration</p>
-                </div>
-                <p className="mb-4 text-sm leading-relaxed text-slate-600 sm:text-base">
-                  Zimbabwe stands at a defining constitutional moment. A proposed constitutional amendment seeks to extend presidential and parliamentary tenure without direct approval by the citizens of Zimbabwe.
-                </p>
-                <p className="mb-6 text-sm leading-relaxed text-slate-600 sm:text-base">
-                  This is not a minor procedural reform. It alters the sovereign right of the people to choose their leaders at regular constitutional intervals. The Constitution of Zimbabwe (2013) was adopted by referendum. Any change affecting the people&apos;s right to elect and replace leadership must therefore return to the people.
-                </p>
-                <div>
-                  <Link
-                    href="/petitions"
-                    className="group inline-flex items-center gap-2.5 rounded-full bg-emerald-600 px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-600/25 transition-all duration-200 hover:bg-emerald-500 hover:shadow-xl hover:shadow-emerald-600/30 hover:-translate-y-0.5 active:translate-y-0"
-                  >
-                    <span>Sign Petition</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                  </Link>
-                </div>
+          <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6">
+            {/* Top label */}
+            <div className="mb-10 text-center sm:mb-14">
+              <div className="mb-4 inline-flex items-center gap-3 rounded-full border border-emerald-200 bg-emerald-50 px-5 py-2">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[11px] font-semibold uppercase tracking-[0.25em] text-emerald-600">National Referendum Declaration</span>
               </div>
+              <p className="mx-auto max-w-2xl text-sm leading-relaxed text-slate-500 sm:text-base">
+                Zimbabwe stands at a defining constitutional moment. A proposed constitutional amendment seeks to extend presidential and parliamentary tenure without direct approval by the citizens of Zimbabwe.
+              </p>
+              <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-slate-500 sm:text-base">
+                This is not a minor procedural reform. It alters the sovereign right of the people to choose their leaders at regular constitutional intervals. The Constitution of Zimbabwe (2013) was adopted by referendum. Any change affecting the people&apos;s right to elect and replace leadership must therefore return to the people.
+              </p>
+            </div>
 
-              {/* Right — Declaration */}
-              <div>
-                <div className="mb-4 flex items-center justify-center gap-2">
-                  <div className="h-px w-8 bg-slate-300 sm:w-12" />
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400 sm:text-xs">Declaration</p>
-                  <div className="h-px w-8 bg-slate-300 sm:w-12" />
-                </div>
-                <p className="mb-4 text-center text-sm font-medium text-slate-600">We therefore affirm and declare:</p>
-                <div ref={declarationCardsRef} className="grid gap-4 sm:grid-cols-2">
-                  {[
-                    { num: 1, title: 'Sovereignty Resides in the People', text: 'The Constitution is a covenant between citizens and the State. No alteration to presidential or parliamentary tenure can be made without returning to the people.' },
-                    { num: 2, title: 'Tenure Affects the Right to Vote', text: "Changing the duration of elected office directly affects the citizen\u2019s right to elect and replace leadership. Such decisions cannot be made by representatives alone." },
-                    { num: 3, title: 'Parliament Cannot Replace the People', text: 'Parliament derives its authority from the Constitution. It cannot substitute itself for the electorate in matters that alter democratic succession.' },
-                    { num: 4, title: 'No Referendum — No Legitimacy', text: 'Any tenure extension enacted without a referendum will lack constitutional legitimacy, democratic consent, and moral authority.' },
-                  ].map((d, i) => (
-                    <div
-                      key={d.num}
-                      className="group rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-700 ease-out hover:shadow-md hover:border-slate-300"
-                      style={{
-                        opacity: cardsVisible ? 1 : 0,
-                        transform: cardsVisible ? 'translateY(0)' : 'translateY(24px)',
-                        transitionDelay: `${i * 150}ms`,
-                      }}
-                    >
-                      <div className="mb-2 flex items-center gap-2">
-                        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">{d.num}</span>
-                        <h3 className="text-sm font-bold text-slate-900">{d.title}</h3>
-                      </div>
-                      <p className="text-xs leading-relaxed text-slate-600">{d.text}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
+            {/* "We therefore affirm and declare" */}
+            <div className="mb-8 flex items-center justify-center gap-4">
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent to-slate-300" />
+              <p className="whitespace-nowrap text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 sm:text-sm">We therefore affirm and declare</p>
+              <div className="h-px flex-1 bg-gradient-to-l from-transparent to-slate-300" />
+            </div>
 
+            {/* Declaration cards */}
+            <div ref={declarationCardsRef} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                { num: 1, title: 'Sovereignty Resides in the People', text: 'The Constitution is a covenant between citizens and the State. No alteration to presidential or parliamentary tenure can be made without returning to the people.', accent: 'from-emerald-500 to-teal-500' },
+                { num: 2, title: 'Tenure Affects the Right to Vote', text: "Changing the duration of elected office directly affects the citizen\u2019s right to elect and replace leadership. Such decisions cannot be made by representatives alone.", accent: 'from-teal-500 to-cyan-500' },
+                { num: 3, title: 'Parliament Cannot Replace the People', text: 'Parliament derives its authority from the Constitution. It cannot substitute itself for the electorate in matters that alter democratic succession.', accent: 'from-cyan-500 to-blue-500' },
+                { num: 4, title: 'No Referendum — No Legitimacy', text: 'Any tenure extension enacted without a referendum will lack constitutional legitimacy, democratic consent, and moral authority.', accent: 'from-blue-500 to-indigo-500' },
+              ].map((d, i) => (
+                <div
+                  key={d.num}
+                  className="group relative rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-700 ease-out hover:border-emerald-200 hover:shadow-md"
+                  style={{
+                    opacity: cardsVisible ? 1 : 0,
+                    transform: cardsVisible ? 'translateY(0)' : 'translateY(30px)',
+                    transitionDelay: `${i * 150}ms`,
+                  }}
+                >
+                  {/* Top accent bar */}
+                  <div className={`mb-5 h-1 w-10 rounded-full bg-gradient-to-r ${d.accent} transition-all duration-300 group-hover:w-16`} />
+                  <span className="mb-3 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-xs font-bold text-white">{d.num}</span>
+                  <h3 className="mb-2 text-sm font-bold text-slate-900">{d.title}</h3>
+                  <p className="text-xs leading-relaxed text-slate-500">{d.text}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* CTA */}
+            <div className="mt-10 text-center sm:mt-14">
+              <Link
+                href="/petitions"
+                className="group inline-flex items-center gap-2.5 rounded-full bg-emerald-600 px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-emerald-600/25 transition-all duration-200 hover:bg-emerald-500 hover:shadow-xl hover:shadow-emerald-600/30 hover:-translate-y-0.5 active:translate-y-0"
+              >
+                <span>Sign Petition</span>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
             </div>
           </div>
         </section>
