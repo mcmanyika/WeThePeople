@@ -234,37 +234,6 @@ export default function Home() {
               </p>
             </div>
 
-            {/* "We therefore affirm and declare" */}
-            <div className="mb-8 flex items-center justify-center gap-4">
-              <div className="h-px flex-1 bg-slate-200" />
-              <p className="whitespace-nowrap text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 sm:text-sm">We therefore affirm and declare</p>
-              <div className="h-px flex-1 bg-slate-200" />
-            </div>
-
-            {/* Declaration cards */}
-            <div ref={declarationCardsRef} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {[
-                { num: 1, title: 'Sovereignty Resides in the People', text: 'The Constitution is a covenant between citizens and the State. No alteration to presidential or parliamentary tenure can be made without returning to the people.' },
-                { num: 2, title: 'Tenure Affects the Right to Vote', text: "Changing the duration of elected office directly affects the citizen\u2019s right to elect and replace leadership. Such decisions cannot be made by representatives alone." },
-                { num: 3, title: 'Parliament Cannot Replace the People', text: 'Parliament derives its authority from the Constitution. It cannot substitute itself for the electorate in matters that alter democratic succession.' },
-                { num: 4, title: 'No Referendum — No Legitimacy', text: 'Any tenure extension enacted without a referendum will lack constitutional legitimacy, democratic consent, and moral authority.' },
-              ].map((d, i) => (
-                <div
-                  key={d.num}
-                  className="group rounded-2xl border border-slate-200 bg-white p-6 transition-all duration-700 ease-out hover:border-slate-300 hover:shadow-sm"
-                  style={{
-                    opacity: cardsVisible ? 1 : 0,
-                    transform: cardsVisible ? 'translateY(0)' : 'translateY(30px)',
-                    transitionDelay: `${i * 150}ms`,
-                  }}
-                >
-                  <span className="mb-4 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-xs font-bold text-white">{d.num}</span>
-                  <h3 className="mb-2 text-sm font-bold text-slate-900">{d.title}</h3>
-                  <p className="text-xs leading-relaxed text-slate-500">{d.text}</p>
-                </div>
-              ))}
-            </div>
-
             {/* CTA */}
             <div className="mt-10 text-center sm:mt-14">
               <Link
