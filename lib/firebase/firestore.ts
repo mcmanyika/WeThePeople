@@ -17,7 +17,7 @@ import {
   increment,
 } from 'firebase/firestore'
 import { db } from './config'
-import type { UserProfile, Donation, Membership, ContactSubmission, Purchase, Product, UserRole, News, CartItem, VolunteerApplication, VolunteerApplicationStatus, Petition, PetitionSignature, ShipmentStatus, NewsletterSubscription, Banner, GalleryCategory, GalleryImage, Survey, SurveyResponse, MembershipApplication, MembershipApplicationStatus, AdminNotification, NotificationType, NotificationAudience, EmailLog, EmailType, EmailStatus, Leader, Referral, ReferralStatus, Resource, EmailDraft, EmailDraftContext, TwitterEmbedPost, InboundEmail } from '@/types'
+import type { UserProfile, Donation, Membership, ContactSubmission, Purchase, Product, UserRole, News, CartItem, VolunteerApplication, VolunteerApplicationStatus, Petition, PetitionSignature, ShipmentStatus, NewsletterSubscription, Banner, GalleryCategory, GalleryImage, Survey, SurveyResponse, MembershipApplication, MembershipApplicationStatus, AdminNotification, NotificationType, NotificationAudience, EmailLog, EmailType, EmailStatus, Leader, Referral, ReferralStatus, Resource, EmailDraft, EmailDraftContext, TwitterEmbedPost, InboundEmail, PaymentMethod } from '@/types'
 
 // Helper functions
 function requireDb() {
@@ -432,6 +432,69 @@ export async function updateMembershipStatus(
   if (membership) {
     await updateMembership(membership.id, { status })
   }
+}
+
+// Cash / Manual Membership Payment
+export async function createCashMembership(data: {
+  userId: string
+  tier: string
+  amount: number
+  billingPeriod: 'monthly' | 'yearly'
+  paymentMethod: PaymentMethod
+  planLabel: string
+  recordedBy: string
+  notes?: string
+}): Promise<string> {
+  const db = requireDb()
+  const ref = doc(collection(db, 'memberships'))
+
+  const now = new Date()
+  const nextDue = new Date(now)
+  if (data.billingPeriod === 'monthly') {
+    nextDue.setMonth(nextDue.getMonth() + 1)
+  } else {
+    nextDue.setFullYear(nextDue.getFullYear() + 1)
+  }
+
+  await setDoc(ref, {
+    id: ref.id,
+    userId: data.userId,
+    tier: data.tier,
+    amount: data.amount,
+    currency: 'USD',
+    billingPeriod: data.billingPeriod,
+    planLabel: data.planLabel,
+    paymentMethod: data.paymentMethod,
+    stripePaymentIntentId: `${data.paymentMethod}_${ref.id}`,
+    status: 'succeeded',
+    paidAt: Timestamp.now(),
+    nextDueDate: Timestamp.fromDate(nextDue),
+    recordedBy: data.recordedBy || 'admin',
+    notes: data.notes || '',
+    createdAt: Timestamp.now(),
+  })
+
+  return ref.id
+}
+
+export async function getMembershipsByUser(userId: string): Promise<Membership[]> {
+  const db = requireDb()
+  const q = query(
+    collection(db, 'memberships'),
+    where('userId', '==', userId),
+    orderBy('createdAt', 'desc')
+  )
+  const snapshot = await getDocs(q)
+  return snapshot.docs.map((d) => {
+    const data = d.data()
+    return {
+      ...data,
+      id: d.id,
+      createdAt: toDate(data.createdAt),
+      paidAt: data.paidAt ? toDate(data.paidAt) : undefined,
+      nextDueDate: data.nextDueDate ? toDate(data.nextDueDate) : undefined,
+    } as Membership
+  })
 }
 
 // Contact operations

@@ -3,6 +3,7 @@ import { Timestamp } from 'firebase/firestore'
 export type UserRole = 'supporter' | 'member' | 'moderator' | 'admin'
 export type MembershipTier = 'free' | 'basic' | 'premium' | 'champion'
 export type PaymentStatus = 'pending' | 'succeeded' | 'failed' | 'canceled'
+export type PaymentMethod = 'stripe' | 'cash' | 'bank_transfer' | 'mobile_money'
 export type SubscriptionStatus = 'active' | 'canceled' | 'past_due' | 'trialing' | 'incomplete'
 export type ShipmentStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
 
@@ -41,6 +42,17 @@ export interface Membership {
   stripePaymentIntentId: string
   status: PaymentStatus
   createdAt: Timestamp | Date
+
+  // Cash / manual payment fields
+  paymentMethod?: PaymentMethod
+  amount?: number
+  currency?: string
+  billingPeriod?: 'monthly' | 'yearly'
+  planLabel?: string           // e.g. "Diaspora Citizens – Yearly"
+  paidAt?: Timestamp | Date
+  nextDueDate?: Timestamp | Date
+  recordedBy?: string          // admin uid who recorded the payment
+  notes?: string               // e.g. "Cash received at Harare office"
 }
 
 export interface ContactSubmission {

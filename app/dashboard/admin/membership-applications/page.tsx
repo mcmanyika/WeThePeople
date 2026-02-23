@@ -5,8 +5,8 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import DashboardNav from '@/app/components/DashboardNav'
 import Link from 'next/link'
-import { getMembershipApplications, updateMembershipApplication, deleteMembershipApplication, markMembershipApplicationEmailed, markMembershipApplicationsEmailedBatch, saveEmailDraft, getEmailDraft, deleteEmailDraft } from '@/lib/firebase/firestore'
-import type { MembershipApplication, MembershipApplicationStatus } from '@/types'
+import { getMembershipApplications, updateMembershipApplication, deleteMembershipApplication, markMembershipApplicationEmailed, markMembershipApplicationsEmailedBatch, saveEmailDraft, getEmailDraft, deleteEmailDraft, createCashMembership } from '@/lib/firebase/firestore'
+import type { MembershipApplication, MembershipApplicationStatus, PaymentMethod } from '@/types'
 
 const statusColors: Record<MembershipApplicationStatus, string> = {
   pending: 'bg-amber-100 text-amber-800',
@@ -36,6 +36,23 @@ const orgTypeLabels: Record<string, string> = {
   other: 'Other',
 }
 
+// Membership pricing tiers for cash payment recording
+const CASH_PAYMENT_PLANS = [
+  { id: 'general', label: 'General Citizens', amount: 5, period: 'yearly' as const },
+  { id: 'students', label: 'Students / Youth', amount: 2, period: 'yearly' as const },
+  { id: 'students_vets', label: 'Students / War Vets / Unemployed', amount: 3, period: 'yearly' as const },
+  { id: 'diaspora_monthly', label: 'Diaspora Citizens – Monthly', amount: 5, period: 'monthly' as const },
+  { id: 'diaspora_yearly', label: 'Diaspora Citizens – Yearly', amount: 60, period: 'yearly' as const },
+  { id: 'workers', label: 'Workers / Informal Traders', amount: 3, period: 'yearly' as const },
+  { id: 'liberation', label: 'Liberation War Veterans', amount: 0, period: 'yearly' as const },
+  { id: 'unwaged', label: 'Unwaged / Vulnerable Persons', amount: 0, period: 'yearly' as const },
+  { id: 'micro', label: 'Monthly Micro-Subscription', amount: 1, period: 'monthly' as const },
+  { id: 'cbo', label: 'Small Community-Based Organisations', amount: 25, period: 'yearly' as const },
+  { id: 'trade_union', label: 'Local Trade Unions / Faith-Based Bodies', amount: 50, period: 'yearly' as const },
+  { id: 'national_civic', label: 'National Civic Organisations & Political Parties', amount: 300, period: 'yearly' as const },
+  { id: 'professional', label: 'Professional Associations', amount: 250, period: 'yearly' as const },
+]
+
 export default function AdminMembershipApplicationsPage() {
   const { userProfile } = useAuth()
   const router = useRouter()
@@ -52,6 +69,17 @@ export default function AdminMembershipApplicationsPage() {
   const [membershipNumber, setMembershipNumber] = useState('')
   const [provinceAllocated, setProvinceAllocated] = useState('')
   const [reviewNotes, setReviewNotes] = useState('')
+
+  // Cash payment modal state
+  const [showCashModal, setShowCashModal] = useState(false)
+  const [cashTarget, setCashTarget] = useState<MembershipApplication | null>(null)
+  const [cashPlanId, setCashPlanId] = useState('general')
+  const [cashAmount, setCashAmount] = useState(5)
+  const [cashMethod, setCashMethod] = useState<PaymentMethod>('cash')
+  const [cashNotes, setCashNotes] = useState('')
+  const [cashSaving, setCashSaving] = useState(false)
+  const [cashSuccess, setCashSuccess] = useState('')
+  const [cashError, setCashError] = useState('')
 
   // Email modal state
   const [showEmailModal, setShowEmailModal] = useState(false)
@@ -84,6 +112,71 @@ export default function AdminMembershipApplicationsPage() {
       console.error('Error loading membership applications:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  // Cash payment handlers
+  const openCashModal = (app: MembershipApplication) => {
+    setCashTarget(app)
+    setCashPlanId('general')
+    setCashAmount(5)
+    setCashMethod('cash')
+    setCashNotes('')
+    setCashSuccess('')
+    setCashError('')
+    setShowCashModal(true)
+  }
+
+  const handleCashPlanChange = (planId: string) => {
+    setCashPlanId(planId)
+    const plan = CASH_PAYMENT_PLANS.find((p) => p.id === planId)
+    if (plan) setCashAmount(plan.amount)
+  }
+
+  const handleRecordCashPayment = async () => {
+    if (!cashTarget || !userProfile) return
+    const plan = CASH_PAYMENT_PLANS.find((p) => p.id === cashPlanId)
+    if (!plan) return
+
+    setCashSaving(true)
+    setCashError('')
+    setCashSuccess('')
+
+    try {
+      await createCashMembership({
+        userId: cashTarget.userId || '',
+        tier: cashPlanId,
+        amount: cashAmount,
+        billingPeriod: plan.period,
+        paymentMethod: cashMethod,
+        planLabel: plan.label,
+        recordedBy: userProfile.uid || userProfile.email || 'admin',
+        notes: cashNotes.trim() || '',
+      })
+
+      // Auto-approve the application if still pending
+      if (cashTarget.status === 'pending') {
+        await updateMembershipApplication(cashTarget.id, {
+          status: 'approved' as MembershipApplicationStatus,
+          approvedBy: userProfile.name || 'Admin',
+          dateReceived: new Date().toISOString().split('T')[0],
+        })
+      }
+
+      const nextDue = new Date()
+      if (plan.period === 'monthly') {
+        nextDue.setMonth(nextDue.getMonth() + 1)
+      } else {
+        nextDue.setFullYear(nextDue.getFullYear() + 1)
+      }
+
+      setCashSuccess(`Payment recorded! Next due: ${nextDue.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`)
+      await loadApplications()
+    } catch (err: any) {
+      console.error('Error recording cash payment:', err)
+      setCashError(err.message || 'Failed to record payment')
+    } finally {
+      setCashSaving(false)
     }
   }
 
@@ -847,6 +940,21 @@ export default function AdminMembershipApplicationsPage() {
                   )}
                 </div>
 
+                {/* Record Payment */}
+                <div className="rounded-lg border border-emerald-200 bg-emerald-50/50 p-4">
+                  <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-emerald-700">Record Payment</label>
+                  <p className="mb-3 text-xs text-emerald-600">For cash, bank transfer, or mobile money payments made outside Stripe.</p>
+                  <button
+                    onClick={() => openCashModal(selectedApp)}
+                    className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 transition-colors"
+                  >
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Record Manual Payment
+                  </button>
+                </div>
+
                 {/* Action Buttons */}
                 <div className="flex flex-wrap gap-3 pt-2">
                   <button
@@ -864,6 +972,174 @@ export default function AdminMembershipApplicationsPage() {
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Cash Payment Modal */}
+        {showCashModal && cashTarget && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/40" onClick={() => !cashSaving && setShowCashModal(false)} />
+            <div className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
+              <h3 className="text-lg font-bold text-slate-900">Record Manual Payment</h3>
+              <p className="mt-1 text-sm text-slate-500">
+                For <span className="font-semibold text-slate-700">{cashTarget.fullName || cashTarget.organisationName || 'Applicant'}</span>
+              </p>
+
+              {cashSuccess && (
+                <div className="mt-4 rounded-lg bg-emerald-50 border border-emerald-200 p-3">
+                  <p className="text-sm font-semibold text-emerald-700">{cashSuccess}</p>
+                </div>
+              )}
+              {cashError && (
+                <div className="mt-4 rounded-lg bg-red-50 border border-red-200 p-3">
+                  <p className="text-sm font-semibold text-red-700">{cashError}</p>
+                </div>
+              )}
+
+              {!cashSuccess && (
+                <div className="mt-5 space-y-4">
+                  {/* Payment Method */}
+                  <div>
+                    <label className="mb-1.5 block text-xs font-semibold text-slate-600">Payment Method</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {([
+                        { value: 'cash' as PaymentMethod, label: 'Cash' },
+                        { value: 'bank_transfer' as PaymentMethod, label: 'Bank Transfer' },
+                        { value: 'mobile_money' as PaymentMethod, label: 'Mobile Money' },
+                      ]).map((m) => (
+                        <button
+                          key={m.value}
+                          onClick={() => setCashMethod(m.value)}
+                          className={`rounded-lg border px-3 py-2 text-xs font-semibold transition-colors ${
+                            cashMethod === m.value
+                              ? 'border-slate-900 bg-slate-900 text-white'
+                              : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                          }`}
+                        >
+                          {m.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Plan Selection */}
+                  <div>
+                    <label className="mb-1.5 block text-xs font-semibold text-slate-600">Membership Plan</label>
+                    <select
+                      value={cashPlanId}
+                      onChange={(e) => handleCashPlanChange(e.target.value)}
+                      className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
+                    >
+                      <optgroup label="Individual (Annual)">
+                        {CASH_PAYMENT_PLANS.filter((p) => ['general', 'students', 'students_vets', 'diaspora_monthly', 'diaspora_yearly', 'workers', 'liberation', 'unwaged'].includes(p.id)).map((p) => (
+                          <option key={p.id} value={p.id}>
+                            {p.label} — ${p.amount}/{p.period === 'monthly' ? 'mo' : 'yr'}
+                          </option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="Monthly Micro-Subscription">
+                        {CASH_PAYMENT_PLANS.filter((p) => p.id === 'micro').map((p) => (
+                          <option key={p.id} value={p.id}>
+                            {p.label} — ${p.amount}/mo
+                          </option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="Institutional (Annual)">
+                        {CASH_PAYMENT_PLANS.filter((p) => ['cbo', 'trade_union', 'national_civic', 'professional'].includes(p.id)).map((p) => (
+                          <option key={p.id} value={p.id}>
+                            {p.label} — ${p.amount}/yr
+                          </option>
+                        ))}
+                      </optgroup>
+                    </select>
+                  </div>
+
+                  {/* Amount */}
+                  <div>
+                    <label className="mb-1.5 block text-xs font-semibold text-slate-600">Amount (USD)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={cashAmount}
+                      onChange={(e) => setCashAmount(parseFloat(e.target.value) || 0)}
+                      className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
+                    />
+                    <p className="mt-1 text-[10px] text-slate-400">
+                      Pre-filled from plan. Adjust for voluntary / partial amounts.
+                    </p>
+                  </div>
+
+                  {/* Next Due Date Preview */}
+                  <div className="rounded-lg border border-blue-100 bg-blue-50/50 p-3">
+                    <p className="text-xs text-blue-700">
+                      <span className="font-semibold">Next due date:</span>{' '}
+                      {(() => {
+                        const plan = CASH_PAYMENT_PLANS.find((p) => p.id === cashPlanId)
+                        const next = new Date()
+                        if (plan?.period === 'monthly') next.setMonth(next.getMonth() + 1)
+                        else next.setFullYear(next.getFullYear() + 1)
+                        return next.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+                      })()}
+                    </p>
+                    <p className="mt-0.5 text-[10px] text-blue-500">
+                      Auto-calculated: +1 {CASH_PAYMENT_PLANS.find((p) => p.id === cashPlanId)?.period === 'monthly' ? 'month' : 'year'} from today
+                    </p>
+                  </div>
+
+                  {/* Notes */}
+                  <div>
+                    <label className="mb-1.5 block text-xs font-semibold text-slate-600">Notes (optional)</label>
+                    <textarea
+                      rows={2}
+                      value={cashNotes}
+                      onChange={(e) => setCashNotes(e.target.value)}
+                      placeholder="e.g. Cash received at Harare office, receipt #123"
+                      className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
+                    />
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex gap-3 pt-1">
+                    <button
+                      onClick={handleRecordCashPayment}
+                      disabled={cashSaving || cashAmount <= 0}
+                      className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {cashSaving ? (
+                        <>
+                          <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                          </svg>
+                          Recording…
+                        </>
+                      ) : (
+                        'Confirm Payment'
+                      )}
+                    </button>
+                    <button
+                      onClick={() => setShowCashModal(false)}
+                      disabled={cashSaving}
+                      className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {cashSuccess && (
+                <div className="mt-4 flex justify-end">
+                  <button
+                    onClick={() => setShowCashModal(false)}
+                    className="rounded-lg bg-slate-900 px-5 py-2 text-sm font-semibold text-white hover:bg-slate-800 transition-colors"
+                  >
+                    Done
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}

@@ -91,8 +91,8 @@ service cloud.firestore {
                       request.resource.data.status is string &&
                       request.resource.data.stripeSubscriptionId is string &&
                       request.resource.data.stripeSubscriptionId.size() > 0);
-      // Admins can read all memberships
-      allow read: if isAdmin();
+      // Admins can read all memberships and update/create (for cash payments)
+      allow read, create, update: if isAdmin();
     }
 
     // Contacts collection
