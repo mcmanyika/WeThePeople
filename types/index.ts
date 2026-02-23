@@ -352,6 +352,21 @@ export interface EmailLog {
   createdAt: Timestamp | Date
 }
 
+// Inbound Email (received via Resend webhook)
+export interface InboundEmail {
+  id: string
+  from: string
+  fromName?: string
+  to: string
+  subject: string
+  body: string           // plain text body
+  html?: string          // HTML body
+  isRead: boolean
+  isStarred: boolean
+  resendEmailId?: string
+  createdAt: Timestamp | Date
+}
+
 // Leadership types
 export interface Leader {
   id: string

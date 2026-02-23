@@ -416,5 +416,15 @@ service cloud.firestore {
       allow update: if isAdmin();
       allow delete: if isAdmin();
     }
+
+    // Inbound Emails collection (received via Resend webhook)
+    match /inboundEmails/{emailId} {
+      // The webhook API route creates inbound emails (server-side)
+      allow create: if true;
+      // Only admins can read, update, and delete inbound emails
+      allow read: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
   }
 }

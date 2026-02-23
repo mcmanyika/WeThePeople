@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
-export default function ComposeEmailPage() {
+function ComposeEmailContent() {
   const { user, userProfile } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   const [to, setTo] = useState('')
   const [name, setName] = useState('')
@@ -15,6 +16,16 @@ export default function ComposeEmailPage() {
   const [sending, setSending] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
+
+  // Pre-fill from search params (e.g. from inbox reply)
+  useEffect(() => {
+    const paramTo = searchParams.get('to')
+    const paramName = searchParams.get('name')
+    const paramSubject = searchParams.get('subject')
+    if (paramTo) setTo(paramTo)
+    if (paramName) setName(paramName)
+    if (paramSubject) setSubject(paramSubject)
+  }, [searchParams])
 
   if (!user || userProfile?.role !== 'admin') {
     return null
@@ -194,5 +205,13 @@ export default function ComposeEmailPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function ComposeEmailPage() {
+  return (
+    <Suspense fallback={<div className="mx-auto max-w-3xl px-4 py-8"><div className="flex items-center justify-center py-20"><div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-300 border-t-slate-900" /></div></div>}>
+      <ComposeEmailContent />
+    </Suspense>
   )
 }

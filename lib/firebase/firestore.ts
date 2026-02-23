@@ -17,7 +17,7 @@ import {
   increment,
 } from 'firebase/firestore'
 import { db } from './config'
-import type { UserProfile, Donation, Membership, ContactSubmission, Purchase, Product, UserRole, News, CartItem, VolunteerApplication, VolunteerApplicationStatus, Petition, PetitionSignature, ShipmentStatus, NewsletterSubscription, Banner, GalleryCategory, GalleryImage, Survey, SurveyResponse, MembershipApplication, MembershipApplicationStatus, AdminNotification, NotificationType, NotificationAudience, EmailLog, EmailType, EmailStatus, Leader, Referral, ReferralStatus, Resource, EmailDraft, EmailDraftContext, TwitterEmbedPost } from '@/types'
+import type { UserProfile, Donation, Membership, ContactSubmission, Purchase, Product, UserRole, News, CartItem, VolunteerApplication, VolunteerApplicationStatus, Petition, PetitionSignature, ShipmentStatus, NewsletterSubscription, Banner, GalleryCategory, GalleryImage, Survey, SurveyResponse, MembershipApplication, MembershipApplicationStatus, AdminNotification, NotificationType, NotificationAudience, EmailLog, EmailType, EmailStatus, Leader, Referral, ReferralStatus, Resource, EmailDraft, EmailDraftContext, TwitterEmbedPost, InboundEmail } from '@/types'
 
 // Helper functions
 function requireDb() {
@@ -3169,4 +3169,41 @@ export async function getAllDownloadStats(): Promise<DownloadStat[]> {
     console.error('Error fetching all download stats:', error)
     return []
   }
+}
+
+// ─── Inbound Emails ──────────────────────────────────────────────
+
+export async function createInboundEmail(email: Omit<InboundEmail, 'id' | 'createdAt'>): Promise<string> {
+  const ref = doc(collection(db, 'inboundEmails'))
+  await setDoc(ref, {
+    ...email,
+    createdAt: Timestamp.now(),
+  })
+  return ref.id
+}
+
+export async function getInboundEmails(limitCount: number = 100): Promise<InboundEmail[]> {
+  const q = query(
+    collection(db, 'inboundEmails'),
+    orderBy('createdAt', 'desc'),
+    limit(limitCount)
+  )
+  const snapshot = await getDocs(q)
+  return snapshot.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+    createdAt: d.data().createdAt?.toDate?.() || d.data().createdAt,
+  })) as InboundEmail[]
+}
+
+export async function markInboundEmailRead(emailId: string): Promise<void> {
+  await updateDoc(doc(db, 'inboundEmails', emailId), { isRead: true })
+}
+
+export async function markInboundEmailStarred(emailId: string, starred: boolean): Promise<void> {
+  await updateDoc(doc(db, 'inboundEmails', emailId), { isStarred: starred })
+}
+
+export async function deleteInboundEmail(emailId: string): Promise<void> {
+  await deleteDoc(doc(db, 'inboundEmails', emailId))
 }

@@ -214,6 +214,7 @@ const adminManageItems: NavItem[] = [
   { href: '/dashboard/admin/orders', label: 'Orders', icon: <IconCube />, description: 'Order management' },
   { href: '/dashboard/admin/volunteers', label: 'Volunteers', icon: <IconUserGroup />, description: 'Applications' },
   { href: '/dashboard/admin/contacts', label: 'Contact', icon: <IconEnvelope />, description: 'Messages received' },
+  { href: '/dashboard/admin/inbox', label: 'Inbox', icon: <IconEnvelope />, description: 'Received emails' },
   { href: '/dashboard/admin/compose-email', label: 'Email Compose', icon: <IconEnvelope />, description: 'Send an email' },
   { href: '/dashboard/admin/emails', label: 'Emails', icon: <IconEnvelope />, description: 'Sent email logs' },
   { href: '/dashboard/admin/downloads', label: 'Downloads', icon: <IconArrowDownTray />, description: 'Download tracking' },
