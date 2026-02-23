@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { Webhook } from 'svix'
 import { createInboundEmail } from '@/lib/firebase/firestore'
+
+const WEBHOOK_SECRET = process.env.RESEND_WEBHOOK_SECRET
 
 /**
  * Resend Inbound Email Webhook
@@ -10,7 +13,33 @@ import { createInboundEmail } from '@/lib/firebase/firestore'
  */
 export async function POST(request: NextRequest) {
   try {
-    const event = await request.json()
+    const body = await request.text()
+
+    // Verify webhook signature if secret is configured
+    if (WEBHOOK_SECRET) {
+      const svixId = request.headers.get('svix-id')
+      const svixTimestamp = request.headers.get('svix-timestamp')
+      const svixSignature = request.headers.get('svix-signature')
+
+      if (!svixId || !svixTimestamp || !svixSignature) {
+        console.error('Missing svix headers')
+        return NextResponse.json({ error: 'Missing webhook signature headers' }, { status: 401 })
+      }
+
+      const wh = new Webhook(WEBHOOK_SECRET)
+      try {
+        wh.verify(body, {
+          'svix-id': svixId,
+          'svix-timestamp': svixTimestamp,
+          'svix-signature': svixSignature,
+        })
+      } catch (err) {
+        console.error('Webhook signature verification failed:', err)
+        return NextResponse.json({ error: 'Invalid webhook signature' }, { status: 401 })
+      }
+    }
+
+    const event = JSON.parse(body)
 
     // Only process email.received events
     if (event.type !== 'email.received') {
@@ -33,7 +62,7 @@ export async function POST(request: NextRequest) {
 
     const to = Array.isArray(data.to) ? data.to.join(', ') : (data.to || '')
     const subject = data.subject || '(No Subject)'
-    const body = data.text || ''
+    const body_text = data.text || ''
     const html = data.html || ''
 
     // Store in Firestore
@@ -42,7 +71,7 @@ export async function POST(request: NextRequest) {
       fromName: fromName || undefined,
       to,
       subject,
-      body,
+      body: body_text,
       html: html || undefined,
       isRead: false,
       isStarred: false,
