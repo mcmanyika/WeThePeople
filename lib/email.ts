@@ -108,6 +108,9 @@ function buildCustomEmailHtml({ name, subject, body }: { name: string; subject: 
                 Warm regards,
               </p>
               <p style="color:#0f172a;font-size:15px;line-height:1.5;margin:0 0 2px;">
+                <strong>P. Manyika</strong>
+              </p>
+              <p style="color:#0f172a;font-size:15px;line-height:1.5;margin:0 0 2px;">
                 <strong>Defend the Constitution Platform</strong>
               </p>
               <p style="color:#64748b;font-size:13px;line-height:1.5;margin:0;">
