@@ -3174,6 +3174,7 @@ export async function getAllDownloadStats(): Promise<DownloadStat[]> {
 // ─── Inbound Emails ──────────────────────────────────────────────
 
 export async function createInboundEmail(email: Omit<InboundEmail, 'id' | 'createdAt'>): Promise<string> {
+  const db = requireDb()
   const ref = doc(collection(db, 'inboundEmails'))
   await setDoc(ref, {
     ...email,
@@ -3183,6 +3184,7 @@ export async function createInboundEmail(email: Omit<InboundEmail, 'id' | 'creat
 }
 
 export async function getInboundEmails(limitCount: number = 100): Promise<InboundEmail[]> {
+  const db = requireDb()
   const q = query(
     collection(db, 'inboundEmails'),
     orderBy('createdAt', 'desc'),
@@ -3197,13 +3199,16 @@ export async function getInboundEmails(limitCount: number = 100): Promise<Inboun
 }
 
 export async function markInboundEmailRead(emailId: string): Promise<void> {
+  const db = requireDb()
   await updateDoc(doc(db, 'inboundEmails', emailId), { isRead: true })
 }
 
 export async function markInboundEmailStarred(emailId: string, starred: boolean): Promise<void> {
+  const db = requireDb()
   await updateDoc(doc(db, 'inboundEmails', emailId), { isStarred: starred })
 }
 
 export async function deleteInboundEmail(emailId: string): Promise<void> {
+  const db = requireDb()
   await deleteDoc(doc(db, 'inboundEmails', emailId))
 }
