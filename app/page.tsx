@@ -608,7 +608,7 @@ export default function Home() {
               {galleryImages.map((image, index) => (
                 <div
                   key={image.id}
-                  className="relative aspect-square overflow-hidden cursor-pointer group"
+                  className={`relative aspect-square overflow-hidden cursor-pointer group ${index >= 4 ? 'hidden sm:block' : ''}`}
                   onClick={() => setGalleryLightbox(index)}
                 >
                   <img
