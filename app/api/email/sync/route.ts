@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
-import { createInboundEmail, getInboundEmails } from '@/lib/firebase/firestore'
+import { createInboundEmail } from '@/lib/firebase/firestore'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -8,8 +8,8 @@ const resend = new Resend(process.env.RESEND_API_KEY)
  * Sync received emails from Resend API into Firestore.
  * GET /api/email/sync
  * 
- * Fetches all received emails from Resend and stores any that
- * aren't already in Firestore (de-duplicated by resendEmailId).
+ * Fetches received emails from Resend and stores them in Firestore.
+ * Duplicates in a single payload are skipped by `email.id`.
  */
 export async function GET(request: NextRequest) {
   try {
@@ -22,16 +22,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch from Resend' }, { status: 500 })
     }
 
-    // Get existing inbound emails to avoid duplicates
-    const existingEmails = await getInboundEmails(500)
-    const existingResendIds = new Set(existingEmails.map((e) => e.resendEmailId).filter(Boolean))
-
     let synced = 0
     const emails = receivedEmails?.data || receivedEmails || []
+    const seenIds = new Set<string>()
 
     for (const email of emails) {
-      // Skip if already stored
-      if (email.id && existingResendIds.has(email.id)) continue
+      // Skip duplicates returned in the same Resend response payload.
+      if (email.id) {
+        if (seenIds.has(email.id)) continue
+        seenIds.add(email.id)
+      }
 
       const from = email.from || ''
       const fromName = from.includes('<')
@@ -45,18 +45,22 @@ export async function GET(request: NextRequest) {
         ? email.to.join(', ')
         : (email.to || '')
 
-      await createInboundEmail({
-        from: fromEmail,
-        fromName: fromName || undefined,
-        to,
-        subject: email.subject || '(No Subject)',
-        body: (email as any).text || email.subject || '',
-        html: (email as any).html || undefined,
-        isRead: false,
-        isStarred: false,
-        resendEmailId: email.id || undefined,
-      })
-      synced++
+      try {
+        await createInboundEmail({
+          from: fromEmail,
+          fromName: fromName || undefined,
+          to,
+          subject: email.subject || '(No Subject)',
+          body: (email as any).text || email.subject || '',
+          html: (email as any).html || undefined,
+          isRead: false,
+          isStarred: false,
+          resendEmailId: email.id || undefined,
+        })
+        synced++
+      } catch (writeError) {
+        console.error('Failed to store synced email:', email.id, writeError)
+      }
     }
 
     return NextResponse.json({ success: true, synced, total: emails.length })
