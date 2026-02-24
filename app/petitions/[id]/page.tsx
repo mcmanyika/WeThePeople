@@ -54,6 +54,28 @@ export default function PetitionDetailPage() {
     }
   }
 
+  const sendPetitionConfirmationEmail = async (payload: { name: string; email: string; petitionTitle: string; petitionId: string }) => {
+    try {
+      const res = await fetch('/api/email/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: payload.email,
+          name: payload.name,
+          subject: 'Thank you for signing the petition',
+          body: `Thank you for signing "${payload.petitionTitle}".\n\nYour voice has been recorded and helps strengthen this constitutional campaign.\n\nView petition: ${window.location.origin}/petitions/${payload.petitionId}\n\nContact email: contact@dcpzim.com\nFor inquiries please do not hesitate to reach out.`,
+        }),
+      })
+
+      if (!res.ok) {
+        const errorBody = await res.text()
+        console.error('Petition confirmation email request failed:', res.status, errorBody)
+      }
+    } catch (err) {
+      console.error('Failed to send petition confirmation email:', err)
+    }
+  }
+
   const handleSign = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!petition) return
@@ -67,6 +89,12 @@ export default function PetitionDetailPage() {
         name: signData.name.trim(),
         email: signData.email.trim(),
         anonymous: signData.anonymous,
+      })
+      void sendPetitionConfirmationEmail({
+        name: signData.name.trim(),
+        email: signData.email.trim(),
+        petitionTitle: petition.title,
+        petitionId: petition.id,
       })
       setShowSignModal(false)
       setShowThankYou(true)
