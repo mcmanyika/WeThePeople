@@ -3239,10 +3239,21 @@ export async function getAllDownloadStats(): Promise<DownloadStat[]> {
 export async function createInboundEmail(email: Omit<InboundEmail, 'id' | 'createdAt'>): Promise<string> {
   const db = requireDb()
   const ref = doc(collection(db, 'inboundEmails'))
-  await setDoc(ref, {
-    ...email,
+  const payload: Record<string, any> = {
+    from: email.from,
+    to: email.to,
+    subject: email.subject,
+    body: email.body,
+    isRead: email.isRead,
+    isStarred: email.isStarred,
     createdAt: Timestamp.now(),
-  })
+  }
+
+  if (email.fromName !== undefined) payload.fromName = email.fromName
+  if (email.html !== undefined) payload.html = email.html
+  if (email.resendEmailId !== undefined) payload.resendEmailId = email.resendEmailId
+
+  await setDoc(ref, payload)
   return ref.id
 }
 

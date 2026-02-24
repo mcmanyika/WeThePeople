@@ -2,6 +2,21 @@ import { NextRequest, NextResponse } from 'next/server'
 import { sendWelcomeEmail } from '@/lib/email'
 import { createEmailLog } from '@/lib/firebase/firestore'
 
+function getErrorMessage(error: unknown): string {
+  if (!error) return 'Unknown error'
+  if (typeof error === 'string') return error
+  if (typeof error === 'object') {
+    const maybeMessage = (error as any).message
+    if (typeof maybeMessage === 'string' && maybeMessage.trim()) return maybeMessage
+    try {
+      return JSON.stringify(error)
+    } catch {
+      return String(error)
+    }
+  }
+  return String(error)
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { email, name, userId } = await request.json()
@@ -64,7 +79,7 @@ export async function POST(request: NextRequest) {
         subject,
         status: result.success ? 'sent' : 'failed',
         resendId: result.id || undefined,
-        error: result.success ? undefined : String(result.error || 'Unknown error'),
+        error: result.success ? undefined : getErrorMessage(result.error),
         userId: userId || undefined,
       })
     } catch (logErr) {
@@ -72,9 +87,10 @@ export async function POST(request: NextRequest) {
     }
 
     if (!result.success) {
-      console.error('Failed to send welcome email:', result.error)
+      const providerError = getErrorMessage(result.error)
+      console.error('Failed to send welcome email:', providerError)
       return NextResponse.json(
-        { success: false, message: 'Email could not be sent, but signup succeeded.' },
+        { success: false, message: `Email could not be sent, but signup succeeded. ${providerError}` },
         { status: 200 }
       )
     }

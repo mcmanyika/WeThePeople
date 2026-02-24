@@ -154,13 +154,18 @@ export default function AdminMembershipApplicationsPage() {
         notes: cashNotes.trim() || '',
       })
 
-      // Auto-approve the application if still pending
+      // Ensure application is approved and has a membership number after manual payment.
+      const updateData: Partial<MembershipApplication> = {}
       if (cashTarget.status === 'pending') {
-        await updateMembershipApplication(cashTarget.id, {
-          status: 'approved' as MembershipApplicationStatus,
-          approvedBy: userProfile.name || 'Admin',
-          dateReceived: new Date().toISOString().split('T')[0],
-        })
+        updateData.status = 'approved' as MembershipApplicationStatus
+        updateData.approvedBy = userProfile.name || 'Admin'
+        updateData.dateReceived = new Date().toISOString().split('T')[0]
+      }
+      if (!cashTarget.membershipNumber) {
+        updateData.membershipNumber = generateMembershipNumber(cashTarget)
+      }
+      if (Object.keys(updateData).length > 0) {
+        await updateMembershipApplication(cashTarget.id, updateData)
       }
 
       const nextDue = new Date()

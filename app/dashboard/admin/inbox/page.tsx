@@ -44,7 +44,7 @@ export default function AdminInboxPage() {
     try {
       setSyncing(true)
       setSyncMsg('')
-      const res = await fetch('/api/email/sync')
+      const res = await fetch('/api/email/sync', { method: 'POST' })
       const data = await res.json()
       if (data.success) {
         setSyncMsg(`Synced ${data.synced} new email${data.synced !== 1 ? 's' : ''}`)

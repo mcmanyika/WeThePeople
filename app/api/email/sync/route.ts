@@ -1,17 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { createInboundEmail } from '@/lib/firebase/firestore'
+
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 /**
  * Sync received emails from Resend API into Firestore.
- * GET /api/email/sync
+ * POST /api/email/sync
  * 
  * Fetches received emails from Resend and stores them in Firestore.
  * Duplicates in a single payload are skipped by `email.id`.
  */
-export async function GET(request: NextRequest) {
+export async function POST() {
   try {
     // Fetch received emails from Resend
     // @ts-ignore - Resend SDK types may not include emails.received yet
