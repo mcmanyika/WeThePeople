@@ -212,7 +212,9 @@ export default function Home() {
     <main className="min-h-screen bg-white text-slate-900">
       <Header onDonateClick={() => setDonationModalOpen(true)} onContactClick={() => setContactOpen(true)} startAtBottom />
 
-      <HeroSection />
+      <div className="hidden md:block">
+        <HeroSection />
+      </div>
 
       {/* All content below hero - sits above hero with z-index */}
       <div className="relative z-10 pt-20 md:pt-0">
