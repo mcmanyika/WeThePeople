@@ -2540,10 +2540,9 @@ export function subscribeToUserNotifications(
 
 export async function markNotificationRead(notificationId: string, userId?: string): Promise<void> {
   const db = requireDb()
-  const updateData: Record<string, any> = { read: true }
-  if (userId) {
-    updateData.readBy = arrayUnion(userId)
-  }
+  const updateData: Record<string, any> = userId
+    ? { readBy: arrayUnion(userId) }
+    : { read: true }
   await updateDoc(doc(db, 'notifications', notificationId), updateData)
 }
 

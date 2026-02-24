@@ -348,38 +348,38 @@ function DashboardContent() {
             </div>
           ) : siteStats ? (
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-8">
-              <div className="rounded-lg bg-slate-50 p-4 text-center">
+              <Link href="/dashboard/admin/users" className="rounded-lg bg-slate-50 p-4 text-center transition-colors hover:bg-slate-100">
                 <p className="text-2xl font-bold text-slate-900">{siteStats.totalUsers}</p>
                 <p className="text-xs text-slate-500 mt-1">Users</p>
-              </div>
-              <div className="rounded-lg bg-slate-50 p-4 text-center">
+              </Link>
+              <Link href="/dashboard/admin/news" className="rounded-lg bg-slate-50 p-4 text-center transition-colors hover:bg-slate-100">
                 <p className="text-2xl font-bold text-slate-900">{siteStats.totalArticles}</p>
                 <p className="text-xs text-slate-500 mt-1">Articles</p>
-              </div>
-              <div className="rounded-lg bg-slate-50 p-4 text-center">
+              </Link>
+              <Link href="/dashboard/admin/petitions" className="rounded-lg bg-slate-50 p-4 text-center transition-colors hover:bg-slate-100">
                 <p className="text-2xl font-bold text-slate-900">{siteStats.totalPetitions}</p>
                 <p className="text-xs text-slate-500 mt-1">Petitions</p>
-              </div>
-              <div className="rounded-lg bg-slate-50 p-4 text-center">
+              </Link>
+              <Link href="/dashboard/admin/products" className="rounded-lg bg-slate-50 p-4 text-center transition-colors hover:bg-slate-100">
                 <p className="text-2xl font-bold text-slate-900">{siteStats.totalProducts}</p>
                 <p className="text-xs text-slate-500 mt-1">Products</p>
-              </div>
-              <div className="rounded-lg bg-slate-50 p-4 text-center">
+              </Link>
+              <Link href="/dashboard/admin/orders" className="rounded-lg bg-slate-50 p-4 text-center transition-colors hover:bg-slate-100">
                 <p className="text-2xl font-bold text-slate-900">{siteStats.totalOrders}</p>
                 <p className="text-xs text-slate-500 mt-1">Orders</p>
-              </div>
-              <div className="rounded-lg bg-slate-50 p-4 text-center">
+              </Link>
+              <Link href="/dashboard/admin/donations" className="rounded-lg bg-slate-50 p-4 text-center transition-colors hover:bg-slate-100">
                 <p className="text-2xl font-bold text-emerald-600">{siteStats.totalDonations}</p>
                 <p className="text-xs text-slate-500 mt-1">Donations</p>
-              </div>
-              <div className="rounded-lg bg-slate-50 p-4 text-center">
+              </Link>
+              <Link href="/dashboard/admin/volunteers" className="rounded-lg bg-slate-50 p-4 text-center transition-colors hover:bg-slate-100">
                 <p className="text-2xl font-bold text-slate-900">{siteStats.totalVolunteers}</p>
                 <p className="text-xs text-slate-500 mt-1">Volunteers</p>
-              </div>
-              <div className="rounded-lg bg-slate-50 p-4 text-center">
+              </Link>
+              <Link href="/dashboard/admin/orders" className="rounded-lg bg-slate-50 p-4 text-center transition-colors hover:bg-slate-100">
                 <p className="text-2xl font-bold text-green-700">${siteStats.totalRevenue.toFixed(2)}</p>
                 <p className="text-xs text-slate-500 mt-1">Revenue</p>
-              </div>
+              </Link>
             </div>
           ) : null}
 
