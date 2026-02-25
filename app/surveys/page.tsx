@@ -2,9 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import Header from '@/app/components/Header'
-import Footer from '@/app/components/Footer'
-import CTASection from '@/app/components/CTASection'
 import { getSurveys } from '@/lib/firebase/firestore'
 import type { Survey, SurveyCategory } from '@/types'
 
@@ -78,15 +75,37 @@ export default function SurveysPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-white text-slate-900">
-        <Header />
-        <section className="bg-gradient-to-r from-slate-900 to-slate-800 pt-24 pb-8 text-white sm:pb-12">
+      <main className="min-h-screen bg-[#f8fbfa] text-slate-900">
+        <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
+          <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
+            <Link href="/" className="flex items-center gap-2">
+              <span className="inline-flex h-8 w-10 items-center justify-center rounded-md bg-emerald-500 text-[10px] font-bold text-white">
+                WTP
+              </span>
+              <span className="text-sm font-semibold tracking-tight text-slate-900 sm:text-base">
+                We The People
+              </span>
+            </Link>
+            <nav className="hidden items-center gap-6 text-sm text-slate-500 md:flex">
+              <Link href="/about" className="transition-colors hover:text-slate-900">
+                About
+              </Link>
+              <Link href="/news" className="transition-colors hover:text-slate-900">
+                Articles
+              </Link>
+              <Link href="/surveys" className="font-medium text-slate-900">
+                Surveys
+              </Link>
+            </nav>
+          </div>
+        </header>
+        <section className="border-b border-slate-200 bg-gradient-to-br from-emerald-50 via-white to-emerald-50/70 py-16 sm:py-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6">
             <div className="text-center">
-              <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Have Your Say</p>
-              <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Surveys</h1>
-              <p className="text-sm text-slate-300 sm:text-base">
-                Your voice matters. Participate in our surveys to help shape policy priorities.
+              <p className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">Have Your Say</p>
+              <h1 className="mb-2 text-2xl font-bold text-slate-900 sm:text-3xl md:text-4xl">Surveys</h1>
+              <p className="text-sm text-slate-600 sm:text-base">
+                Share your voice on civic participation, political priorities, youth issues, and social concerns.
               </p>
             </div>
           </div>
@@ -97,36 +116,61 @@ export default function SurveysPage() {
             <p className="text-sm text-slate-500">Loading surveys...</p>
           </div>
         </div>
-        <CTASection />
-        <Footer />
+        <footer className="border-t border-slate-200 bg-white">
+          <div className="mx-auto max-w-7xl px-4 py-8 text-sm text-slate-600 sm:px-6">
+            <p className="text-center">© 2026 We The People (WTP). All rights reserved.</p>
+          </div>
+        </footer>
       </main>
     )
   }
 
   return (
-    <main className="min-h-screen bg-white text-slate-900">
-      <Header />
+    <main className="min-h-screen bg-[#f8fbfa] text-slate-900">
+      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="inline-flex h-8 w-10 items-center justify-center rounded-md bg-emerald-500 text-[10px] font-bold text-white">
+              WTP
+            </span>
+            <span className="text-sm font-semibold tracking-tight text-slate-900 sm:text-base">
+              We The People
+            </span>
+          </Link>
+          <nav className="hidden items-center gap-6 text-sm text-slate-500 md:flex">
+            <Link href="/about" className="transition-colors hover:text-slate-900">
+              About
+            </Link>
+            <Link href="/news" className="transition-colors hover:text-slate-900">
+              Articles
+            </Link>
+            <Link href="/surveys" className="font-medium text-slate-900">
+              Surveys
+            </Link>
+          </nav>
+        </div>
+      </header>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-slate-900 to-slate-800 pt-24 pb-8 text-white sm:pb-12">
+      <section className="border-b border-slate-200 bg-gradient-to-br from-emerald-50 via-white to-emerald-50/70 py-16 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="text-center">
-            <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Have Your Say</p>
-            <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Surveys</h1>
-            <p className="text-sm text-slate-300 sm:text-base">
-              Your voice matters. Participate in our surveys to help shape policy priorities.
+            <p className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">Have Your Say</p>
+            <h1 className="mb-2 text-2xl font-bold text-slate-900 sm:text-3xl md:text-4xl">Surveys</h1>
+            <p className="text-sm text-slate-600 sm:text-base">
+              Your voice matters. Participate in surveys covering civic participation, politics, youth issues, and broader social concerns.
             </p>
           </div>
         </div>
       </section>
 
-      <section className="bg-white py-10 sm:py-16">
+      <section className="bg-[#f8fbfa] py-10 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
 
           {/* Filters */}
           <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap gap-2">
-              {(['all', 'active', 'closed'] as const).map(status => (
+              {(['all', 'active', 'closed'] as const).map((status) => (
                 <button
                   key={status}
                   onClick={() => setStatusFilter(status)}
@@ -146,7 +190,9 @@ export default function SurveysPage() {
               >
                 <option value="all">All Categories</option>
                 {Object.entries(categoryLabels).map(([key, label]) => (
-                  <option key={key} value={key}>{label}</option>
+                  <option key={key} value={key}>
+                    {label}
+                  </option>
                 ))}
               </select>
             </div>
@@ -248,7 +294,7 @@ export default function SurveysPage() {
                   >
                     Previous
                   </button>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                     <button
                       key={page}
                       onClick={() => setCurrentPage(page)}
@@ -275,11 +321,11 @@ export default function SurveysPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <CTASection />
-
-      {/* Footer */}
-      <Footer />
+      <footer className="border-t border-slate-200 bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-8 text-sm text-slate-600 sm:px-6">
+          <p className="text-center">© 2026 We The People (WTP). All rights reserved.</p>
+        </div>
+      </footer>
     </main>
   )
 }

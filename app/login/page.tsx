@@ -11,18 +11,19 @@ function LoginContent() {
   const signupHref = returnUrl ? `/signup?returnUrl=${encodeURIComponent(returnUrl)}` : '/signup'
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12">
+    <div className="flex min-h-screen items-center justify-center bg-[#f8fbfa] px-4 py-12">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <Link href="/" className="inline-block mb-4">
-            <img 
-              src="/images/logo.png" 
-              alt="DCP Logo" 
-              className="mx-auto h-24 w-24 rounded-md object-contain"
-            />
+            <div className="mx-auto inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+              <span className="inline-flex h-9 w-11 items-center justify-center rounded-md bg-emerald-500 text-[10px] font-bold text-white">
+                WTP
+              </span>
+              <span className="text-sm font-semibold text-slate-900">We The People</span>
+            </div>
           </Link>
           <h1 className="mb-2 text-3xl font-bold">Welcome Back</h1>
-          <p className="text-slate-600">Sign in to your account</p>
+          <p className="text-slate-600">Sign in to continue to your WTP account</p>
         </div>
 
         <div className="rounded-2xl border bg-white p-8 shadow-sm">

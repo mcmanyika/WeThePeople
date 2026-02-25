@@ -11,8 +11,8 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: 'Defend the Constitution Platform',
-  description: 'Citizen-led constitutionalism & accountability',
+  title: 'We The People (WTP)',
+  description: 'A platform for civic participation, political awareness, youth issues, and social concerns.',
 }
 
 export default function RootLayout({

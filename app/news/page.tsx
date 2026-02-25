@@ -2,9 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import Header from '@/app/components/Header'
-import Footer from '@/app/components/Footer'
-import CTASection from '@/app/components/CTASection'
 import { getNews } from '@/lib/firebase/firestore'
 import type { News } from '@/types'
 
@@ -65,24 +62,46 @@ export default function NewsPage() {
   }, [searchQuery, selectedCategory])
 
   return (
-    <main className="min-h-screen bg-white">
-      <Header />
+    <main className="min-h-screen bg-[#f8fbfa]">
+      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="inline-flex h-8 w-10 items-center justify-center rounded-md bg-emerald-500 text-[10px] font-bold text-white">
+              WTP
+            </span>
+            <span className="text-sm font-semibold tracking-tight text-slate-900 sm:text-base">
+              We The People
+            </span>
+          </Link>
+          <nav className="hidden items-center gap-6 text-sm text-slate-500 md:flex">
+            <Link href="/about" className="transition-colors hover:text-slate-900">
+              About
+            </Link>
+            <Link href="/news" className="font-medium text-slate-900">
+              Articles
+            </Link>
+            <Link href="/signup" className="transition-colors hover:text-slate-900">
+              Join
+            </Link>
+          </nav>
+        </div>
+      </header>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-slate-900 to-slate-800 pt-24 pb-8 text-white sm:pb-12">
+      <section className="border-b border-slate-200 bg-gradient-to-br from-emerald-50 via-white to-emerald-50/70 py-16 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="text-center">
-            <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Latest Articles</p>
-            <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Updates & Announcements</h1>
-            <p className="text-sm text-slate-300 sm:text-base">
-              Stay informed about the latest developments, events, and announcements from the Defend the Constitution Platform.
+            <p className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">Latest Articles</p>
+            <h1 className="mb-2 text-2xl font-bold text-slate-900 sm:text-3xl md:text-4xl">Updates & Insights</h1>
+            <p className="text-sm text-slate-600 sm:text-base">
+              Stay informed with the latest stories, analysis, and announcements from We The People.
             </p>
           </div>
         </div>
       </section>
 
       {/* Filters */}
-      <section className="border-b bg-white sticky top-0 z-10">
+      <section className="sticky top-[64px] z-10 border-b bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4">
           <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
             {/* Search */}
@@ -122,7 +141,7 @@ export default function NewsPage() {
       </section>
 
       {/* News Grid */}
-      <section className="bg-slate-50 py-8 sm:py-12">
+      <section className="bg-[#f8fbfa] py-8 sm:py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           {loading ? (
             <div className="flex items-center justify-center py-16">
@@ -178,7 +197,7 @@ export default function NewsPage() {
                         <div className="flex h-40 w-full items-center justify-center bg-slate-100">
                           <img
                             src="/images/logo.png"
-                            alt="DCP"
+                            alt="WTP"
                             className="h-16 w-16 object-contain opacity-40"
                           />
                         </div>
@@ -293,11 +312,11 @@ export default function NewsPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <CTASection />
-
-      {/* Footer */}
-      <Footer />
+      <footer className="border-t border-slate-200 bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-8 text-sm text-slate-600 sm:px-6">
+          <p className="text-center">© 2026 We The People (WTP). All rights reserved.</p>
+        </div>
+      </footer>
     </main>
   )
 }
