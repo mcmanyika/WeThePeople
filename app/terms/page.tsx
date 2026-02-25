@@ -1,56 +1,62 @@
-'use client'
-
-import Header from '@/app/components/Header'
-import Footer from '@/app/components/Footer'
-import CTASection from '@/app/components/CTASection'
 import Link from 'next/link'
 
 export default function TermsOfServicePage() {
   return (
-    <main className="min-h-screen bg-white text-slate-900">
-      <Header />
+    <main className="min-h-screen bg-[#f8fbfa] text-slate-900">
+      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="inline-flex h-8 w-10 items-center justify-center rounded-md bg-emerald-500 text-[10px] font-bold text-white">
+              WTP
+            </span>
+            <span className="text-sm font-semibold tracking-tight text-slate-900 sm:text-base">
+              We The People
+            </span>
+          </Link>
+          <nav className="hidden items-center gap-6 text-sm text-slate-500 md:flex">
+            <Link href="/about" className="transition-colors hover:text-slate-900">
+              About
+            </Link>
+            <Link href="/news" className="transition-colors hover:text-slate-900">
+              Articles
+            </Link>
+            <Link href="/terms" className="font-medium text-slate-900">
+              Terms
+            </Link>
+          </nav>
+        </div>
+      </header>
 
-      {/* Hero */}
-      <section className="bg-gradient-to-r from-slate-900 to-slate-800 pt-24 pb-8 text-white sm:pb-12">
+      <section className="border-b border-slate-200 bg-gradient-to-br from-emerald-50 via-white to-emerald-50/70 py-16 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="text-center">
-            <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Legal</p>
-            <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">Terms of Service</h1>
-            <p className="text-sm text-slate-300 sm:text-base">
-              Last updated: February 21, 2026
-            </p>
+            <p className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">Legal</p>
+            <h1 className="mb-2 text-2xl font-bold text-slate-900 sm:text-3xl md:text-4xl">Terms of Service</h1>
+            <p className="text-sm text-slate-600 sm:text-base">Last updated: February 25, 2026</p>
           </div>
         </div>
       </section>
 
-      {/* Content */}
-      <section className="bg-white py-10 sm:py-16">
+      <section className="bg-[#f8fbfa] py-10 sm:py-16">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
-          <div className="prose prose-slate max-w-none space-y-8">
-
-            {/* Introduction */}
+          <div className="space-y-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-10">
             <div>
               <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
-                Welcome to the Defend the Constitution Platform (&quot;DCP&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;). By
-                accessing or using our website at{' '}
-                <a href="https://www.dcpzim.com" className="text-blue-600 hover:underline">www.dcpzim.com</a>{' '}
-                and related services (collectively, the &quot;Platform&quot;), you agree to be bound by these Terms of Service.
-                If you do not agree to these terms, please do not use the Platform.
+                Welcome to We The People (&quot;WTP&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;). By accessing or using
+                our website and related services (collectively, the &quot;Platform&quot;), you agree to be bound by
+                these Terms of Service. If you do not agree to these terms, please do not use the Platform.
               </p>
             </div>
 
-            {/* Section 1 */}
             <div>
               <h2 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">1. About the Platform</h2>
               <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
-                The Defend the Constitution Platform is a non-partisan, inclusive civic organisation dedicated to
-                defending Zimbabwe&apos;s Constitution, promoting citizen participation, and opposing unconstitutional
-                amendments. The Platform provides tools for civic education, petitions, membership, volunteering,
-                donations, and community engagement.
+                We The People is a non-partisan civic platform focused on civic participation, political awareness,
+                youth issues, and broader social concerns. The Platform provides tools for engagement, surveys,
+                membership, volunteering, donations, and community dialogue.
               </p>
             </div>
 
-            {/* Section 2 */}
             <div>
               <h2 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">2. Eligibility</h2>
               <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
@@ -60,7 +66,6 @@ export default function TermsOfServicePage() {
               </p>
             </div>
 
-            {/* Section 3 */}
             <div>
               <h2 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">3. Account Registration</h2>
               <p className="mb-3 text-sm leading-relaxed text-slate-600 sm:text-base">
@@ -77,28 +82,25 @@ export default function TermsOfServicePage() {
               </p>
             </div>
 
-            {/* Section 4 */}
             <div>
               <h2 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">4. Membership</h2>
               <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
-                Membership applications are subject to review and approval by DCP. Membership contributions of $5 per
+                Membership applications are subject to review and approval by WTP. Membership contributions of $5 per
                 month or $60 per year support our civic education, mobilisation, petition outreach, and constitutional
                 defence work. Membership may be revoked if a member engages in conduct that is inconsistent with
-                DCP&apos;s values, mission, or these terms.
+                WTP&apos;s values, mission, or these terms.
               </p>
             </div>
 
-            {/* Section 5 */}
             <div>
               <h2 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">5. Volunteering</h2>
               <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
-                Volunteer applications are subject to review and approval. Volunteers are expected to act in good
-                faith, represent DCP respectfully, and adhere to any guidelines or instructions provided. DCP reserves
+                Volunteer applications are subject to review and approval. Volunteers are expected to act in good faith,
+                represent WTP respectfully, and adhere to any guidelines or instructions provided. WTP reserves
                 the right to decline or revoke volunteer status at its discretion.
               </p>
             </div>
 
-            {/* Section 6 */}
             <div>
               <h2 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">6. Petitions</h2>
               <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
@@ -109,7 +111,6 @@ export default function TermsOfServicePage() {
               </p>
             </div>
 
-            {/* Section 7 */}
             <div>
               <h2 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">7. Donations and Payments</h2>
               <p className="mb-3 text-sm leading-relaxed text-slate-600 sm:text-base">
@@ -117,8 +118,8 @@ export default function TermsOfServicePage() {
               </p>
               <ul className="ml-5 list-disc space-y-2 text-sm text-slate-600 sm:text-base">
                 <li>All donations are voluntary and made at your own discretion.</li>
-                <li>Donations are non-refundable unless required by law or at DCP&apos;s sole discretion.</li>
-                <li>Funds will be used to support DCP&apos;s mission, programmes, and operational costs.</li>
+                <li>Donations are non-refundable unless required by law or at WTP&apos;s sole discretion.</li>
+                <li>Funds will be used to support WTP&apos;s mission, programmes, and operational costs.</li>
                 <li>You are authorised to use the payment method provided.</li>
               </ul>
               <p className="mt-3 text-sm leading-relaxed text-slate-600 sm:text-base">
@@ -126,7 +127,6 @@ export default function TermsOfServicePage() {
               </p>
             </div>
 
-            {/* Section 8 */}
             <div>
               <h2 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">8. User Conduct</h2>
               <p className="mb-3 text-sm leading-relaxed text-slate-600 sm:text-base">
@@ -143,71 +143,64 @@ export default function TermsOfServicePage() {
               </ul>
             </div>
 
-            {/* Section 9 */}
             <div>
               <h2 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">9. Intellectual Property</h2>
               <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
-                All content on the Platform, including text, graphics, logos, images, and software, is the property
-                of DCP or its content providers and is protected by applicable intellectual property laws. You may not
+                All content on the Platform, including text, graphics, logos, images, and software, is the property of
+                WTP or its content providers and is protected by applicable intellectual property laws. You may not
                 reproduce, distribute, modify, or create derivative works from any content on the Platform without
-                prior written consent from DCP.
+                prior written consent from WTP.
               </p>
             </div>
 
-            {/* Section 10 */}
             <div>
               <h2 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">10. Third-Party Links and Services</h2>
               <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
                 The Platform may contain links to third-party websites or services (such as social media platforms,
-                payment processors, and external resources). DCP is not responsible for the content, privacy
+                payment processors, and external resources). WTP is not responsible for the content, privacy
                 practices, or availability of these external sites. Use of third-party services is at your own risk
                 and subject to their respective terms and conditions.
               </p>
             </div>
 
-            {/* Section 11 */}
             <div>
               <h2 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">11. Disclaimer of Warranties</h2>
               <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
-                The Platform is provided on an &quot;as is&quot; and &quot;as available&quot; basis. DCP makes no warranties, express
-                or implied, regarding the Platform&apos;s reliability, accuracy, availability, or fitness for a particular
+                The Platform is provided on an &quot;as is&quot; and &quot;as available&quot; basis. WTP makes no warranties,
+                express or implied, regarding the Platform&apos;s reliability, accuracy, availability, or fitness for a particular
                 purpose. We do not guarantee that the Platform will be uninterrupted, error-free, or free from
                 viruses or other harmful components.
               </p>
             </div>
 
-            {/* Section 12 */}
             <div>
               <h2 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">12. Limitation of Liability</h2>
               <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
-                To the fullest extent permitted by law, DCP and its directors, officers, volunteers, and affiliates
+                To the fullest extent permitted by law, WTP and its directors, officers, volunteers, and affiliates
                 shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising
                 from your use of or inability to use the Platform, including but not limited to loss of data, revenue,
                 or goodwill.
               </p>
             </div>
 
-            {/* Section 13 */}
             <div>
               <h2 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">13. Indemnification</h2>
               <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
-                You agree to indemnify and hold harmless DCP, its directors, officers, volunteers, and affiliates
+                You agree to indemnify and hold harmless WTP, its directors, officers, volunteers, and affiliates
                 from any claims, damages, losses, or expenses (including legal fees) arising from your use of the
                 Platform, your violation of these terms, or your infringement of any rights of another party.
               </p>
             </div>
 
-            {/* Section 14 */}
             <div>
               <h2 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">14. Termination</h2>
               <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
                 We reserve the right to suspend or terminate your access to the Platform at any time, with or without
-                notice, for conduct that we believe violates these terms or is harmful to other users, DCP, or third
+                notice, for conduct that we believe violates these terms or is harmful to other users, WTP, or third
                 parties. Upon termination, your right to use the Platform will immediately cease.
               </p>
             </div>
 
-            {/* Section 15 */}
             <div>
               <h2 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">15. Changes to These Terms</h2>
               <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
@@ -217,7 +210,6 @@ export default function TermsOfServicePage() {
               </p>
             </div>
 
-            {/* Section 16 */}
             <div>
               <h2 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">16. Governing Law</h2>
               <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
@@ -227,40 +219,36 @@ export default function TermsOfServicePage() {
               </p>
             </div>
 
-            {/* Section 17 */}
             <div>
               <h2 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">17. Contact Us</h2>
               <p className="mb-3 text-sm leading-relaxed text-slate-600 sm:text-base">
                 If you have any questions or concerns about these Terms of Service, please contact us:
               </p>
               <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700 sm:text-base">
-                <p className="font-semibold">Defend the Constitution Platform (DCP)</p>
+                <p className="font-semibold">We The People (WTP)</p>
                 <p className="mt-1">
                   Email:{' '}
-                  <a href="mailto:contact@dcpzim.com" className="text-blue-600 hover:underline">contact@dcpzim.com</a>
-                </p>
-                <p className="mt-1">
-                  Website:{' '}
-                  <a href="https://www.dcpzim.com" className="text-blue-600 hover:underline">www.dcpzim.com</a>
+                  <a href="mailto:contact@wtp.com" className="text-emerald-700 hover:underline">contact@wtp.com</a>
                 </p>
               </div>
             </div>
 
-            {/* Related */}
             <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
               <p className="text-sm text-slate-600">
                 Please also review our{' '}
-                <Link href="/privacy" className="text-blue-600 hover:underline font-medium">Privacy Policy</Link>{' '}
+                <Link href="/privacy" className="font-medium text-emerald-700 hover:underline">Privacy Policy</Link>{' '}
                 to understand how we collect, use, and protect your personal information.
               </p>
             </div>
-
           </div>
         </div>
       </section>
 
-      <CTASection />
-      <Footer />
+      <footer className="border-t border-slate-200 bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-8 text-center text-sm text-slate-600 sm:px-6">
+          <p>© 2026 We The People (WTP). All rights reserved.</p>
+        </div>
+      </footer>
     </main>
   )
 }

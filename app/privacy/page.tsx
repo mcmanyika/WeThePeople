@@ -174,7 +174,7 @@ export default function PrivacyPolicyPage() {
                 <p className="font-semibold">We The People (WTP)</p>
                 <p className="mt-1">
                   Email:{' '}
-                  <a href="mailto:contact@dcpzim.com" className="text-emerald-700 hover:underline">contact@dcpzim.com</a>
+                  <a href="mailto:contact@wtp.com" className="text-emerald-700 hover:underline">contact@wtp.com</a>
                 </p>
               </div>
             </div>
