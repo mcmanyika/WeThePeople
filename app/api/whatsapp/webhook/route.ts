@@ -12,23 +12,46 @@ const conversationHistory: Map<string, { role: 'user' | 'assistant'; content: st
 // Maximum history length per conversation
 const MAX_HISTORY_LENGTH = 10
 
-function toBool(value: string): boolean {
-  const normalized = (value || '').trim().toLowerCase()
-  return ['true', 'yes', 'y', '1', 'anon', 'anonymous'].includes(normalized)
-}
-
 function parseSignCommand(text: string) {
-  // Expected format:
-  // SIGN|petitionId|Full Name|email@example.com|anonymous(optional)
+  // Supported formats:
+  // 1) Full Name,email@example.com
+  // 2) SIGN|Full Name|email@example.com
+  // 3) SIGN|petitionId|Full Name|email@example.com [legacy]
+  const raw = (text || '').trim()
+
+  // Plain format: "Name,email"
+  if (!raw.toUpperCase().startsWith('SIGN|') && raw.includes(',')) {
+    const [namePart, emailPart] = raw.split(',', 2).map((p) => p.trim())
+    if (namePart && emailPart) {
+      return {
+        petitionId: undefined as string | undefined,
+        name: namePart,
+        email: emailPart,
+        anonymous: false,
+      }
+    }
+  }
+
   const parts = text.split('|').map((p) => p.trim())
-  if (parts.length < 4) return null
+  if (parts.length < 3) return null
   if (parts[0].toUpperCase() !== 'SIGN') return null
 
+  // New simplified format
+  if (parts.length === 3) {
+    return {
+      petitionId: undefined as string | undefined,
+      name: parts[1],
+      email: parts[2],
+      anonymous: false,
+    }
+  }
+
+  // Legacy format with explicit petitionId
   return {
     petitionId: parts[1],
     name: parts[2],
     email: parts[3],
-    anonymous: parts[4] ? toBool(parts[4]) : false,
+    anonymous: false,
   }
 }
 
@@ -93,7 +116,7 @@ export async function POST(request: NextRequest) {
             const lines = top.map((p, i) => `${i + 1}. ${p.title}\nID: ${p.id}`)
             const reply =
               `Active petitions:\n\n${lines.join('\n\n')}\n\n` +
-              'To sign, send:\nSIGN|petitionId|Your Full Name|your@email.com|anonymous(optional)'
+              'To sign, send:\nYour Full Name,your@email.com'
 
             await sendWhatsAppMessage(from, reply)
             return NextResponse.json({ success: true })
@@ -107,16 +130,27 @@ export async function POST(request: NextRequest) {
         // 2) Petition sign command: SIGN|petitionId|name|email|anonymous(optional)
         const signPayload = parseSignCommand(trimmedText)
         if (signPayload) {
-          if (!signPayload.petitionId || !signPayload.name || !signPayload.email || !signPayload.email.includes('@')) {
+          if (!signPayload.name || !signPayload.email || !signPayload.email.includes('@')) {
             await sendWhatsAppMessage(
               from,
-              'Invalid sign format.\n\nUse:\nSIGN|petitionId|Your Full Name|your@email.com|anonymous(optional)'
+              'Invalid sign format.\n\nUse:\nYour Full Name,your@email.com'
             )
             return NextResponse.json({ success: true })
           }
 
           try {
-            await signPetition(signPayload.petitionId, {
+            let petitionId = signPayload.petitionId
+            if (!petitionId) {
+              const activePetitions = await getPetitions(true, true)
+              if (!activePetitions.length) {
+                await sendWhatsAppMessage(from, 'No active petitions are available right now.')
+                return NextResponse.json({ success: true })
+              }
+              // Default to the most recent active petition.
+              petitionId = activePetitions[0].id
+            }
+
+            await signPetition(petitionId, {
               userId: undefined,
               name: signPayload.name,
               email: signPayload.email,
