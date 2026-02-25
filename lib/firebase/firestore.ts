@@ -479,13 +479,7 @@ export async function createCashMembership(data: {
 
 export async function getMembershipsByUser(userId: string): Promise<Membership[]> {
   const db = requireDb()
-  const q = query(
-    collection(db, 'memberships'),
-    where('userId', '==', userId),
-    orderBy('createdAt', 'desc')
-  )
-  const snapshot = await getDocs(q)
-  return snapshot.docs.map((d) => {
+  const mapDocs = (snapshot: any): Membership[] => snapshot.docs.map((d: any) => {
     const data = d.data()
     return {
       ...data,
@@ -495,6 +489,38 @@ export async function getMembershipsByUser(userId: string): Promise<Membership[]
       nextDueDate: data.nextDueDate ? toDate(data.nextDueDate) : undefined,
     } as Membership
   })
+
+  // Strategy 1: indexed query (preferred)
+  try {
+    const q = query(
+      collection(db, 'memberships'),
+      where('userId', '==', userId),
+      orderBy('createdAt', 'desc')
+    )
+    const snapshot = await getDocs(q)
+    return mapDocs(snapshot)
+  } catch (error: any) {
+    console.warn('Memberships indexed query failed:', error?.code, error?.message)
+  }
+
+  // Strategy 2: simple query + manual sort (no composite index required)
+  try {
+    const q = query(
+      collection(db, 'memberships'),
+      where('userId', '==', userId)
+    )
+    const snapshot = await getDocs(q)
+    const memberships = mapDocs(snapshot)
+    memberships.sort((a, b) => {
+      const dateA = a.createdAt instanceof Date ? a.createdAt.getTime() : new Date(a.createdAt as any).getTime()
+      const dateB = b.createdAt instanceof Date ? b.createdAt.getTime() : new Date(b.createdAt as any).getTime()
+      return dateB - dateA
+    })
+    return memberships
+  } catch (error: any) {
+    console.error('Memberships simple query failed:', error?.code, error?.message)
+    return []
+  }
 }
 
 // Contact operations

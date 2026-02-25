@@ -12,6 +12,31 @@ const conversationHistory: Map<string, { role: 'user' | 'assistant'; content: st
 // Maximum history length per conversation
 const MAX_HISTORY_LENGTH = 10
 
+function getFriendlyPetitionError(errorMessage: string): string {
+  const msg = (errorMessage || '').toLowerCase()
+  if (msg.includes('already signed')) {
+    return 'This email has already signed the current petition.'
+  }
+  if (msg.includes('petition not found')) {
+    return 'I could not find an active petition to sign right now.'
+  }
+  return 'I could not complete your petition signature right now.'
+}
+
+function getFriendlyWhatsAppApiError(data: any): string {
+  const raw = String(data?.error?.message || '').toLowerCase()
+  if (raw.includes('error validating access token') || raw.includes('session has expired')) {
+    return 'WhatsApp service token expired. Please refresh the Meta access token.'
+  }
+  if (raw.includes('unsupported post request')) {
+    return 'WhatsApp configuration issue: invalid phone number ID or endpoint.'
+  }
+  if (raw.includes('recipient') || raw.includes('not in allowed list')) {
+    return 'Recipient is not enabled for test messaging in Meta.'
+  }
+  return 'WhatsApp API request failed.'
+}
+
 function parseSignCommand(text: string) {
   // Supported formats:
   // 1) Full Name,email@example.com
@@ -165,9 +190,10 @@ export async function POST(request: NextRequest) {
           } catch (err: any) {
             console.error('Error signing petition from WhatsApp:', err)
             const message = err?.message || 'Failed to sign petition'
+            const friendly = getFriendlyPetitionError(message)
             await sendWhatsAppMessage(
               from,
-              `Could not sign petition: ${message}\n\nTip: send PETITIONS to view active petition names.`
+              `${friendly}\n\nTip: send PETITIONS to view active petition names.`
             )
             return NextResponse.json({ success: true })
           }
@@ -248,7 +274,11 @@ async function sendWhatsAppMessage(to: string, message: string): Promise<boolean
     const data = await response.json()
 
     if (!response.ok) {
-      console.error('Failed to send WhatsApp message:', data)
+      console.error('Failed to send WhatsApp message:', {
+        friendly: getFriendlyWhatsAppApiError(data),
+        code: data?.error?.code,
+        type: data?.error?.type,
+      })
       return false
     }
 

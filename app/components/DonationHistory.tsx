@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
-import { getDonationsByUser } from '@/lib/firebase/firestore'
-import type { Donation } from '@/types'
+import { getDonationsByUser, getMembershipsByUser } from '@/lib/firebase/firestore'
+import type { Donation, Membership } from '@/types'
 
 function formatDate(date: Date | any): string {
   if (date instanceof Date) {
@@ -19,7 +19,7 @@ function formatDate(date: Date | any): string {
 
 export default function DonationHistory() {
   const { user } = useAuth()
-  const [donations, setDonations] = useState<Donation[]>([])
+  const [historyItems, setHistoryItems] = useState<(Donation & { source?: 'donation' | 'manual_membership'; paymentMethod?: string })[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string>('')
 
@@ -33,13 +33,44 @@ export default function DonationHistory() {
     setError('')
     
     try {
-      const data = await getDonationsByUser(user.uid)
-      console.log('Fetched donations:', data.length, data)
-      setDonations(data)
+      const [donationsData, membershipsData] = await Promise.all([
+        getDonationsByUser(user.uid),
+        getMembershipsByUser(user.uid),
+      ])
+
+      const manualMembershipRows: Donation[] = membershipsData
+        .filter((membership: Membership) =>
+          Boolean(membership.paymentMethod && membership.paymentMethod !== 'stripe')
+        )
+        .map((membership: Membership) => ({
+          id: `manual-membership-${membership.id}`,
+          userId: membership.userId,
+          amount: membership.amount || 0,
+          currency: (membership.currency || 'USD').toLowerCase(),
+          status: membership.status,
+          stripePaymentIntentId: membership.stripePaymentIntentId,
+          createdAt: membership.paidAt || membership.createdAt,
+          description:
+            `Manual membership payment${membership.planLabel ? ` - ${membership.planLabel}` : ''}`,
+        }))
+
+      const merged = [
+        ...donationsData.map((d) => ({ ...d, source: 'donation' as const })),
+        ...manualMembershipRows.map((d) => ({ ...d, source: 'manual_membership' as const })),
+      ]
+
+      merged.sort((a, b) => {
+        const dateA = a.createdAt instanceof Date ? a.createdAt.getTime() : new Date(a.createdAt as any).getTime()
+        const dateB = b.createdAt instanceof Date ? b.createdAt.getTime() : new Date(b.createdAt as any).getTime()
+        return dateB - dateA
+      })
+
+      console.log('Fetched donation history rows:', merged.length, merged)
+      setHistoryItems(merged)
     } catch (err: any) {
       console.error('Error fetching donations:', err)
       setError(err.message || 'Failed to load donations')
-      setDonations([])
+      setHistoryItems([])
     } finally {
       setLoading(false)
     }
@@ -85,10 +116,10 @@ export default function DonationHistory() {
     )
   }
 
-  if (donations.length === 0) {
+  if (historyItems.length === 0) {
     return (
       <div className="rounded-lg border border-slate-200 bg-white p-8 text-center">
-        <p className="text-slate-600">No donations yet.</p>
+        <p className="text-slate-600">No donations or manual payments yet.</p>
         <a
           href="/#donate"
           className="mt-4 inline-block rounded-lg bg-slate-900 px-6 py-3 text-sm font-semibold text-white hover:bg-slate-800 transition-colors"
@@ -109,7 +140,7 @@ export default function DonationHistory() {
       </div>
 
       <div className="space-y-3">
-        {donations.map((donation) => (
+        {historyItems.map((donation) => (
           <div
             key={donation.id}
             className="rounded-lg border border-slate-200 bg-white p-6"
@@ -126,6 +157,9 @@ export default function DonationHistory() {
                   <p className="mt-1 text-sm text-slate-500">
                     {donation.description}
                   </p>
+                )}
+                {donation.source === 'manual_membership' && (
+                  <p className="mt-1 text-xs font-medium text-slate-500">Manual Entry</p>
                 )}
               </div>
               <div
