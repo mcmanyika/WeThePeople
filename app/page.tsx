@@ -226,21 +226,21 @@ export default function Home() {
 
       <footer className="bg-white">
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-          <div className="grid gap-8 md:grid-cols-4">
-            <div>
+          <div className="grid gap-8 text-center md:grid-cols-4">
+            <div className="flex flex-col items-center">
               <p className="text-base font-semibold text-slate-900">WTP We The People</p>
               <p className="mt-2 text-sm text-slate-600">
                 Zimbabwe&apos;s diaspora intelligence platform — trusted information, verified services, and
                 structured participation for our global community.
               </p>
-              <a
-                href="https://expo.dev/artifacts/eas/hopnYPS9wRJX8ugWGP9Uhz.apk"
+              <button
+                type="button"
                 className="mt-4 inline-flex rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
               >
                 Download for Android
-              </a>
+              </button>
             </div>
-            <div>
+            <div className="flex flex-col items-center">
               <h3 className="text-sm font-semibold text-slate-900">Explore</h3>
               <div className="mt-3 space-y-2 text-sm text-slate-600">
                 <Link href="/about" className="block transition-colors hover:text-slate-900">
@@ -254,7 +254,7 @@ export default function Home() {
                 </Link>
               </div>
             </div>
-            <div>
+            <div className="flex flex-col items-center">
               <h3 className="text-sm font-semibold text-slate-900">Engage</h3>
               <div className="mt-3 space-y-2 text-sm text-slate-600">
                 <Link href="/news" className="block transition-colors hover:text-slate-900">
@@ -268,12 +268,12 @@ export default function Home() {
                 </Link>
               </div>
             </div>
-            <div id="footer-contact">
+            <div id="footer-contact" className="flex flex-col items-center">
               <h3 className="text-sm font-semibold text-slate-900">Follow Us</h3>
               <p className="mt-3 text-sm text-slate-600">Connect with us on social media.</p>
             </div>
           </div>
-          <div className="mt-8 border-t border-slate-200 pt-6 text-sm text-slate-600">
+          <div className="mt-8 border-t border-slate-200 pt-6 text-center text-sm text-slate-600">
             <p>© 2026 We The People (WTP). All rights reserved.</p>
             <p className="mt-1">
               <Link href="/privacy" className="transition-colors hover:text-slate-900">
