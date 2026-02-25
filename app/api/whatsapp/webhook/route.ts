@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { processChat } from '@/lib/chat-service'
+import { getPetitions, signPetition } from '@/lib/firebase/firestore'
 
 const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN
 const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN
@@ -10,6 +11,26 @@ const conversationHistory: Map<string, { role: 'user' | 'assistant'; content: st
 
 // Maximum history length per conversation
 const MAX_HISTORY_LENGTH = 10
+
+function toBool(value: string): boolean {
+  const normalized = (value || '').trim().toLowerCase()
+  return ['true', 'yes', 'y', '1', 'anon', 'anonymous'].includes(normalized)
+}
+
+function parseSignCommand(text: string) {
+  // Expected format:
+  // SIGN|petitionId|Full Name|email@example.com|anonymous(optional)
+  const parts = text.split('|').map((p) => p.trim())
+  if (parts.length < 4) return null
+  if (parts[0].toUpperCase() !== 'SIGN') return null
+
+  return {
+    petitionId: parts[1],
+    name: parts[2],
+    email: parts[3],
+    anonymous: parts[4] ? toBool(parts[4]) : false,
+  }
+}
 
 /**
  * Webhook verification (GET request from Meta)
@@ -55,6 +76,68 @@ export async function POST(request: NextRequest) {
         const text = message.text?.body
 
         console.log(`WhatsApp message from ${from}: ${text}`)
+
+        const trimmedText = (text || '').trim()
+        const upperText = trimmedText.toUpperCase()
+
+        // 1) Petition helper command: list active petitions with IDs
+        if (upperText === 'PETITIONS' || upperText === 'LIST PETITIONS') {
+          try {
+            const petitions = await getPetitions(true, true)
+            if (!petitions.length) {
+              await sendWhatsAppMessage(from, 'No active petitions are available at the moment.')
+              return NextResponse.json({ success: true })
+            }
+
+            const top = petitions.slice(0, 8)
+            const lines = top.map((p, i) => `${i + 1}. ${p.title}\nID: ${p.id}`)
+            const reply =
+              `Active petitions:\n\n${lines.join('\n\n')}\n\n` +
+              'To sign, send:\nSIGN|petitionId|Your Full Name|your@email.com|anonymous(optional)'
+
+            await sendWhatsAppMessage(from, reply)
+            return NextResponse.json({ success: true })
+          } catch (err) {
+            console.error('Error listing petitions on WhatsApp:', err)
+            await sendWhatsAppMessage(from, 'Sorry, I could not load petitions right now. Please try again shortly.')
+            return NextResponse.json({ success: true })
+          }
+        }
+
+        // 2) Petition sign command: SIGN|petitionId|name|email|anonymous(optional)
+        const signPayload = parseSignCommand(trimmedText)
+        if (signPayload) {
+          if (!signPayload.petitionId || !signPayload.name || !signPayload.email || !signPayload.email.includes('@')) {
+            await sendWhatsAppMessage(
+              from,
+              'Invalid sign format.\n\nUse:\nSIGN|petitionId|Your Full Name|your@email.com|anonymous(optional)'
+            )
+            return NextResponse.json({ success: true })
+          }
+
+          try {
+            await signPetition(signPayload.petitionId, {
+              userId: undefined,
+              name: signPayload.name,
+              email: signPayload.email,
+              anonymous: signPayload.anonymous,
+            })
+
+            await sendWhatsAppMessage(
+              from,
+              `Thank you, ${signPayload.name}. Your petition signature has been recorded successfully.`
+            )
+            return NextResponse.json({ success: true })
+          } catch (err: any) {
+            console.error('Error signing petition from WhatsApp:', err)
+            const message = err?.message || 'Failed to sign petition'
+            await sendWhatsAppMessage(
+              from,
+              `Could not sign petition: ${message}\n\nTip: send PETITIONS to get valid petition IDs.`
+            )
+            return NextResponse.json({ success: true })
+          }
+        }
 
         // Get or initialize conversation history for this user
         let history = conversationHistory.get(from) || []
