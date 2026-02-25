@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
             }
 
             const top = petitions.slice(0, 8)
-            const lines = top.map((p, i) => `${i + 1}. ${p.title}\nID: ${p.id}`)
+            const lines = top.map((p, i) => `${i + 1}. ${p.title}`)
             const reply =
               `Active petitions:\n\n${lines.join('\n\n')}\n\n` +
               'To sign, send:\nYour Full Name,your@email.com'
@@ -167,7 +167,7 @@ export async function POST(request: NextRequest) {
             const message = err?.message || 'Failed to sign petition'
             await sendWhatsAppMessage(
               from,
-              `Could not sign petition: ${message}\n\nTip: send PETITIONS to get valid petition IDs.`
+              `Could not sign petition: ${message}\n\nTip: send PETITIONS to view active petition names.`
             )
             return NextResponse.json({ success: true })
           }
