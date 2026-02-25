@@ -123,6 +123,22 @@ html {
   animation: slideDown 0.3s ease-out forwards;
 }
 
+/* Subtle hero scroll cue animation */
+@keyframes scrollNudge {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateY(6px);
+    opacity: 1;
+  }
+}
+
+.animate-scroll-nudge {
+  animation: scrollNudge 1.8s ease-in-out infinite;
+}
+
 /* Safe area inset for mobile status bar (time, battery, notch, Dynamic Island) */
 .safe-top {
   top: 0;

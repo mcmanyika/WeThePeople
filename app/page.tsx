@@ -103,6 +103,9 @@ export default function Home() {
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.26em] text-emerald-600">
             Zimbabwe&apos;s Diaspora Platform
           </p>
+          <p className="-mt-2 mb-4 text-center text-lg" aria-label="Zimbabwe flag">
+            🇿🇼
+          </p>
           <h1 className="mx-auto max-w-3xl text-4xl font-bold leading-tight text-slate-900 sm:text-6xl">We The People</h1>
           <p className="mx-auto mt-6 max-w-3xl text-base leading-relaxed text-slate-600 sm:text-xl">
             Promoting civic participation, political awareness, youth issues, and broader social concerns
@@ -123,6 +126,18 @@ export default function Home() {
             </Link>
           </div>
         </div>
+        <Link
+          href="#learn-more"
+          className="group absolute bottom-8 left-1/2 -translate-x-1/2 text-center"
+          aria-label="Scroll to learn more"
+        >
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.28em] text-slate-400 transition-colors group-hover:text-slate-500">
+            Scroll
+          </p>
+          <span className="mx-auto flex h-16 w-9 items-start justify-center rounded-full border-4 border-slate-200 p-1.5">
+            <span className="h-3 w-5 rounded-full bg-emerald-400 animate-scroll-nudge" />
+          </span>
+        </Link>
       </section>
 
       <section id="learn-more" className="mx-auto max-w-7xl px-4 py-16 text-center sm:px-6 sm:py-20">
@@ -136,7 +151,7 @@ export default function Home() {
         </p>
         <div className="mt-10 grid gap-4 sm:grid-cols-2">
           {offerings.map((offering) => (
-            <article key={offering.title} className="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm">
+            <article key={offering.title} className="rounded-2xl border border-slate-200 bg-white p-6 text-left shadow-sm">
               <h3 className="text-lg font-semibold text-slate-900">{offering.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-slate-600">{offering.description}</p>
             </article>
@@ -146,10 +161,10 @@ export default function Home() {
 
       <section className="border-y border-slate-200 bg-emerald-50/30">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">Powered by Expertise</p>
-          <h2 className="mt-3 text-3xl font-bold text-slate-900 sm:text-4xl">Knowledge from Industry Leaders</h2>
-          <p className="mt-4 max-w-3xl text-slate-600">
-            Our platform is built on expert insights gathered through structured podcast interviews with
+          <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">Powered by Expertise</p>
+          <h2 className="mt-3 text-center text-3xl font-bold text-slate-900 sm:text-4xl">Knowledge from Industry Leaders</h2>
+          <p className="mx-auto mt-4 max-w-3xl text-center text-slate-600">
+            Our platform is built on expert insights gathered through structured consultations with
             Zimbabwe&apos;s top professionals.
           </p>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -172,8 +187,8 @@ export default function Home() {
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">Why Choose WTP</p>
-        <h2 className="mt-3 text-3xl font-bold text-slate-900 sm:text-4xl">What makes WTP different?</h2>
+        <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">Why Choose WTP</p>
+        <h2 className="mt-3 text-center text-3xl font-bold text-slate-900 sm:text-4xl">What makes WTP different?</h2>
         <div className="mt-10 grid gap-4 md:grid-cols-3">
           {differentiators.map((item) => (
             <article key={item.title} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
