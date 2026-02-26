@@ -31,7 +31,7 @@ const offerings = [
 ]
 
 const experts = [
-  { title: 'Youths', subtitle: 'Youth leaders & advocates' },
+  { title: 'Youths', subtitle: 'Youth leaders & advocates', href: '/youths' },
   { title: 'Lawyers', subtitle: 'Legal & citizenship specialists' },
   { title: 'Investors', subtitle: 'Investment & property advisors' },
   { title: 'Policymakers', subtitle: 'Government & policy leaders', href: '/leadership' },
@@ -120,6 +120,9 @@ export default function Home() {
             </Link>
             <Link href="/nominations" className="transition-colors hover:text-slate-900">
               Nominations
+            </Link>
+            <Link href="/youths" className="transition-colors hover:text-slate-900">
+              Youths
             </Link>
           </nav>
           <LandingAuthActions />
@@ -309,6 +312,9 @@ export default function Home() {
                 </Link>
                 <Link href="/surveys" className="block transition-colors hover:text-slate-900">
                   Surveys
+                </Link>
+                <Link href="/youths" className="block transition-colors hover:text-slate-900">
+                  Youths
                 </Link>
                 <Link href="/signup" className="block transition-colors hover:text-slate-900">
                   Join DC
