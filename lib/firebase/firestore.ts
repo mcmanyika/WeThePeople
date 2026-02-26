@@ -15,9 +15,10 @@ import {
   onSnapshot,
   arrayUnion,
   increment,
+  runTransaction,
 } from 'firebase/firestore'
 import { db } from './config'
-import type { UserProfile, Donation, Membership, ContactSubmission, Purchase, Product, UserRole, News, CartItem, VolunteerApplication, VolunteerApplicationStatus, Petition, PetitionSignature, ShipmentStatus, NewsletterSubscription, Banner, GalleryCategory, GalleryImage, Survey, SurveyResponse, MembershipApplication, MembershipApplicationStatus, AdminNotification, NotificationType, NotificationAudience, EmailLog, EmailType, EmailStatus, Leader, Referral, ReferralStatus, Resource, EmailDraft, EmailDraftContext, TwitterEmbedPost, InboundEmail, PaymentMethod, DirectoryListing, DirectoryStatus, ClassifiedListing, ClassifiedStatus } from '@/types'
+import type { UserProfile, Donation, Membership, ContactSubmission, Purchase, Product, UserRole, News, CartItem, VolunteerApplication, VolunteerApplicationStatus, Petition, PetitionSignature, ShipmentStatus, NewsletterSubscription, Banner, GalleryCategory, GalleryImage, Survey, SurveyResponse, MembershipApplication, MembershipApplicationStatus, AdminNotification, NotificationType, NotificationAudience, EmailLog, EmailType, EmailStatus, Leader, Referral, ReferralStatus, Resource, EmailDraft, EmailDraftContext, TwitterEmbedPost, InboundEmail, PaymentMethod, DirectoryListing, DirectoryStatus, ClassifiedListing, ClassifiedStatus, CandidateNomination, CandidateNominationStatus, NominationVote, PublicOffice } from '@/types'
 
 // Helper functions
 function requireDb() {
@@ -2746,6 +2747,19 @@ export async function getLeaders(activeOnly: boolean = false): Promise<Leader[]>
   }
 }
 
+export async function getLeaderById(leaderId: string): Promise<Leader | null> {
+  const leaderDoc = await getDoc(doc(requireDb(), 'leaders', leaderId))
+  if (!leaderDoc.exists()) return null
+
+  const data = leaderDoc.data()
+  return {
+    ...data,
+    id: leaderDoc.id,
+    createdAt: toDate(data.createdAt),
+    updatedAt: toDate(data.updatedAt),
+  } as Leader
+}
+
 export async function updateLeader(leaderId: string, data: Partial<Leader>): Promise<void> {
   const updateData: any = { updatedAt: Timestamp.now() }
 
@@ -3359,6 +3373,211 @@ export async function reviewClassifiedListing(
 
 export async function deleteClassifiedListing(listingId: string): Promise<void> {
   await deleteDoc(doc(requireDb(), 'classifieds', listingId))
+}
+
+// ===== Candidate Nominations =====
+
+export async function createCandidateNomination(
+  nomination: Omit<CandidateNomination, 'id' | 'createdAt' | 'updatedAt' | 'approvedAt' | 'approvedBy' | 'voteCount' | 'isPreferredCandidate'>
+): Promise<string> {
+  const db = requireDb()
+  const ref = doc(collection(db, 'candidateNominations'))
+  const payload: Record<string, any> = {
+    id: ref.id,
+    cycleId: nomination.cycleId,
+    office: nomination.office,
+    fullName: nomination.fullName,
+    bio: nomination.bio,
+    proposedByUserId: nomination.proposedByUserId,
+    status: nomination.status,
+    voteCount: 0,
+    isPreferredCandidate: false,
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  }
+
+  if (nomination.manifesto) payload.manifesto = nomination.manifesto
+  if (nomination.location) payload.location = nomination.location
+  if (nomination.photoUrl) payload.photoUrl = nomination.photoUrl
+  if (nomination.proposedByName) payload.proposedByName = nomination.proposedByName
+  if (nomination.rejectionReason) payload.rejectionReason = nomination.rejectionReason
+
+  await setDoc(ref, payload)
+  return ref.id
+}
+
+export async function getCandidateNominations(filter: 'approved' | 'all' = 'approved'): Promise<CandidateNomination[]> {
+  if (!db) return []
+
+  const mapDoc = (d: any): CandidateNomination => {
+    const data = d.data()
+    return {
+      ...data,
+      id: d.id,
+      createdAt: toDate(data.createdAt),
+      updatedAt: toDate(data.updatedAt),
+      approvedAt: data.approvedAt ? toDate(data.approvedAt) : undefined,
+    } as CandidateNomination
+  }
+
+  try {
+    let q = query(collection(requireDb(), 'candidateNominations'), orderBy('createdAt', 'desc'))
+    if (filter === 'approved') q = query(q, where('status', '==', 'approved'))
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map(mapDoc)
+  } catch (error: any) {
+    console.warn('Nominations query failed, using fallback:', error?.code || error?.message)
+  }
+
+  try {
+    const snapshot = await getDocs(collection(requireDb(), 'candidateNominations'))
+    const nominations = snapshot.docs.map(mapDoc)
+    const filtered = filter === 'approved' ? nominations.filter((n) => n.status === 'approved') : nominations
+    return filtered.sort((a, b) => {
+      const aDate = a.createdAt instanceof Date ? a.createdAt.getTime() : 0
+      const bDate = b.createdAt instanceof Date ? b.createdAt.getTime() : 0
+      return bDate - aDate
+    })
+  } catch (fallbackError) {
+    console.error('Error fetching candidate nominations:', fallbackError)
+    return []
+  }
+}
+
+export async function getCandidateNominationById(nominationId: string): Promise<CandidateNomination | null> {
+  const nominationDoc = await getDoc(doc(requireDb(), 'candidateNominations', nominationId))
+  if (!nominationDoc.exists()) return null
+  const data = nominationDoc.data()
+  return {
+    ...data,
+    id: nominationDoc.id,
+    createdAt: toDate(data.createdAt),
+    updatedAt: toDate(data.updatedAt),
+    approvedAt: data.approvedAt ? toDate(data.approvedAt) : undefined,
+  } as CandidateNomination
+}
+
+export async function getCandidateNominationsByOwner(ownerUserId: string): Promise<CandidateNomination[]> {
+  const db = requireDb()
+  try {
+    const q = query(
+      collection(db, 'candidateNominations'),
+      where('proposedByUserId', '==', ownerUserId),
+      orderBy('createdAt', 'desc')
+    )
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map((d) => {
+      const data = d.data()
+      return {
+        ...data,
+        id: d.id,
+        createdAt: toDate(data.createdAt),
+        updatedAt: toDate(data.updatedAt),
+        approvedAt: data.approvedAt ? toDate(data.approvedAt) : undefined,
+      } as CandidateNomination
+    })
+  } catch (error: any) {
+    console.warn('Owner nominations query failed, using fallback:', error?.code || error?.message)
+    const snapshot = await getDocs(query(collection(db, 'candidateNominations'), where('proposedByUserId', '==', ownerUserId)))
+    const nominations = snapshot.docs.map((d) => {
+      const data = d.data()
+      return {
+        ...data,
+        id: d.id,
+        createdAt: toDate(data.createdAt),
+        updatedAt: toDate(data.updatedAt),
+        approvedAt: data.approvedAt ? toDate(data.approvedAt) : undefined,
+      } as CandidateNomination
+    })
+    return nominations.sort((a, b) => {
+      const aDate = a.createdAt instanceof Date ? a.createdAt.getTime() : 0
+      const bDate = b.createdAt instanceof Date ? b.createdAt.getTime() : 0
+      return bDate - aDate
+    })
+  }
+}
+
+export async function updateCandidateNomination(nominationId: string, data: Partial<CandidateNomination>): Promise<void> {
+  const updateData: Record<string, any> = { updatedAt: Timestamp.now() }
+  if (data.office !== undefined) updateData.office = data.office
+  if (data.fullName !== undefined) updateData.fullName = data.fullName
+  if (data.bio !== undefined) updateData.bio = data.bio
+  if (data.manifesto !== undefined) updateData.manifesto = data.manifesto || null
+  if (data.location !== undefined) updateData.location = data.location || null
+  if (data.photoUrl !== undefined) updateData.photoUrl = data.photoUrl || null
+  if (data.proposedByName !== undefined) updateData.proposedByName = data.proposedByName || null
+  if (data.status !== undefined) updateData.status = data.status
+  if (data.isPreferredCandidate !== undefined) updateData.isPreferredCandidate = data.isPreferredCandidate
+  if (data.rejectionReason !== undefined) updateData.rejectionReason = data.rejectionReason || null
+  if (data.voteCount !== undefined) updateData.voteCount = data.voteCount
+  await updateDoc(doc(requireDb(), 'candidateNominations', nominationId), updateData)
+}
+
+export async function reviewCandidateNomination(
+  nominationId: string,
+  status: CandidateNominationStatus,
+  reviewedBy: string,
+  rejectionReason?: string
+): Promise<void> {
+  const payload: Record<string, any> = {
+    status,
+    updatedAt: Timestamp.now(),
+    approvedBy: reviewedBy,
+  }
+  if (status === 'approved') {
+    payload.approvedAt = Timestamp.now()
+    payload.rejectionReason = null
+  } else if (rejectionReason) {
+    payload.rejectionReason = rejectionReason
+  }
+  await updateDoc(doc(requireDb(), 'candidateNominations', nominationId), payload)
+}
+
+export async function castNominationVote(
+  nominationId: string,
+  cycleId: string,
+  office: PublicOffice,
+  voterUserId: string
+): Promise<void> {
+  const db = requireDb()
+  const voteId = `${nominationId}_${voterUserId}`
+  const voteRef = doc(db, 'nominationVotes', voteId)
+  const nominationRef = doc(db, 'candidateNominations', nominationId)
+
+  await runTransaction(db, async (tx) => {
+    const existingVote = await tx.get(voteRef)
+    if (existingVote.exists()) {
+      throw new Error('You have already voted for this candidate')
+    }
+
+    const nominationDoc = await tx.get(nominationRef)
+    if (!nominationDoc.exists()) {
+      throw new Error('Nomination not found')
+    }
+
+    const nominationData = nominationDoc.data()
+    if (nominationData.status !== 'approved') {
+      throw new Error('Only approved nominations can receive votes')
+    }
+
+    const nextVoteCount = (nominationData.voteCount || 0) + 1
+    tx.set(voteRef, {
+      id: voteId,
+      nominationId,
+      cycleId,
+      office,
+      voterUserId,
+      createdAt: Timestamp.now(),
+    } as NominationVote)
+    tx.update(nominationRef, {
+      voteCount: nextVoteCount,
+      updatedAt: Timestamp.now(),
+    })
+  })
+}
+
+export async function deleteCandidateNomination(nominationId: string): Promise<void> {
+  await deleteDoc(doc(requireDb(), 'candidateNominations', nominationId))
 }
 
 // ===== Download Tracking =====

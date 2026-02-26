@@ -214,6 +214,71 @@ service cloud.firestore {
                      request.resource.data.signatures.size() > resource.data.signatures.size();
     }
 
+    // Candidate Nominations collection
+    match /candidateNominations/{nominationId} {
+      // Public can read approved nominations
+      allow read: if resource.data.status == 'approved';
+      // Proposer can read their own nomination in any state
+      allow read: if isAuthenticated() && resource.data.proposedByUserId == request.auth.uid;
+      // Admins can read all nominations
+      allow read: if isAdmin();
+
+      // Authenticated users can submit nominations for review
+      allow create: if isAuthenticated() &&
+                    request.resource.data.proposedByUserId == request.auth.uid &&
+                    request.resource.data.fullName is string &&
+                    request.resource.data.fullName.size() > 0 &&
+                    request.resource.data.bio is string &&
+                    request.resource.data.bio.size() > 0 &&
+                    request.resource.data.office is string &&
+                    request.resource.data.status == 'pending_review' &&
+                    request.resource.data.voteCount == 0 &&
+                    request.resource.data.isPreferredCandidate == false;
+
+      // Proposer can update only basic nomination fields while pending/rejected
+      allow update: if isAuthenticated() &&
+                    resource.data.proposedByUserId == request.auth.uid &&
+                    resource.data.status in ['pending_review', 'rejected'] &&
+                    request.resource.data.proposedByUserId == resource.data.proposedByUserId &&
+                    request.resource.data.status in ['pending_review', 'rejected'] &&
+                    request.resource.data.voteCount == resource.data.voteCount &&
+                    request.resource.data.isPreferredCandidate == resource.data.isPreferredCandidate &&
+                    request.resource.data.approvedAt == resource.data.approvedAt &&
+                    request.resource.data.approvedBy == resource.data.approvedBy;
+
+      // Allow authenticated users to increment vote count on approved nominations
+      allow update: if isAuthenticated() &&
+                    resource.data.status == 'approved' &&
+                    request.resource.data.diff(resource.data).affectedKeys().hasOnly(['voteCount', 'updatedAt']) &&
+                    request.resource.data.voteCount == resource.data.voteCount + 1;
+
+      // Admins can review/manage all nominations
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Nomination Votes collection
+    match /nominationVotes/{voteId} {
+      // Voters can read their own vote records
+      allow read: if isAuthenticated() && resource.data.voterUserId == request.auth.uid;
+      // Admins can read all votes
+      allow read: if isAdmin();
+
+      // Authenticated users can create one deterministic vote per nomination
+      allow create: if isAuthenticated() &&
+                    request.resource.data.voterUserId == request.auth.uid &&
+                    request.resource.data.nominationId is string &&
+                    request.resource.data.cycleId is string &&
+                    request.resource.data.office is string &&
+                    voteId == request.resource.data.nominationId + '_' + request.auth.uid &&
+                    get(/databases/$(database)/documents/candidateNominations/$(request.resource.data.nominationId)).data.status == 'approved';
+
+      // No direct edits by users after vote cast
+      allow update: if false;
+      // Admins can delete vote records for moderation/corrections
+      allow delete: if isAdmin();
+    }
+
     // Banners collection
     match /banners/{bannerId} {
       // Everyone can read active banners (for the hero section)

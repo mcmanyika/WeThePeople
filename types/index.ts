@@ -495,6 +495,52 @@ export interface ClassifiedListing {
   approvedBy?: string
 }
 
+// Nominations & Voting
+export type PublicOffice = 'president' | 'vice_president' | 'member_of_parliament' | 'councillor' | 'mayor' | 'other'
+export type ElectionCycleStatus = 'draft' | 'nominations_open' | 'voting_open' | 'closed' | 'archived'
+export type CandidateNominationStatus = 'pending_review' | 'approved' | 'rejected' | 'withdrawn' | 'suspended'
+
+export interface ElectionCycle {
+  id: string
+  title: string
+  year: number
+  status: ElectionCycleStatus
+  startAt?: Timestamp | Date
+  endAt?: Timestamp | Date
+  createdAt: Timestamp | Date
+  updatedAt: Timestamp | Date
+}
+
+export interface CandidateNomination {
+  id: string
+  cycleId: string
+  office: PublicOffice
+  fullName: string
+  bio: string
+  manifesto?: string
+  location?: string
+  photoUrl?: string
+  proposedByUserId: string
+  proposedByName?: string
+  status: CandidateNominationStatus
+  voteCount: number
+  isPreferredCandidate: boolean
+  rejectionReason?: string
+  approvedBy?: string
+  approvedAt?: Timestamp | Date
+  createdAt: Timestamp | Date
+  updatedAt: Timestamp | Date
+}
+
+export interface NominationVote {
+  id: string
+  nominationId: string
+  cycleId: string
+  office: PublicOffice
+  voterUserId: string
+  createdAt: Timestamp | Date
+}
+
 // Twitter Embeds
 export interface TwitterEmbedPost {
   id: string

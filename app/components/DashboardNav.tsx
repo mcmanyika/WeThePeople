@@ -172,6 +172,7 @@ function IconTwitter({ className = 'h-5 w-5' }: { className?: string }) {
 const adminContentItems: NavItem[] = [
   { href: '/dashboard/admin/news', label: 'Articles', icon: <IconNewspaper />, description: 'Manage articles' },
   { href: '/dashboard/admin/petitions', label: 'Petitions', icon: <IconPencilSquare />, description: 'Manage petitions' },
+  { href: '/dashboard/admin/nominations', label: 'Nominations', icon: <IconPencilSquare />, description: 'Candidate nominations' },
   { href: '/dashboard/admin/petition-signatures', label: 'Signatures', icon: <IconPencilSquare />, description: 'Petition signatories' },
   { href: '/dashboard/admin/surveys', label: 'Surveys', icon: <IconClipboard />, description: 'Manage surveys' },
   { href: '/dashboard/admin/banners', label: 'Banners', icon: <IconFlag />, description: 'Hero banners' },

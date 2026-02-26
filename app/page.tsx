@@ -24,6 +24,7 @@ const offerings = [
   {
     title: 'Voting & Civic Participation',
     icon: 'civic',
+    href: '/nominations',
     description:
       'Stay informed on voting processes and civic updates so diaspora Zimbabweans can participate meaningfully in national development.',
   },
@@ -33,7 +34,7 @@ const experts = [
   { title: 'Youths', subtitle: 'Youth leaders & advocates' },
   { title: 'Lawyers', subtitle: 'Legal & citizenship specialists' },
   { title: 'Investors', subtitle: 'Investment & property advisors' },
-  { title: 'Policymakers', subtitle: 'Government & policy leaders' },
+  { title: 'Policymakers', subtitle: 'Government & policy leaders', href: '/leadership' },
 ]
 
 const stats = [
@@ -117,6 +118,9 @@ export default function Home() {
             <Link href="/classifieds" className="transition-colors hover:text-slate-900">
               Classifieds
             </Link>
+            <Link href="/nominations" className="transition-colors hover:text-slate-900">
+              Nominations
+            </Link>
           </nav>
           <LandingAuthActions />
         </div>
@@ -176,15 +180,27 @@ export default function Home() {
           informed decisions.
         </p>
         <div className="mt-10 grid gap-4 sm:grid-cols-2">
-          {offerings.map((offering) => (
-            <article key={offering.title} className="rounded-2xl border border-slate-200 bg-white p-6 text-left shadow-sm">
-              <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
-                {renderOfferingIcon(offering.icon)}
-              </div>
-              <h3 className="text-lg font-semibold text-slate-900">{offering.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600">{offering.description}</p>
-            </article>
-          ))}
+          {offerings.map((offering) => {
+            const card = (
+              <article className="rounded-2xl border border-slate-200 bg-white p-6 text-left shadow-sm transition hover:border-emerald-300 hover:shadow-md">
+                <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
+                  {renderOfferingIcon(offering.icon)}
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900">{offering.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-slate-600">{offering.description}</p>
+              </article>
+            )
+
+            if (offering.href) {
+              return (
+                <Link key={offering.title} href={offering.href} className="block">
+                  {card}
+                </Link>
+              )
+            }
+
+            return <div key={offering.title}>{card}</div>
+          })}
         </div>
       </section>
 
@@ -197,12 +213,24 @@ export default function Home() {
             bankers, lawyers, policymakers, investors, and industry leaders.
           </p>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {experts.map((expert) => (
-              <article key={expert.title} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <h3 className="text-lg font-semibold text-slate-900">{expert.title}</h3>
-                <p className="mt-1 text-sm text-slate-600">{expert.subtitle}</p>
-              </article>
-            ))}
+            {experts.map((expert) => {
+              const card = (
+                <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-emerald-300 hover:shadow-md">
+                  <h3 className="text-lg font-semibold text-slate-900">{expert.title}</h3>
+                  <p className="mt-1 text-sm text-slate-600">{expert.subtitle}</p>
+                </article>
+              )
+
+              if (expert.href) {
+                return (
+                  <Link key={expert.title} href={expert.href} className="block">
+                    {card}
+                  </Link>
+                )
+              }
+
+              return <div key={expert.title}>{card}</div>
+            })}
           </div>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {stats.map((stat) => (
@@ -298,6 +326,9 @@ export default function Home() {
                 </Link>
                 <Link href="/classifieds" className="block transition-colors hover:text-slate-900">
                   Classifieds
+                </Link>
+                <Link href="/nominations" className="block transition-colors hover:text-slate-900">
+                  Nominations
                 </Link>
               </div>
             </div>
