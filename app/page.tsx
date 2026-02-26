@@ -30,7 +30,7 @@ const offerings = [
 ]
 
 const experts = [
-  { title: 'Bankers', subtitle: 'Banking & finance experts' },
+  { title: 'Youths', subtitle: 'Youth leaders & advocates' },
   { title: 'Lawyers', subtitle: 'Legal & citizenship specialists' },
   { title: 'Investors', subtitle: 'Investment & property advisors' },
   { title: 'Policymakers', subtitle: 'Government & policy leaders' },
@@ -116,9 +116,6 @@ export default function Home() {
             </Link>
             <Link href="/classifieds" className="transition-colors hover:text-slate-900">
               Classifieds
-            </Link>
-            <Link href="#footer-contact" className="transition-colors hover:text-slate-900">
-              Contact
             </Link>
           </nav>
           <LandingAuthActions />
@@ -285,6 +282,9 @@ export default function Home() {
                 <Link href="/surveys" className="block transition-colors hover:text-slate-900">
                   Surveys
                 </Link>
+                <Link href="/signup" className="block transition-colors hover:text-slate-900">
+                  Join DC
+                </Link>
               </div>
             </div>
             <div className="flex flex-col items-center">
@@ -298,9 +298,6 @@ export default function Home() {
                 </Link>
                 <Link href="/classifieds" className="block transition-colors hover:text-slate-900">
                   Classifieds
-                </Link>
-                <Link href="/signup" className="block transition-colors hover:text-slate-900">
-                  Join DC
                 </Link>
               </div>
             </div>
