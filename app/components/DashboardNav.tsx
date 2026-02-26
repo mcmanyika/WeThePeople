@@ -211,6 +211,8 @@ const adminManageItems: NavItem[] = [
   { href: '/dashboard/admin/referrals', label: 'Referrals', icon: <IconShare />, description: 'Referral program' },
   { href: '/dashboard/admin/donations', label: 'All Donations', icon: <IconHeart />, description: 'All donations' },
   { href: '/dashboard/admin/products', label: 'Products', icon: <IconShoppingBag />, description: 'Shop inventory' },
+  { href: '/dashboard/admin/directory', label: 'Directory', icon: <IconBook />, description: 'Business listings' },
+  { href: '/dashboard/admin/classifieds', label: 'Classifieds', icon: <IconClipboard />, description: 'Community ads' },
   { href: '/dashboard/admin/orders', label: 'Orders', icon: <IconCube />, description: 'Order management' },
   { href: '/dashboard/admin/volunteers', label: 'Volunteers', icon: <IconUserGroup />, description: 'Applications' },
   { href: '/dashboard/admin/contacts', label: 'Contact', icon: <IconEnvelope />, description: 'Messages received' },

@@ -420,6 +420,81 @@ export interface Resource {
   createdAt: Timestamp | Date
 }
 
+// Directory Listings
+export type DirectoryCategory =
+  | 'legal'
+  | 'property'
+  | 'banking'
+  | 'remittance'
+  | 'pensions'
+  | 'business'
+  | 'citizenship'
+  | 'other'
+
+export type DirectoryStatus = 'draft' | 'pending_review' | 'approved' | 'rejected' | 'suspended'
+
+export interface DirectoryListing {
+  id: string
+  ownerUserId: string
+  businessName: string
+  category: DirectoryCategory
+  shortDescription: string
+  longDescription?: string
+  country: string
+  city?: string
+  serviceAreas?: string[]
+  contactEmail?: string
+  contactPhone?: string
+  website?: string
+  logoUrl?: string
+  isVerified: boolean
+  status: DirectoryStatus
+  rejectionReason?: string
+  createdAt: Timestamp | Date
+  updatedAt: Timestamp | Date
+  approvedAt?: Timestamp | Date
+  approvedBy?: string
+}
+
+// Classified Listings
+export type ClassifiedCategory =
+  | 'jobs'
+  | 'housing'
+  | 'vehicles'
+  | 'services'
+  | 'marketplace'
+  | 'community'
+  | 'other'
+
+export type ClassifiedCondition = 'new' | 'like_new' | 'good' | 'fair' | 'poor'
+export type ClassifiedStatus = 'draft' | 'pending_review' | 'approved' | 'rejected' | 'suspended' | 'sold' | 'expired'
+
+export interface ClassifiedListing {
+  id: string
+  ownerUserId: string
+  title: string
+  description: string
+  category: ClassifiedCategory
+  country: string
+  city?: string
+  price?: number
+  currency?: string
+  isNegotiable?: boolean
+  condition?: ClassifiedCondition
+  contactEmail?: string
+  contactPhone?: string
+  whatsapp?: string
+  imageUrls?: string[]
+  isFeatured: boolean
+  status: ClassifiedStatus
+  rejectionReason?: string
+  expiresAt?: Timestamp | Date
+  createdAt: Timestamp | Date
+  updatedAt: Timestamp | Date
+  approvedAt?: Timestamp | Date
+  approvedBy?: string
+}
+
 // Twitter Embeds
 export interface TwitterEmbedPost {
   id: string

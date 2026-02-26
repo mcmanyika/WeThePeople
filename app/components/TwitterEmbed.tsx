@@ -7,6 +7,9 @@ interface TwitterEmbedProps {
   hideAtSelectors?: string[]
 }
 
+const OPEN_STATE_KEY = 'wtp_twitter_embed_open'
+const URL_CACHE_KEY = 'wtp_twitter_embed_url'
+
 export default function TwitterEmbed({ hideAtSelectors }: TwitterEmbedProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isOpen, setIsOpen] = useState(false)
@@ -21,11 +24,32 @@ export default function TwitterEmbed({ hideAtSelectors }: TwitterEmbedProps) {
   // Fetch active embed from Firestore
   useEffect(() => {
     let cancelled = false
+
+    // Restore last open/closed state and cached URL to reduce UI reset on dev reloads
+    try {
+      const savedOpen = sessionStorage.getItem(OPEN_STATE_KEY)
+      if (savedOpen === '1') setIsOpen(true)
+      const cachedUrl = sessionStorage.getItem(URL_CACHE_KEY)
+      if (cachedUrl) {
+        setTweetUrl(cachedUrl)
+        setLoadingEmbed(false)
+      }
+    } catch {
+      // Ignore storage errors in private mode/restricted browsers
+    }
+
     async function fetchEmbed() {
       try {
         const embed = await getActiveTwitterEmbed()
         if (!cancelled) {
-          setTweetUrl(embed?.tweetUrl ?? null)
+          const nextUrl = embed?.tweetUrl ?? null
+          setTweetUrl(nextUrl)
+          try {
+            if (nextUrl) sessionStorage.setItem(URL_CACHE_KEY, nextUrl)
+            else sessionStorage.removeItem(URL_CACHE_KEY)
+          } catch {
+            // Ignore storage errors
+          }
         }
       } catch (err) {
         console.error('Error fetching active twitter embed:', err)
@@ -36,6 +60,15 @@ export default function TwitterEmbed({ hideAtSelectors }: TwitterEmbedProps) {
     fetchEmbed()
     return () => { cancelled = true }
   }, [])
+
+  // Persist open/closed state so full reloads don't reset panel state
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(OPEN_STATE_KEY, isOpen ? '1' : '0')
+    } catch {
+      // Ignore storage errors
+    }
+  }, [isOpen])
 
   // Load Twitter widget script when panel opens
   useEffect(() => {

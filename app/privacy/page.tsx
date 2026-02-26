@@ -7,10 +7,10 @@ export default function PrivacyPolicyPage() {
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
           <Link href="/" className="flex items-center gap-2">
             <span className="inline-flex h-8 w-10 items-center justify-center rounded-md bg-emerald-500 text-[10px] font-bold text-white">
-              WTP
+              DC
             </span>
             <span className="text-sm font-semibold tracking-tight text-slate-900 sm:text-base">
-              We The People
+              Diaspora Connect
             </span>
           </Link>
           <nav className="hidden items-center gap-6 text-sm text-slate-500 md:flex">
@@ -42,7 +42,7 @@ export default function PrivacyPolicyPage() {
           <div className="space-y-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-10">
             <div>
               <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
-                We The People (&quot;WTP&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) is committed to protecting and
+                Diaspora Connect (&quot;DC&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) is committed to protecting and
                 respecting your privacy. This Privacy Policy explains how we collect, use, store, and protect your
                 personal information when you use our website and related services.
               </p>
@@ -76,7 +76,7 @@ export default function PrivacyPolicyPage() {
                 <li>To process membership and volunteer applications.</li>
                 <li>To process donations and issue receipts.</li>
                 <li>To manage petition signatures and civic engagement activities.</li>
-                <li>To send you updates, newsletters, and communications related to WTP activities (with your consent).</li>
+                <li>To send you updates, newsletters, and communications related to DC activities (with your consent).</li>
                 <li>To respond to your enquiries and provide support.</li>
                 <li>To improve our website, services, and user experience.</li>
                 <li>To comply with legal obligations.</li>
@@ -141,7 +141,7 @@ export default function PrivacyPolicyPage() {
               <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
                 We retain your personal data only for as long as necessary to fulfil the purposes for which it was
                 collected, or as required by law. Membership and volunteer application data is retained for the
-                duration of your relationship with WTP. You may request deletion of your account and associated data
+                duration of your relationship with DC. You may request deletion of your account and associated data
                 at any time.
               </p>
             </div>
@@ -171,7 +171,7 @@ export default function PrivacyPolicyPage() {
                 personal data, please contact us:
               </p>
               <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700 sm:text-base">
-                <p className="font-semibold">We The People (WTP)</p>
+                <p className="font-semibold">Diaspora Connect (DC)</p>
                 <p className="mt-1">
                   Email:{' '}
                   <a href="mailto:contact@wtp.com" className="text-emerald-700 hover:underline">contact@wtp.com</a>
@@ -184,7 +184,7 @@ export default function PrivacyPolicyPage() {
 
       <footer className="border-t border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-8 text-center text-sm text-slate-600 sm:px-6">
-          <p>© 2026 We The People (WTP). All rights reserved.</p>
+          <p>© 2026 Diaspora Connect (DC). All rights reserved.</p>
         </div>
       </footer>
     </main>

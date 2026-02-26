@@ -53,10 +53,10 @@ function WelcomeContent() {
         <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
           <Link href="/" className="flex items-center gap-2">
             <span className="inline-flex h-8 w-10 items-center justify-center rounded-md bg-emerald-500 text-[10px] font-bold text-white">
-              WTP
+              DC
             </span>
             <span className="text-sm font-semibold tracking-tight text-slate-900 sm:text-base">
-              We The People
+              Diaspora Connect
             </span>
           </Link>
           <Link
@@ -73,7 +73,7 @@ function WelcomeContent() {
           <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">
             Welcome
           </p>
-          <h1 className="text-2xl font-bold text-slate-900 sm:text-4xl">Welcome to We The People</h1>
+          <h1 className="text-2xl font-bold text-slate-900 sm:text-4xl">Welcome to Diaspora Connect</h1>
           <p className="mt-3 text-sm text-slate-600 sm:text-base">
             Thank you for joining a platform dedicated to civic participation, political awareness, youth
             priorities, and social issues that shape our society.
@@ -89,7 +89,7 @@ function WelcomeContent() {
           </p>
 
           <p className="text-base text-slate-700 leading-relaxed mb-6">
-            Thank you for joining <strong>We The People (WTP)</strong>.
+            Thank you for joining <strong>Diaspora Connect (DC)</strong>.
           </p>
 
           <p className="text-base text-slate-700 leading-relaxed mb-6">
@@ -98,7 +98,7 @@ function WelcomeContent() {
           </p>
 
           <p className="text-base text-slate-700 leading-relaxed mb-6">
-            WTP is non-partisan and citizen-centered. We create space for conversations and participation
+            DC is non-partisan and citizen-centered. We create space for conversations and participation
             around governance, politics, youth concerns, and social challenges affecting everyday life.
           </p>
 
@@ -144,8 +144,8 @@ function WelcomeContent() {
           {/* Signature */}
           <div className="mb-8 border-t border-slate-100 pt-6">
             <p className="text-base text-slate-700 mb-1">Warm regards,</p>
-            <p className="text-base font-bold text-slate-900">The WTP Team</p>
-            <p className="text-sm text-slate-500">We The People (WTP)</p>
+            <p className="text-base font-bold text-slate-900">The DC Team</p>
+            <p className="text-sm text-slate-500">Diaspora Connect (DC)</p>
           </div>
 
           {/* CTA Buttons */}
@@ -184,7 +184,7 @@ function WelcomeContent() {
       {/* Footer */}
       <div className="border-t bg-slate-100 py-6 text-center">
         <p className="text-xs text-slate-500">
-          &copy; {new Date().getFullYear()} We The People (WTP). All rights reserved.
+          &copy; {new Date().getFullYear()} Diaspora Connect (DC). All rights reserved.
         </p>
       </div>
     </div>

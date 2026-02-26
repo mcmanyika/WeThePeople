@@ -965,7 +965,7 @@ export default function MembershipApplicationForm() {
 
           <div className="rounded-xl border border-slate-200 bg-slate-50 p-6">
             <p className="mb-4 text-sm leading-relaxed text-slate-700">
-              I / We hereby apply for membership of <strong>We The People (WTP)</strong> and affirm that:
+              I / We hereby apply for membership of <strong>Diaspora Connect (DC)</strong> and affirm that:
             </p>
             <ul className="space-y-3 text-sm text-slate-700">
               <li className="flex items-start gap-2">
@@ -986,11 +986,11 @@ export default function MembershipApplicationForm() {
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-200 text-xs font-bold text-slate-600">5</span>
-                <span>I / We agree to uphold WTP&apos;s <strong>non-partisan values, community standards, and code of conduct</strong>.</span>
+                <span>I / We agree to uphold DC&apos;s <strong>non-partisan values, community standards, and code of conduct</strong>.</span>
               </li>
             </ul>
             <p className="mt-4 text-sm italic text-slate-500">
-              I / We acknowledge that WTP membership does not replace affiliation to any political party, civic organisation, or institution.
+              I / We acknowledge that DC membership does not replace affiliation to any political party, civic organisation, or institution.
             </p>
           </div>
 

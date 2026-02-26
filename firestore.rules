@@ -387,6 +387,81 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Directory Listings collection
+    match /directoryListings/{listingId} {
+      // Public can only read approved listings
+      allow read: if resource.data.status == 'approved';
+      // Owners can read their own listing in any state
+      allow read: if isAuthenticated() && resource.data.ownerUserId == request.auth.uid;
+      // Admins can read all listings
+      allow read: if isAdmin();
+
+      // Authenticated users can submit their own listing for review
+      allow create: if isAuthenticated() &&
+                    request.resource.data.ownerUserId == request.auth.uid &&
+                    request.resource.data.businessName is string &&
+                    request.resource.data.businessName.size() > 0 &&
+                    request.resource.data.category is string &&
+                    request.resource.data.shortDescription is string &&
+                    request.resource.data.shortDescription.size() > 0 &&
+                    request.resource.data.country is string &&
+                    request.resource.data.country.size() > 0 &&
+                    request.resource.data.status in ['draft', 'pending_review'] &&
+                    request.resource.data.isVerified == false;
+
+      // Owners can edit their listing while not yet approved
+      allow update: if isAuthenticated() &&
+                    resource.data.ownerUserId == request.auth.uid &&
+                    resource.data.status in ['draft', 'pending_review', 'rejected'] &&
+                    request.resource.data.ownerUserId == resource.data.ownerUserId &&
+                    request.resource.data.status in ['draft', 'pending_review'] &&
+                    request.resource.data.isVerified == false &&
+                    request.resource.data.approvedAt == resource.data.approvedAt &&
+                    request.resource.data.approvedBy == resource.data.approvedBy;
+
+      // Admins can review/manage all listings
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Classifieds collection
+    match /classifieds/{listingId} {
+      // Public can only read approved + active (non-expired) classifieds
+      allow read: if resource.data.status == 'approved' &&
+                  (!('expiresAt' in resource.data) || resource.data.expiresAt > request.time);
+      // Owners can read their own listing in any state
+      allow read: if isAuthenticated() && resource.data.ownerUserId == request.auth.uid;
+      // Admins can read all classifieds
+      allow read: if isAdmin();
+
+      // Authenticated users can submit classifieds for review
+      allow create: if isAuthenticated() &&
+                    request.resource.data.ownerUserId == request.auth.uid &&
+                    request.resource.data.title is string &&
+                    request.resource.data.title.size() > 0 &&
+                    request.resource.data.description is string &&
+                    request.resource.data.description.size() > 0 &&
+                    request.resource.data.category is string &&
+                    request.resource.data.country is string &&
+                    request.resource.data.country.size() > 0 &&
+                    request.resource.data.status in ['draft', 'pending_review'] &&
+                    request.resource.data.isFeatured == false;
+
+      // Owners can edit while awaiting approval or after rejection
+      allow update: if isAuthenticated() &&
+                    resource.data.ownerUserId == request.auth.uid &&
+                    resource.data.status in ['draft', 'pending_review', 'rejected'] &&
+                    request.resource.data.ownerUserId == resource.data.ownerUserId &&
+                    request.resource.data.status in ['draft', 'pending_review'] &&
+                    request.resource.data.isFeatured == false &&
+                    request.resource.data.approvedAt == resource.data.approvedAt &&
+                    request.resource.data.approvedBy == resource.data.approvedBy;
+
+      // Admins can review/manage all classifieds
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
     // ─── Analytics (download tracking) ─────────────────────────────
     match /analytics/{docId} {
       // Anyone can read download counts (public display)

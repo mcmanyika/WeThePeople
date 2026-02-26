@@ -17,7 +17,7 @@ import {
   increment,
 } from 'firebase/firestore'
 import { db } from './config'
-import type { UserProfile, Donation, Membership, ContactSubmission, Purchase, Product, UserRole, News, CartItem, VolunteerApplication, VolunteerApplicationStatus, Petition, PetitionSignature, ShipmentStatus, NewsletterSubscription, Banner, GalleryCategory, GalleryImage, Survey, SurveyResponse, MembershipApplication, MembershipApplicationStatus, AdminNotification, NotificationType, NotificationAudience, EmailLog, EmailType, EmailStatus, Leader, Referral, ReferralStatus, Resource, EmailDraft, EmailDraftContext, TwitterEmbedPost, InboundEmail, PaymentMethod } from '@/types'
+import type { UserProfile, Donation, Membership, ContactSubmission, Purchase, Product, UserRole, News, CartItem, VolunteerApplication, VolunteerApplicationStatus, Petition, PetitionSignature, ShipmentStatus, NewsletterSubscription, Banner, GalleryCategory, GalleryImage, Survey, SurveyResponse, MembershipApplication, MembershipApplicationStatus, AdminNotification, NotificationType, NotificationAudience, EmailLog, EmailType, EmailStatus, Leader, Referral, ReferralStatus, Resource, EmailDraft, EmailDraftContext, TwitterEmbedPost, InboundEmail, PaymentMethod, DirectoryListing, DirectoryStatus, ClassifiedListing, ClassifiedStatus } from '@/types'
 
 // Helper functions
 function requireDb() {
@@ -3018,6 +3018,347 @@ export async function getResources(): Promise<Resource[]> {
 export async function deleteResource(resourceId: string): Promise<void> {
   const db = requireDb()
   await deleteDoc(doc(db, 'resources', resourceId))
+}
+
+// ===== Directory Listings =====
+
+export async function createDirectoryListing(
+  listing: Omit<DirectoryListing, 'id' | 'createdAt' | 'updatedAt' | 'approvedAt' | 'approvedBy'>
+): Promise<string> {
+  const db = requireDb()
+  const ref = doc(collection(db, 'directoryListings'))
+  const payload: Record<string, any> = {
+    id: ref.id,
+    ownerUserId: listing.ownerUserId,
+    businessName: listing.businessName,
+    category: listing.category,
+    shortDescription: listing.shortDescription,
+    country: listing.country,
+    isVerified: listing.isVerified,
+    status: listing.status,
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  }
+  if (listing.longDescription) payload.longDescription = listing.longDescription
+  if (listing.city) payload.city = listing.city
+  if (listing.serviceAreas && listing.serviceAreas.length > 0) payload.serviceAreas = listing.serviceAreas
+  if (listing.contactEmail) payload.contactEmail = listing.contactEmail
+  if (listing.contactPhone) payload.contactPhone = listing.contactPhone
+  if (listing.website) payload.website = listing.website
+  if (listing.logoUrl) payload.logoUrl = listing.logoUrl
+  if (listing.rejectionReason) payload.rejectionReason = listing.rejectionReason
+  await setDoc(ref, payload)
+  return ref.id
+}
+
+export async function getDirectoryListings(filter: 'approved' | 'all' = 'approved'): Promise<DirectoryListing[]> {
+  if (!db) return []
+  const mapDoc = (d: any): DirectoryListing => {
+    const data = d.data()
+    return {
+      ...data,
+      id: d.id,
+      createdAt: toDate(data.createdAt),
+      updatedAt: toDate(data.updatedAt),
+      approvedAt: data.approvedAt ? toDate(data.approvedAt) : undefined,
+    } as DirectoryListing
+  }
+
+  try {
+    let q = query(collection(requireDb(), 'directoryListings'), orderBy('createdAt', 'desc'))
+    if (filter === 'approved') q = query(q, where('status', '==', 'approved'))
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map(mapDoc)
+  } catch (error: any) {
+    console.warn('Directory listings query failed, using fallback:', error?.code || error?.message)
+  }
+
+  try {
+    const snapshot = await getDocs(collection(requireDb(), 'directoryListings'))
+    const listings = snapshot.docs.map(mapDoc)
+    const filtered = filter === 'approved' ? listings.filter((l) => l.status === 'approved') : listings
+    return filtered.sort((a, b) => {
+      const aDate = a.createdAt instanceof Date ? a.createdAt.getTime() : 0
+      const bDate = b.createdAt instanceof Date ? b.createdAt.getTime() : 0
+      return bDate - aDate
+    })
+  } catch (fallbackError) {
+    console.error('Error fetching directory listings:', fallbackError)
+    return []
+  }
+}
+
+export async function getDirectoryListingById(listingId: string): Promise<DirectoryListing | null> {
+  const listingDoc = await getDoc(doc(requireDb(), 'directoryListings', listingId))
+  if (!listingDoc.exists()) return null
+  const data = listingDoc.data()
+  return {
+    ...data,
+    id: listingDoc.id,
+    createdAt: toDate(data.createdAt),
+    updatedAt: toDate(data.updatedAt),
+    approvedAt: data.approvedAt ? toDate(data.approvedAt) : undefined,
+  } as DirectoryListing
+}
+
+export async function getDirectoryListingsByOwner(ownerUserId: string): Promise<DirectoryListing[]> {
+  const db = requireDb()
+  try {
+    const q = query(
+      collection(db, 'directoryListings'),
+      where('ownerUserId', '==', ownerUserId),
+      orderBy('createdAt', 'desc')
+    )
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map((d) => {
+      const data = d.data()
+      return {
+        ...data,
+        id: d.id,
+        createdAt: toDate(data.createdAt),
+        updatedAt: toDate(data.updatedAt),
+        approvedAt: data.approvedAt ? toDate(data.approvedAt) : undefined,
+      } as DirectoryListing
+    })
+  } catch (error: any) {
+    console.warn('Owner directory query failed, using fallback:', error?.code || error?.message)
+    const snapshot = await getDocs(query(collection(db, 'directoryListings'), where('ownerUserId', '==', ownerUserId)))
+    const listings = snapshot.docs.map((d) => {
+      const data = d.data()
+      return {
+        ...data,
+        id: d.id,
+        createdAt: toDate(data.createdAt),
+        updatedAt: toDate(data.updatedAt),
+        approvedAt: data.approvedAt ? toDate(data.approvedAt) : undefined,
+      } as DirectoryListing
+    })
+    return listings.sort((a, b) => {
+      const aDate = a.createdAt instanceof Date ? a.createdAt.getTime() : 0
+      const bDate = b.createdAt instanceof Date ? b.createdAt.getTime() : 0
+      return bDate - aDate
+    })
+  }
+}
+
+export async function updateDirectoryListing(listingId: string, data: Partial<DirectoryListing>): Promise<void> {
+  const updateData: Record<string, any> = { updatedAt: Timestamp.now() }
+  if (data.businessName !== undefined) updateData.businessName = data.businessName
+  if (data.category !== undefined) updateData.category = data.category
+  if (data.shortDescription !== undefined) updateData.shortDescription = data.shortDescription
+  if (data.longDescription !== undefined) updateData.longDescription = data.longDescription || null
+  if (data.country !== undefined) updateData.country = data.country
+  if (data.city !== undefined) updateData.city = data.city || null
+  if (data.serviceAreas !== undefined) updateData.serviceAreas = data.serviceAreas || []
+  if (data.contactEmail !== undefined) updateData.contactEmail = data.contactEmail || null
+  if (data.contactPhone !== undefined) updateData.contactPhone = data.contactPhone || null
+  if (data.website !== undefined) updateData.website = data.website || null
+  if (data.logoUrl !== undefined) updateData.logoUrl = data.logoUrl || null
+  if (data.isVerified !== undefined) updateData.isVerified = data.isVerified
+  if (data.status !== undefined) updateData.status = data.status
+  if (data.rejectionReason !== undefined) updateData.rejectionReason = data.rejectionReason || null
+  await updateDoc(doc(requireDb(), 'directoryListings', listingId), updateData)
+}
+
+export async function reviewDirectoryListing(
+  listingId: string,
+  status: DirectoryStatus,
+  reviewedBy: string,
+  rejectionReason?: string
+): Promise<void> {
+  const payload: Record<string, any> = {
+    status,
+    updatedAt: Timestamp.now(),
+    approvedBy: reviewedBy,
+  }
+  if (status === 'approved') {
+    payload.approvedAt = Timestamp.now()
+    payload.rejectionReason = null
+  } else if (rejectionReason) {
+    payload.rejectionReason = rejectionReason
+  }
+  await updateDoc(doc(requireDb(), 'directoryListings', listingId), payload)
+}
+
+export async function deleteDirectoryListing(listingId: string): Promise<void> {
+  await deleteDoc(doc(requireDb(), 'directoryListings', listingId))
+}
+
+// ===== Classified Listings =====
+
+export async function createClassifiedListing(
+  listing: Omit<ClassifiedListing, 'id' | 'createdAt' | 'updatedAt' | 'approvedAt' | 'approvedBy'>
+): Promise<string> {
+  const db = requireDb()
+  const ref = doc(collection(db, 'classifieds'))
+  const payload: Record<string, any> = {
+    id: ref.id,
+    ownerUserId: listing.ownerUserId,
+    title: listing.title,
+    description: listing.description,
+    category: listing.category,
+    country: listing.country,
+    isFeatured: listing.isFeatured,
+    status: listing.status,
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  }
+
+  if (listing.city) payload.city = listing.city
+  if (listing.price !== undefined) payload.price = listing.price
+  if (listing.currency) payload.currency = listing.currency
+  if (listing.isNegotiable !== undefined) payload.isNegotiable = listing.isNegotiable
+  if (listing.condition) payload.condition = listing.condition
+  if (listing.contactEmail) payload.contactEmail = listing.contactEmail
+  if (listing.contactPhone) payload.contactPhone = listing.contactPhone
+  if (listing.whatsapp) payload.whatsapp = listing.whatsapp
+  if (listing.imageUrls && listing.imageUrls.length > 0) payload.imageUrls = listing.imageUrls
+  if (listing.rejectionReason) payload.rejectionReason = listing.rejectionReason
+  if (listing.expiresAt) payload.expiresAt = listing.expiresAt
+
+  await setDoc(ref, payload)
+  return ref.id
+}
+
+export async function getClassifiedListings(filter: 'approved' | 'all' = 'approved'): Promise<ClassifiedListing[]> {
+  if (!db) return []
+
+  const mapDoc = (d: any): ClassifiedListing => {
+    const data = d.data()
+    return {
+      ...data,
+      id: d.id,
+      createdAt: toDate(data.createdAt),
+      updatedAt: toDate(data.updatedAt),
+      approvedAt: data.approvedAt ? toDate(data.approvedAt) : undefined,
+      expiresAt: data.expiresAt ? toDate(data.expiresAt) : undefined,
+    } as ClassifiedListing
+  }
+
+  try {
+    let q = query(collection(requireDb(), 'classifieds'), orderBy('createdAt', 'desc'))
+    if (filter === 'approved') q = query(q, where('status', '==', 'approved'))
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map(mapDoc)
+  } catch (error: any) {
+    console.warn('Classifieds query failed, using fallback:', error?.code || error?.message)
+  }
+
+  try {
+    const snapshot = await getDocs(collection(requireDb(), 'classifieds'))
+    const listings = snapshot.docs.map(mapDoc)
+    const filtered = filter === 'approved' ? listings.filter((l) => l.status === 'approved') : listings
+    return filtered.sort((a, b) => {
+      const aDate = a.createdAt instanceof Date ? a.createdAt.getTime() : 0
+      const bDate = b.createdAt instanceof Date ? b.createdAt.getTime() : 0
+      return bDate - aDate
+    })
+  } catch (fallbackError) {
+    console.error('Error fetching classifieds:', fallbackError)
+    return []
+  }
+}
+
+export async function getClassifiedListingById(listingId: string): Promise<ClassifiedListing | null> {
+  const listingDoc = await getDoc(doc(requireDb(), 'classifieds', listingId))
+  if (!listingDoc.exists()) return null
+  const data = listingDoc.data()
+  return {
+    ...data,
+    id: listingDoc.id,
+    createdAt: toDate(data.createdAt),
+    updatedAt: toDate(data.updatedAt),
+    approvedAt: data.approvedAt ? toDate(data.approvedAt) : undefined,
+    expiresAt: data.expiresAt ? toDate(data.expiresAt) : undefined,
+  } as ClassifiedListing
+}
+
+export async function getClassifiedListingsByOwner(ownerUserId: string): Promise<ClassifiedListing[]> {
+  const db = requireDb()
+  try {
+    const q = query(
+      collection(db, 'classifieds'),
+      where('ownerUserId', '==', ownerUserId),
+      orderBy('createdAt', 'desc')
+    )
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map((d) => {
+      const data = d.data()
+      return {
+        ...data,
+        id: d.id,
+        createdAt: toDate(data.createdAt),
+        updatedAt: toDate(data.updatedAt),
+        approvedAt: data.approvedAt ? toDate(data.approvedAt) : undefined,
+        expiresAt: data.expiresAt ? toDate(data.expiresAt) : undefined,
+      } as ClassifiedListing
+    })
+  } catch (error: any) {
+    console.warn('Owner classifieds query failed, using fallback:', error?.code || error?.message)
+    const snapshot = await getDocs(query(collection(db, 'classifieds'), where('ownerUserId', '==', ownerUserId)))
+    const listings = snapshot.docs.map((d) => {
+      const data = d.data()
+      return {
+        ...data,
+        id: d.id,
+        createdAt: toDate(data.createdAt),
+        updatedAt: toDate(data.updatedAt),
+        approvedAt: data.approvedAt ? toDate(data.approvedAt) : undefined,
+        expiresAt: data.expiresAt ? toDate(data.expiresAt) : undefined,
+      } as ClassifiedListing
+    })
+    return listings.sort((a, b) => {
+      const aDate = a.createdAt instanceof Date ? a.createdAt.getTime() : 0
+      const bDate = b.createdAt instanceof Date ? b.createdAt.getTime() : 0
+      return bDate - aDate
+    })
+  }
+}
+
+export async function updateClassifiedListing(listingId: string, data: Partial<ClassifiedListing>): Promise<void> {
+  const updateData: Record<string, any> = { updatedAt: Timestamp.now() }
+  if (data.title !== undefined) updateData.title = data.title
+  if (data.description !== undefined) updateData.description = data.description
+  if (data.category !== undefined) updateData.category = data.category
+  if (data.country !== undefined) updateData.country = data.country
+  if (data.city !== undefined) updateData.city = data.city || null
+  if (data.price !== undefined) updateData.price = data.price
+  if (data.currency !== undefined) updateData.currency = data.currency || null
+  if (data.isNegotiable !== undefined) updateData.isNegotiable = data.isNegotiable
+  if (data.condition !== undefined) updateData.condition = data.condition || null
+  if (data.contactEmail !== undefined) updateData.contactEmail = data.contactEmail || null
+  if (data.contactPhone !== undefined) updateData.contactPhone = data.contactPhone || null
+  if (data.whatsapp !== undefined) updateData.whatsapp = data.whatsapp || null
+  if (data.imageUrls !== undefined) updateData.imageUrls = data.imageUrls || []
+  if (data.isFeatured !== undefined) updateData.isFeatured = data.isFeatured
+  if (data.status !== undefined) updateData.status = data.status
+  if (data.rejectionReason !== undefined) updateData.rejectionReason = data.rejectionReason || null
+  if (data.expiresAt !== undefined) updateData.expiresAt = data.expiresAt || null
+  await updateDoc(doc(requireDb(), 'classifieds', listingId), updateData)
+}
+
+export async function reviewClassifiedListing(
+  listingId: string,
+  status: ClassifiedStatus,
+  reviewedBy: string,
+  rejectionReason?: string
+): Promise<void> {
+  const payload: Record<string, any> = {
+    status,
+    updatedAt: Timestamp.now(),
+    approvedBy: reviewedBy,
+  }
+  if (status === 'approved') {
+    payload.approvedAt = Timestamp.now()
+    payload.rejectionReason = null
+  } else if (rejectionReason) {
+    payload.rejectionReason = rejectionReason
+  }
+  await updateDoc(doc(requireDb(), 'classifieds', listingId), payload)
+}
+
+export async function deleteClassifiedListing(listingId: string): Promise<void> {
+  await deleteDoc(doc(requireDb(), 'classifieds', listingId))
 }
 
 // ===== Download Tracking =====

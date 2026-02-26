@@ -37,10 +37,10 @@ function MembershipApplicationContent() {
           <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
             <Link href="/" className="flex items-center gap-2">
               <span className="inline-flex h-8 w-10 items-center justify-center rounded-md bg-emerald-500 text-[10px] font-bold text-white">
-                WTP
+                DC
               </span>
               <span className="text-sm font-semibold tracking-tight text-slate-900 sm:text-base">
-                We The People
+                Diaspora Connect
               </span>
             </Link>
             <nav className="hidden items-center gap-6 text-sm text-slate-500 md:flex">
@@ -59,7 +59,7 @@ function MembershipApplicationContent() {
         <section className="border-b border-slate-200 bg-gradient-to-br from-emerald-50 via-white to-emerald-50/70 py-16 sm:py-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6">
             <div className="text-center">
-              <p className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">Join WTP</p>
+              <p className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">Join DC</p>
               <h1 className="mb-2 text-2xl font-bold text-slate-900 sm:text-3xl md:text-4xl">Membership Application</h1>
             </div>
           </div>
@@ -72,7 +72,7 @@ function MembershipApplicationContent() {
         </div>
         <footer className="border-t border-slate-200 bg-white">
           <div className="mx-auto max-w-7xl px-4 py-8 text-center text-sm text-slate-600 sm:px-6">
-            <p>© 2026 We The People (WTP). All rights reserved.</p>
+            <p>© 2026 Diaspora Connect (DC). All rights reserved.</p>
           </div>
         </footer>
       </main>
@@ -85,10 +85,10 @@ function MembershipApplicationContent() {
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
           <Link href="/" className="flex items-center gap-2">
             <span className="inline-flex h-8 w-10 items-center justify-center rounded-md bg-emerald-500 text-[10px] font-bold text-white">
-              WTP
+              DC
             </span>
             <span className="text-sm font-semibold tracking-tight text-slate-900 sm:text-base">
-              We The People
+              Diaspora Connect
             </span>
           </Link>
           <nav className="hidden items-center gap-6 text-sm text-slate-500 md:flex">
@@ -109,7 +109,7 @@ function MembershipApplicationContent() {
       <section className="border-b border-slate-200 bg-gradient-to-br from-emerald-50 via-white to-emerald-50/70 py-16 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="text-center">
-            <p className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">Join WTP</p>
+            <p className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">Join DC</p>
             <h1 className="mb-2 text-2xl font-bold text-slate-900 sm:text-3xl md:text-4xl">Membership Application</h1>
             <p className="text-sm text-slate-600 sm:text-base">Join a community focused on civic participation, youth voice, and social impact.</p>
           </div>
@@ -125,9 +125,9 @@ function MembershipApplicationContent() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
               </svg>
               <div>
-                <h3 className="text-sm font-bold text-amber-900">We The People (WTP)</h3>
+                <h3 className="text-sm font-bold text-amber-900">Diaspora Connect (DC)</h3>
                 <p className="mt-1 text-sm text-amber-700">
-                  WTP is a non-partisan civic platform dedicated to informed participation on political, youth,
+                  DC is a non-partisan civic platform dedicated to informed participation on political, youth,
                   and social issues that concern society. Membership is open to individuals and organisations
                   who share this commitment.
                 </p>
@@ -144,7 +144,7 @@ function MembershipApplicationContent() {
 
       <footer className="border-t border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-8 text-center text-sm text-slate-600 sm:px-6">
-          <p>© 2026 We The People (WTP). All rights reserved.</p>
+          <p>© 2026 Diaspora Connect (DC). All rights reserved.</p>
         </div>
       </footer>
     </main>

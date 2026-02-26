@@ -7,10 +7,10 @@ export default function AboutPage() {
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
           <Link href="/" className="flex items-center gap-2">
             <span className="inline-flex h-8 w-10 items-center justify-center rounded-md bg-emerald-500 text-[10px] font-bold text-white">
-              WTP
+              DC
             </span>
             <span className="text-sm font-semibold tracking-tight text-slate-900 sm:text-base">
-              We The People
+              Diaspora Connect
             </span>
           </Link>
           <nav className="hidden items-center gap-6 text-sm text-slate-500 md:flex">
@@ -29,10 +29,10 @@ export default function AboutPage() {
 
       <section className="border-b border-slate-200 bg-gradient-to-br from-emerald-50 via-white to-emerald-50/70 py-16 sm:py-20">
         <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">About WTP</p>
-          <h1 className="mt-3 text-3xl font-bold text-slate-900 sm:text-5xl">Why We The People</h1>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">About DC</p>
+          <h1 className="mt-3 text-3xl font-bold text-slate-900 sm:text-5xl">Why Diaspora Connect</h1>
           <p className="mx-auto mt-4 max-w-3xl text-sm leading-relaxed text-slate-600 sm:text-lg">
-            We The People is a non-partisan platform that promotes civic participation, political awareness,
+            Diaspora Connect is a non-partisan platform that promotes civic participation, political awareness,
             youth priorities, and the social issues that matter most to society.
           </p>
         </div>
@@ -72,7 +72,7 @@ export default function AboutPage() {
             Built for confidence, clarity, and impact
           </h2>
           <p className="mx-auto mt-4 max-w-3xl text-sm leading-relaxed text-slate-600 sm:text-base">
-            We The People is a trusted civic platform that connects people to the conversations, institutions,
+            Diaspora Connect is a trusted civic platform that connects people to the conversations, institutions,
             and actions needed to address political, youth, and societal challenges responsibly.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
@@ -80,7 +80,7 @@ export default function AboutPage() {
               href="/signup"
               className="rounded-full bg-emerald-500 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-emerald-600"
             >
-              Join WTP
+              Join DC
             </Link>
             <Link
               href="/news"
@@ -94,7 +94,7 @@ export default function AboutPage() {
 
       <footer className="border-t border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-8 text-sm text-slate-600 sm:px-6">
-          <p className="text-center">© 2026 We The People (WTP). All rights reserved.</p>
+          <p className="text-center">© 2026 Diaspora Connect (DC). All rights reserved.</p>
         </div>
       </footer>
     </main>

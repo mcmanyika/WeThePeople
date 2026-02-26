@@ -17,13 +17,13 @@ function LoginContent() {
           <Link href="/" className="inline-block mb-4">
             <div className="mx-auto inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
               <span className="inline-flex h-9 w-11 items-center justify-center rounded-md bg-emerald-500 text-[10px] font-bold text-white">
-                WTP
+                DC
               </span>
-              <span className="text-sm font-semibold text-slate-900">We The People</span>
+              <span className="text-sm font-semibold text-slate-900">Diaspora Connect</span>
             </div>
           </Link>
           <h1 className="mb-2 text-3xl font-bold">Welcome Back</h1>
-          <p className="text-slate-600">Sign in to continue to your WTP account</p>
+          <p className="text-slate-600">Sign in to continue to your DC account</p>
         </div>
 
         <div className="rounded-2xl border bg-white p-8 shadow-sm">

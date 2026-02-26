@@ -80,10 +80,10 @@ export default function SurveysPage() {
           <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
             <Link href="/" className="flex items-center gap-2">
               <span className="inline-flex h-8 w-10 items-center justify-center rounded-md bg-emerald-500 text-[10px] font-bold text-white">
-                WTP
+                DC
               </span>
               <span className="text-sm font-semibold tracking-tight text-slate-900 sm:text-base">
-                We The People
+                Diaspora Connect
               </span>
             </Link>
             <nav className="hidden items-center gap-6 text-sm text-slate-500 md:flex">
@@ -118,7 +118,7 @@ export default function SurveysPage() {
         </div>
         <footer className="border-t border-slate-200 bg-white">
           <div className="mx-auto max-w-7xl px-4 py-8 text-sm text-slate-600 sm:px-6">
-            <p className="text-center">© 2026 We The People (WTP). All rights reserved.</p>
+            <p className="text-center">© 2026 Diaspora Connect (DC). All rights reserved.</p>
           </div>
         </footer>
       </main>
@@ -131,10 +131,10 @@ export default function SurveysPage() {
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
           <Link href="/" className="flex items-center gap-2">
             <span className="inline-flex h-8 w-10 items-center justify-center rounded-md bg-emerald-500 text-[10px] font-bold text-white">
-              WTP
+              DC
             </span>
             <span className="text-sm font-semibold tracking-tight text-slate-900 sm:text-base">
-              We The People
+              Diaspora Connect
             </span>
           </Link>
           <nav className="hidden items-center gap-6 text-sm text-slate-500 md:flex">
@@ -323,7 +323,7 @@ export default function SurveysPage() {
 
       <footer className="border-t border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-8 text-sm text-slate-600 sm:px-6">
-          <p className="text-center">© 2026 We The People (WTP). All rights reserved.</p>
+          <p className="text-center">© 2026 Diaspora Connect (DC). All rights reserved.</p>
         </div>
       </footer>
     </main>

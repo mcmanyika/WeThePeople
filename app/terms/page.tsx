@@ -7,10 +7,10 @@ export default function TermsOfServicePage() {
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
           <Link href="/" className="flex items-center gap-2">
             <span className="inline-flex h-8 w-10 items-center justify-center rounded-md bg-emerald-500 text-[10px] font-bold text-white">
-              WTP
+              DC
             </span>
             <span className="text-sm font-semibold tracking-tight text-slate-900 sm:text-base">
-              We The People
+              Diaspora Connect
             </span>
           </Link>
           <nav className="hidden items-center gap-6 text-sm text-slate-500 md:flex">
@@ -42,7 +42,7 @@ export default function TermsOfServicePage() {
           <div className="space-y-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-10">
             <div>
               <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
-                Welcome to We The People (&quot;WTP&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;). By accessing or using
+                Welcome to Diaspora Connect (&quot;DC&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;). By accessing or using
                 our website and related services (collectively, the &quot;Platform&quot;), you agree to be bound by
                 these Terms of Service. If you do not agree to these terms, please do not use the Platform.
               </p>
@@ -51,7 +51,7 @@ export default function TermsOfServicePage() {
             <div>
               <h2 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">1. About the Platform</h2>
               <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
-                We The People is a non-partisan civic platform focused on civic participation, political awareness,
+                Diaspora Connect is a non-partisan civic platform focused on civic participation, political awareness,
                 youth issues, and broader social concerns. The Platform provides tools for engagement, surveys,
                 membership, volunteering, donations, and community dialogue.
               </p>
@@ -85,10 +85,10 @@ export default function TermsOfServicePage() {
             <div>
               <h2 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">4. Membership</h2>
               <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
-                Membership applications are subject to review and approval by WTP. Membership contributions of $5 per
+                Membership applications are subject to review and approval by DC. Membership contributions of $5 per
                 month or $60 per year support our civic education, mobilisation, petition outreach, and constitutional
                 defence work. Membership may be revoked if a member engages in conduct that is inconsistent with
-                WTP&apos;s values, mission, or these terms.
+                DC&apos;s values, mission, or these terms.
               </p>
             </div>
 
@@ -96,7 +96,7 @@ export default function TermsOfServicePage() {
               <h2 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">5. Volunteering</h2>
               <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
                 Volunteer applications are subject to review and approval. Volunteers are expected to act in good faith,
-                represent WTP respectfully, and adhere to any guidelines or instructions provided. WTP reserves
+                represent DC respectfully, and adhere to any guidelines or instructions provided. DC reserves
                 the right to decline or revoke volunteer status at its discretion.
               </p>
             </div>
@@ -118,8 +118,8 @@ export default function TermsOfServicePage() {
               </p>
               <ul className="ml-5 list-disc space-y-2 text-sm text-slate-600 sm:text-base">
                 <li>All donations are voluntary and made at your own discretion.</li>
-                <li>Donations are non-refundable unless required by law or at WTP&apos;s sole discretion.</li>
-                <li>Funds will be used to support WTP&apos;s mission, programmes, and operational costs.</li>
+                <li>Donations are non-refundable unless required by law or at DC&apos;s sole discretion.</li>
+                <li>Funds will be used to support DC&apos;s mission, programmes, and operational costs.</li>
                 <li>You are authorised to use the payment method provided.</li>
               </ul>
               <p className="mt-3 text-sm leading-relaxed text-slate-600 sm:text-base">
@@ -147,9 +147,9 @@ export default function TermsOfServicePage() {
               <h2 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">9. Intellectual Property</h2>
               <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
                 All content on the Platform, including text, graphics, logos, images, and software, is the property of
-                WTP or its content providers and is protected by applicable intellectual property laws. You may not
+                DC or its content providers and is protected by applicable intellectual property laws. You may not
                 reproduce, distribute, modify, or create derivative works from any content on the Platform without
-                prior written consent from WTP.
+                prior written consent from DC.
               </p>
             </div>
 
@@ -157,7 +157,7 @@ export default function TermsOfServicePage() {
               <h2 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">10. Third-Party Links and Services</h2>
               <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
                 The Platform may contain links to third-party websites or services (such as social media platforms,
-                payment processors, and external resources). WTP is not responsible for the content, privacy
+                payment processors, and external resources). DC is not responsible for the content, privacy
                 practices, or availability of these external sites. Use of third-party services is at your own risk
                 and subject to their respective terms and conditions.
               </p>
@@ -166,7 +166,7 @@ export default function TermsOfServicePage() {
             <div>
               <h2 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">11. Disclaimer of Warranties</h2>
               <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
-                The Platform is provided on an &quot;as is&quot; and &quot;as available&quot; basis. WTP makes no warranties,
+                The Platform is provided on an &quot;as is&quot; and &quot;as available&quot; basis. DC makes no warranties,
                 express or implied, regarding the Platform&apos;s reliability, accuracy, availability, or fitness for a particular
                 purpose. We do not guarantee that the Platform will be uninterrupted, error-free, or free from
                 viruses or other harmful components.
@@ -176,7 +176,7 @@ export default function TermsOfServicePage() {
             <div>
               <h2 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">12. Limitation of Liability</h2>
               <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
-                To the fullest extent permitted by law, WTP and its directors, officers, volunteers, and affiliates
+                To the fullest extent permitted by law, DC and its directors, officers, volunteers, and affiliates
                 shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising
                 from your use of or inability to use the Platform, including but not limited to loss of data, revenue,
                 or goodwill.
@@ -186,7 +186,7 @@ export default function TermsOfServicePage() {
             <div>
               <h2 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">13. Indemnification</h2>
               <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
-                You agree to indemnify and hold harmless WTP, its directors, officers, volunteers, and affiliates
+                You agree to indemnify and hold harmless DC, its directors, officers, volunteers, and affiliates
                 from any claims, damages, losses, or expenses (including legal fees) arising from your use of the
                 Platform, your violation of these terms, or your infringement of any rights of another party.
               </p>
@@ -196,7 +196,7 @@ export default function TermsOfServicePage() {
               <h2 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">14. Termination</h2>
               <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
                 We reserve the right to suspend or terminate your access to the Platform at any time, with or without
-                notice, for conduct that we believe violates these terms or is harmful to other users, WTP, or third
+                notice, for conduct that we believe violates these terms or is harmful to other users, DC, or third
                 parties. Upon termination, your right to use the Platform will immediately cease.
               </p>
             </div>
@@ -225,7 +225,7 @@ export default function TermsOfServicePage() {
                 If you have any questions or concerns about these Terms of Service, please contact us:
               </p>
               <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700 sm:text-base">
-                <p className="font-semibold">We The People (WTP)</p>
+                <p className="font-semibold">Diaspora Connect (DC)</p>
                 <p className="mt-1">
                   Email:{' '}
                   <a href="mailto:contact@wtp.com" className="text-emerald-700 hover:underline">contact@wtp.com</a>
@@ -246,7 +246,7 @@ export default function TermsOfServicePage() {
 
       <footer className="border-t border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-8 text-center text-sm text-slate-600 sm:px-6">
-          <p>© 2026 We The People (WTP). All rights reserved.</p>
+          <p>© 2026 Diaspora Connect (DC). All rights reserved.</p>
         </div>
       </footer>
     </main>

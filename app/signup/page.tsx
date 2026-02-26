@@ -18,13 +18,13 @@ function SignupContent() {
           <Link href="/" className="inline-block mb-4">
             <div className="mx-auto inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
               <span className="inline-flex h-9 w-11 items-center justify-center rounded-md bg-emerald-500 text-[10px] font-bold text-white">
-                WTP
+                DC
               </span>
-              <span className="text-sm font-semibold text-slate-900">We The People</span>
+              <span className="text-sm font-semibold text-slate-900">Diaspora Connect</span>
             </div>
           </Link>
           <h1 className="mb-2 text-3xl font-bold">Create Account</h1>
-          <p className="text-slate-600">Create your WTP account and join the conversation</p>
+          <p className="text-slate-600">Create your DC account and join the conversation</p>
           {refCode && (
             <p className="mt-2 text-sm text-emerald-600 font-medium">You&apos;ve been invited! Sign up to get started.</p>
           )}

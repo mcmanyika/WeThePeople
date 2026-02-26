@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import TwitterEmbed from '@/app/components/TwitterEmbed'
+import LandingAuthActions from '@/app/components/LandingAuthActions'
 
 const offerings = [
   {
@@ -97,10 +98,10 @@ export default function Home() {
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
           <Link href="/" className="flex items-center gap-2">
             <span className="inline-flex h-8 w-10 items-center justify-center rounded-md bg-emerald-500 text-[10px] font-bold text-white">
-              WTP
+              DC
             </span>
             <span className="text-sm font-semibold tracking-tight text-slate-900 sm:text-base">
-              We The People
+              Diaspora Connect
             </span>
           </Link>
           <nav className="hidden items-center gap-6 text-sm text-slate-500 md:flex">
@@ -110,24 +111,17 @@ export default function Home() {
             <Link href="/news" className="transition-colors hover:text-slate-900">
               Articles
             </Link>
+            <Link href="/directory" className="transition-colors hover:text-slate-900">
+              Directory
+            </Link>
+            <Link href="/classifieds" className="transition-colors hover:text-slate-900">
+              Classifieds
+            </Link>
             <Link href="#footer-contact" className="transition-colors hover:text-slate-900">
               Contact
             </Link>
           </nav>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/login"
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 sm:text-sm"
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/signup"
-              className="rounded-lg bg-emerald-500 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-emerald-600 sm:text-sm"
-            >
-              Join WTP
-            </Link>
-          </div>
+          <LandingAuthActions />
         </div>
       </header>
 
@@ -140,7 +134,7 @@ export default function Home() {
           <p className="-mt-2 mb-4 text-center text-lg" aria-label="Zimbabwe flag">
             🇿🇼
           </p>
-          <h1 className="mx-auto max-w-3xl text-4xl font-bold leading-tight text-slate-900 sm:text-6xl">We The People</h1>
+          <h1 className="mx-auto max-w-3xl text-4xl font-bold leading-tight text-slate-900 sm:text-6xl">Diaspora Connect</h1>
           <p className="mx-auto mt-6 max-w-3xl text-base leading-relaxed text-slate-600 sm:text-xl">
             Zimbabwe&apos;s Diaspora Intelligence Platform — connecting Zimbabwe and its global diaspora through
             trusted information, verified services, and structured economic and civic participation.
@@ -180,7 +174,7 @@ export default function Home() {
           Everything Zimbabwe&apos;s Diaspora Needs
         </h2>
         <p className="mx-auto mt-4 max-w-3xl text-slate-600">
-          WTP provides a centralized, trusted digital infrastructure where diaspora Zimbabweans can access
+          DC provides a centralized, trusted digital infrastructure where diaspora Zimbabweans can access
           verified knowledge, connect with trusted professionals, discover secure opportunities, and make
           informed decisions.
         </p>
@@ -225,8 +219,8 @@ export default function Home() {
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20">
-        <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">Why Choose WTP</p>
-        <h2 className="mt-3 text-center text-3xl font-bold text-slate-900 sm:text-4xl">What makes WTP different?</h2>
+        <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">Why Choose DC</p>
+        <h2 className="mt-3 text-center text-3xl font-bold text-slate-900 sm:text-4xl">What makes DC different?</h2>
         <div className="mt-10 grid gap-4 md:grid-cols-3">
           {differentiators.map((item) => (
             <article key={item.title} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -242,7 +236,7 @@ export default function Home() {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">Mission</p>
           <h2 className="mt-3 text-3xl font-bold text-slate-900 sm:text-4xl">From fragmented support to structured development</h2>
           <p className="mx-auto mt-4 max-w-3xl text-slate-600">
-            WTP transforms diaspora contribution into trusted, scalable national development by improving
+            DC transforms diaspora contribution into trusted, scalable national development by improving
             transparency, reducing fraud, and enabling confident participation in Zimbabwe&apos;s economic and
             civic future.
           </p>
@@ -251,7 +245,7 @@ export default function Home() {
               href="/signup"
               className="rounded-full bg-emerald-500 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-emerald-600"
             >
-              Join WTP
+              Join DC
             </Link>
             <Link
               href="/news"
@@ -267,7 +261,7 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
           <div className="grid gap-8 text-center md:grid-cols-4">
             <div className="flex flex-col items-center">
-              <p className="text-base font-semibold text-slate-900">WTP We The People</p>
+              <p className="text-base font-semibold text-slate-900">DC Diaspora Connect</p>
               <p className="mt-2 text-sm text-slate-600">
                 Zimbabwe&apos;s diaspora intelligence platform — trusted information, verified services, and
                 structured participation for our global community.
@@ -299,11 +293,14 @@ export default function Home() {
                 <Link href="/news" className="block transition-colors hover:text-slate-900">
                   Articles
                 </Link>
-                <Link href="#footer-contact" className="block transition-colors hover:text-slate-900">
-                  Contact
+                <Link href="/directory" className="block transition-colors hover:text-slate-900">
+                  Directory
+                </Link>
+                <Link href="/classifieds" className="block transition-colors hover:text-slate-900">
+                  Classifieds
                 </Link>
                 <Link href="/signup" className="block transition-colors hover:text-slate-900">
-                  Join WTP
+                  Join DC
                 </Link>
               </div>
             </div>
@@ -313,7 +310,7 @@ export default function Home() {
             </div>
           </div>
           <div className="mt-8 border-t border-slate-200 pt-6 text-center text-sm text-slate-600">
-            <p>© 2026 We The People (WTP). All rights reserved.</p>
+            <p>© 2026 Diaspora Connect (DC). All rights reserved.</p>
             <p className="mt-1">
               <Link href="/privacy" className="transition-colors hover:text-slate-900">
                 Privacy Policy

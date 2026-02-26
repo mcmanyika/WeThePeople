@@ -11,7 +11,7 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: 'We The People (WTP)',
+  title: 'Diaspora Connect (DC)',
   description: 'A platform for civic participation, political awareness, youth issues, and social concerns.',
 }
 

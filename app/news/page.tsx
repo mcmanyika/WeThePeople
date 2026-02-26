@@ -67,10 +67,10 @@ export default function NewsPage() {
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
           <Link href="/" className="flex items-center gap-2">
             <span className="inline-flex h-8 w-10 items-center justify-center rounded-md bg-emerald-500 text-[10px] font-bold text-white">
-              WTP
+              DC
             </span>
             <span className="text-sm font-semibold tracking-tight text-slate-900 sm:text-base">
-              We The People
+              Diaspora Connect
             </span>
           </Link>
           <nav className="hidden items-center gap-6 text-sm text-slate-500 md:flex">
@@ -94,7 +94,7 @@ export default function NewsPage() {
             <p className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">Latest Articles</p>
             <h1 className="mb-2 text-2xl font-bold text-slate-900 sm:text-3xl md:text-4xl">Updates & Insights</h1>
             <p className="text-sm text-slate-600 sm:text-base">
-              Stay informed with the latest stories, analysis, and announcements from We The People.
+              Stay informed with the latest stories, analysis, and announcements from Diaspora Connect.
             </p>
           </div>
         </div>
@@ -197,7 +197,7 @@ export default function NewsPage() {
                         <div className="flex h-40 w-full items-center justify-center bg-slate-100">
                           <img
                             src="/images/logo.png"
-                            alt="WTP"
+                            alt="DC"
                             className="h-16 w-16 object-contain opacity-40"
                           />
                         </div>
@@ -314,7 +314,7 @@ export default function NewsPage() {
 
       <footer className="border-t border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-8 text-sm text-slate-600 sm:px-6">
-          <p className="text-center">© 2026 We The People (WTP). All rights reserved.</p>
+          <p className="text-center">© 2026 Diaspora Connect (DC). All rights reserved.</p>
         </div>
       </footer>
     </main>
