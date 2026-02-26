@@ -6,19 +6,6 @@ import { useRouter } from 'next/navigation'
 import { createMembershipApplication, createNotification, getReferralByReferred, updateReferralStatus } from '@/lib/firebase/firestore'
 import type { MembershipApplicationType, ParticipationArea, OrganisationType } from '@/types'
 
-const provinces = [
-  'Bulawayo',
-  'Harare',
-  'Manicaland',
-  'Mashonaland Central',
-  'Mashonaland East',
-  'Mashonaland West',
-  'Masvingo',
-  'Matabeleland North',
-  'Matabeleland South',
-  'Midlands',
-]
-
 const participationOptions: { value: ParticipationArea; label: string }[] = [
   { value: 'civic_education', label: 'Civic education' },
   { value: 'legal_constitutional', label: 'Legal & constitutional advocacy' },
@@ -40,6 +27,206 @@ const organisationTypes: { value: OrganisationType; label: string }[] = [
   { value: 'other', label: 'Other' },
 ]
 
+const countries = [
+  'Afghanistan',
+  'Albania',
+  'Algeria',
+  'Andorra',
+  'Angola',
+  'Antigua and Barbuda',
+  'Argentina',
+  'Armenia',
+  'Australia',
+  'Austria',
+  'Azerbaijan',
+  'Bahamas',
+  'Bahrain',
+  'Bangladesh',
+  'Barbados',
+  'Belarus',
+  'Belgium',
+  'Belize',
+  'Benin',
+  'Bhutan',
+  'Bolivia',
+  'Bosnia and Herzegovina',
+  'Botswana',
+  'Brazil',
+  'Brunei',
+  'Bulgaria',
+  'Burkina Faso',
+  'Burundi',
+  'Cabo Verde',
+  'Cambodia',
+  'Cameroon',
+  'Canada',
+  'Central African Republic',
+  'Chad',
+  'Chile',
+  'China',
+  'Colombia',
+  'Comoros',
+  'Congo (Congo-Brazzaville)',
+  'Costa Rica',
+  "Cote d'Ivoire",
+  'Croatia',
+  'Cuba',
+  'Cyprus',
+  'Czechia',
+  'Democratic Republic of the Congo',
+  'Denmark',
+  'Djibouti',
+  'Dominica',
+  'Dominican Republic',
+  'Ecuador',
+  'Egypt',
+  'El Salvador',
+  'Equatorial Guinea',
+  'Eritrea',
+  'Estonia',
+  'Eswatini',
+  'Ethiopia',
+  'Fiji',
+  'Finland',
+  'France',
+  'Gabon',
+  'Gambia',
+  'Georgia',
+  'Germany',
+  'Ghana',
+  'Greece',
+  'Grenada',
+  'Guatemala',
+  'Guinea',
+  'Guinea-Bissau',
+  'Guyana',
+  'Haiti',
+  'Honduras',
+  'Hungary',
+  'Iceland',
+  'India',
+  'Indonesia',
+  'Iran',
+  'Iraq',
+  'Ireland',
+  'Israel',
+  'Italy',
+  'Jamaica',
+  'Japan',
+  'Jordan',
+  'Kazakhstan',
+  'Kenya',
+  'Kiribati',
+  'Kuwait',
+  'Kyrgyzstan',
+  'Laos',
+  'Latvia',
+  'Lebanon',
+  'Lesotho',
+  'Liberia',
+  'Libya',
+  'Liechtenstein',
+  'Lithuania',
+  'Luxembourg',
+  'Madagascar',
+  'Malawi',
+  'Malaysia',
+  'Maldives',
+  'Mali',
+  'Malta',
+  'Marshall Islands',
+  'Mauritania',
+  'Mauritius',
+  'Mexico',
+  'Micronesia',
+  'Moldova',
+  'Monaco',
+  'Mongolia',
+  'Montenegro',
+  'Morocco',
+  'Mozambique',
+  'Myanmar',
+  'Namibia',
+  'Nauru',
+  'Nepal',
+  'Netherlands',
+  'New Zealand',
+  'Nicaragua',
+  'Niger',
+  'Nigeria',
+  'North Korea',
+  'North Macedonia',
+  'Norway',
+  'Oman',
+  'Pakistan',
+  'Palau',
+  'Palestine',
+  'Panama',
+  'Papua New Guinea',
+  'Paraguay',
+  'Peru',
+  'Philippines',
+  'Poland',
+  'Portugal',
+  'Qatar',
+  'Romania',
+  'Russia',
+  'Rwanda',
+  'Saint Kitts and Nevis',
+  'Saint Lucia',
+  'Saint Vincent and the Grenadines',
+  'Samoa',
+  'San Marino',
+  'Sao Tome and Principe',
+  'Saudi Arabia',
+  'Senegal',
+  'Serbia',
+  'Seychelles',
+  'Sierra Leone',
+  'Singapore',
+  'Slovakia',
+  'Slovenia',
+  'Solomon Islands',
+  'Somalia',
+  'South Africa',
+  'South Korea',
+  'South Sudan',
+  'Spain',
+  'Sri Lanka',
+  'Sudan',
+  'Suriname',
+  'Sweden',
+  'Switzerland',
+  'Syria',
+  'Taiwan',
+  'Tajikistan',
+  'Tanzania',
+  'Thailand',
+  'Timor-Leste',
+  'Togo',
+  'Tonga',
+  'Trinidad and Tobago',
+  'Tunisia',
+  'Turkey',
+  'Turkmenistan',
+  'Tuvalu',
+  'Uganda',
+  'Ukraine',
+  'United Arab Emirates',
+  'United Kingdom',
+  'United States',
+  'Uruguay',
+  'Uzbekistan',
+  'Vanuatu',
+  'Vatican City',
+  'Venezuela',
+  'Vietnam',
+  'Yemen',
+  'Zambia',
+  'Zimbabwe',
+  'Other',
+]
+
 export default function MembershipApplicationForm() {
   const { user, userProfile } = useAuth()
   const router = useRouter()
@@ -54,11 +241,9 @@ export default function MembershipApplicationForm() {
   // Section B: Individual
   const [individual, setIndividual] = useState({
     fullName: '',
-    nationalIdPassport: '',
     gender: '',
     dateOfBirth: '',
-    province: '',
-    district: '',
+    country: '',
     occupation: '',
     mobileNumber: '',
     emailAddress: '',
@@ -133,8 +318,8 @@ export default function MembershipApplicationForm() {
           setError('A valid Email Address is required')
           return false
         }
-        if (!individual.province) {
-          setError('Province is required')
+        if (!individual.country.trim()) {
+          setError('Country is required')
           return false
         }
       } else {
@@ -207,11 +392,9 @@ export default function MembershipApplicationForm() {
 
       if (membershipType === 'individual') {
         applicationData.fullName = individual.fullName.trim()
-        if (individual.nationalIdPassport.trim()) applicationData.nationalIdPassport = individual.nationalIdPassport.trim()
         if (individual.gender) applicationData.gender = individual.gender
         if (individual.dateOfBirth) applicationData.dateOfBirth = individual.dateOfBirth
-        applicationData.province = individual.province
-        if (individual.district.trim()) applicationData.district = individual.district.trim()
+        applicationData.country = individual.country.trim()
         if (individual.occupation.trim()) applicationData.occupation = individual.occupation.trim()
         applicationData.mobileNumber = individual.mobileNumber.trim()
         applicationData.emailAddress = individual.emailAddress.trim()
@@ -438,37 +621,23 @@ export default function MembershipApplicationForm() {
               />
             </div>
 
-            {/* ID & Gender */}
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label className="mb-1 block text-sm font-semibold text-slate-900">
-                  National ID / Passport Number
-                </label>
-                <input
-                  type="text"
-                  value={individual.nationalIdPassport}
-                  onChange={(e) => setIndividual({ ...individual, nationalIdPassport: e.target.value })}
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
-                  placeholder="e.g. 63-123456A78"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-semibold text-slate-900">
-                  Gender <span className="text-slate-400 text-xs">(Optional)</span>
-                </label>
-                <select
-                  value={individual.gender}
-                  onChange={(e) => setIndividual({ ...individual, gender: e.target.value })}
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
-                >
-                  <option value="">Select gender</option>
-                  <option value="Female">Female</option>
-                  <option value="Male">Male</option>
-                </select>
-              </div>
+            {/* Gender */}
+            <div>
+              <label className="mb-1 block text-sm font-semibold text-slate-900">
+                Gender <span className="text-slate-400 text-xs">(Optional)</span>
+              </label>
+              <select
+                value={individual.gender}
+                onChange={(e) => setIndividual({ ...individual, gender: e.target.value })}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
+              >
+                <option value="">Select gender</option>
+                <option value="Female">Female</option>
+                <option value="Male">Male</option>
+              </select>
             </div>
 
-            {/* DOB & Province */}
+            {/* DOB & Country */}
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label className="mb-1 block text-sm font-semibold text-slate-900">
@@ -483,36 +652,26 @@ export default function MembershipApplicationForm() {
               </div>
               <div>
                 <label className="mb-1 block text-sm font-semibold text-slate-900">
-                  Province <span className="text-red-500">*</span>
+                  Country <span className="text-red-500">*</span>
                 </label>
                 <select
-                  value={individual.province}
-                  onChange={(e) => setIndividual({ ...individual, province: e.target.value })}
+                  value={individual.country}
+                  onChange={(e) => setIndividual({ ...individual, country: e.target.value })}
                   className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
                   required
                 >
-                  <option value="">Select province</option>
-                  {provinces.map((p) => (
-                    <option key={p} value={p}>{p}</option>
+                  <option value="">Select country</option>
+                  {countries.map((country) => (
+                    <option key={country} value={country}>
+                      {country}
+                    </option>
                   ))}
                 </select>
               </div>
             </div>
 
-            {/* District & Occupation */}
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label className="mb-1 block text-sm font-semibold text-slate-900">
-                  District / Ward <span className="text-slate-400 text-xs">(if applicable)</span>
-                </label>
-                <input
-                  type="text"
-                  value={individual.district}
-                  onChange={(e) => setIndividual({ ...individual, district: e.target.value })}
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
-                  placeholder="Enter district or ward"
-                />
-              </div>
+            {/* Occupation */}
+            <div>
               <div>
                 <label className="mb-1 block text-sm font-semibold text-slate-900">
                   Occupation / Social Base <span className="text-slate-400 text-xs">(if applicable)</span>
@@ -806,32 +965,32 @@ export default function MembershipApplicationForm() {
 
           <div className="rounded-xl border border-slate-200 bg-slate-50 p-6">
             <p className="mb-4 text-sm leading-relaxed text-slate-700">
-              I / We hereby apply for membership of the <strong>Defend the Constitution Platform (DCP)</strong> and affirm that:
+              I / We hereby apply for membership of <strong>We The People (WTP)</strong> and affirm that:
             </p>
             <ul className="space-y-3 text-sm text-slate-700">
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-200 text-xs font-bold text-slate-600">1</span>
-                <span>I / We support the defence, protection, and full implementation of the <strong>2013 Constitution of Zimbabwe</strong>;</span>
+                <span>I / We support informed, peaceful, and lawful <strong>civic participation</strong>;</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-200 text-xs font-bold text-slate-600">2</span>
-                <span>I / We subscribe to and uphold the <strong>People&apos;s Resolution</strong> as adopted by the Defend the Constitution Platform;</span>
+                <span>I / We value <strong>political awareness and accountability</strong> grounded in facts and respectful dialogue;</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-200 text-xs font-bold text-slate-600">3</span>
-                <span>I / We understand that the DCP is <strong>non-partisan, non-electoral</strong>, and does not seek state power;</span>
+                <span>I / We support <strong>youth inclusion and leadership</strong> in national and community issues;</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-200 text-xs font-bold text-slate-600">4</span>
-                <span>I / We commit to <strong>peaceful, lawful, and constitutional</strong> action;</span>
+                <span>I / We commit to constructive engagement on <strong>social issues that concern society</strong>;</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-200 text-xs font-bold text-slate-600">5</span>
-                <span>I / We agree to abide by the <strong>DCP Constitution, governance framework, and code of conduct</strong>.</span>
+                <span>I / We agree to uphold WTP&apos;s <strong>non-partisan values, community standards, and code of conduct</strong>.</span>
               </li>
             </ul>
             <p className="mt-4 text-sm italic text-slate-500">
-              I / We further acknowledge that membership of the DCP does not replace affiliation to any political party, civic organisation, or institution.
+              I / We acknowledge that WTP membership does not replace affiliation to any political party, civic organisation, or institution.
             </p>
           </div>
 
@@ -912,11 +1071,9 @@ export default function MembershipApplicationForm() {
             {membershipType === 'individual' ? (
               <div className="grid gap-3 sm:grid-cols-2 text-sm">
                 <div><span className="text-slate-500">Full Name:</span> <span className="font-medium text-slate-900">{individual.fullName}</span></div>
-                {individual.nationalIdPassport && <div><span className="text-slate-500">ID/Passport:</span> <span className="font-medium text-slate-900">{individual.nationalIdPassport}</span></div>}
                 {individual.gender && <div><span className="text-slate-500">Gender:</span> <span className="font-medium text-slate-900">{individual.gender}</span></div>}
                 {individual.dateOfBirth && <div><span className="text-slate-500">Date of Birth:</span> <span className="font-medium text-slate-900">{individual.dateOfBirth}</span></div>}
-                <div><span className="text-slate-500">Province:</span> <span className="font-medium text-slate-900">{individual.province}</span></div>
-                {individual.district && <div><span className="text-slate-500">District/Ward:</span> <span className="font-medium text-slate-900">{individual.district}</span></div>}
+                <div><span className="text-slate-500">Country:</span> <span className="font-medium text-slate-900">{individual.country}</span></div>
                 {individual.occupation && <div><span className="text-slate-500">Occupation:</span> <span className="font-medium text-slate-900">{individual.occupation}</span></div>}
                 <div><span className="text-slate-500">Mobile:</span> <span className="font-medium text-slate-900">{individual.mobileNumber}</span></div>
                 <div><span className="text-slate-500">Email:</span> <span className="font-medium text-slate-900">{individual.emailAddress}</span></div>

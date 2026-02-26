@@ -1,25 +1,30 @@
 import Link from 'next/link'
+import TwitterEmbed from '@/app/components/TwitterEmbed'
 
 const offerings = [
   {
-    title: 'Civic Participation',
+    title: 'Investment & Property',
+    icon: 'investment',
     description:
-      'Promote informed civic participation through accessible resources, public dialogue, and action-oriented community engagement.',
+      'Discover safer investment pathways, property ownership guidance, and trusted professionals to reduce risk and improve outcomes.',
   },
   {
-    title: 'Political Awareness',
+    title: 'Banking, Remittances & Pensions',
+    icon: 'banking',
     description:
-      'Track policy changes, governance developments, and democratic processes with clear, balanced analysis for informed decisions.',
+      'Access practical guidance on remittance channels, banking options, pensions, and cross-border financial decision-making.',
   },
   {
-    title: 'Youth Issues',
+    title: 'Legal, Citizenship & Return Planning',
+    icon: 'legal',
     description:
-      'Elevate youth voices on education, employment, innovation, and leadership with opportunities for mentorship and advocacy.',
+      'Get clarity on legal and citizenship matters, business setup considerations, and structured planning for returning home.',
   },
   {
-    title: 'Social Issues',
+    title: 'Voting & Civic Participation',
+    icon: 'civic',
     description:
-      'Address the issues that concern society, including equity, community well-being, public services, and social accountability.',
+      'Stay informed on voting processes and civic updates so diaspora Zimbabweans can participate meaningfully in national development.',
   },
 ]
 
@@ -57,6 +62,35 @@ const differentiators = [
 ]
 
 export default function Home() {
+  const renderOfferingIcon = (icon: string) => {
+    if (icon === 'investment') {
+      return (
+        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3 21h18M5 21V7l7-4 7 4v14M9 10h6M9 14h6" />
+        </svg>
+      )
+    }
+    if (icon === 'banking') {
+      return (
+        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 3l9 4.5-9 4.5-9-4.5L12 3zm0 9v9m-6-6h12" />
+        </svg>
+      )
+    }
+    if (icon === 'legal') {
+      return (
+        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v18M6 7h12M8 11l-3 5h6l-3-5zm8 0l-3 5h6l-3-5z" />
+        </svg>
+      )
+    }
+    return (
+      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h10v10H7zM3 11h4m10 0h4M11 3v4m0 10v4" />
+      </svg>
+    )
+  }
+
   return (
     <main className="min-h-screen bg-[#f8fbfa] text-slate-900">
       <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
@@ -108,8 +142,8 @@ export default function Home() {
           </p>
           <h1 className="mx-auto max-w-3xl text-4xl font-bold leading-tight text-slate-900 sm:text-6xl">We The People</h1>
           <p className="mx-auto mt-6 max-w-3xl text-base leading-relaxed text-slate-600 sm:text-xl">
-            Promoting civic participation, political awareness, youth issues, and broader social concerns
-            that shape Zimbabwe&apos;s future.
+            Zimbabwe&apos;s Diaspora Intelligence Platform — connecting Zimbabwe and its global diaspora through
+            trusted information, verified services, and structured economic and civic participation.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
@@ -146,12 +180,16 @@ export default function Home() {
           Everything Zimbabwe&apos;s Diaspora Needs
         </h2>
         <p className="mx-auto mt-4 max-w-3xl text-slate-600">
-          A trusted platform for informed participation on civic, political, youth, and social issues
-          affecting communities at home and in the diaspora.
+          WTP provides a centralized, trusted digital infrastructure where diaspora Zimbabweans can access
+          verified knowledge, connect with trusted professionals, discover secure opportunities, and make
+          informed decisions.
         </p>
         <div className="mt-10 grid gap-4 sm:grid-cols-2">
           {offerings.map((offering) => (
             <article key={offering.title} className="rounded-2xl border border-slate-200 bg-white p-6 text-left shadow-sm">
+              <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
+                {renderOfferingIcon(offering.icon)}
+              </div>
               <h3 className="text-lg font-semibold text-slate-900">{offering.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-slate-600">{offering.description}</p>
             </article>
@@ -164,8 +202,8 @@ export default function Home() {
           <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">Powered by Expertise</p>
           <h2 className="mt-3 text-center text-3xl font-bold text-slate-900 sm:text-4xl">Knowledge from Industry Leaders</h2>
           <p className="mx-auto mt-4 max-w-3xl text-center text-slate-600">
-            Our platform is built on expert insights gathered through structured consultations with
-            Zimbabwe&apos;s top professionals.
+            The platform is powered by expert knowledge gathered through structured consultations with
+            bankers, lawyers, policymakers, investors, and industry leaders.
           </p>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {experts.map((expert) => (
@@ -201,11 +239,12 @@ export default function Home() {
 
       <section className="border-y border-slate-200 bg-gradient-to-r from-emerald-100 to-white">
         <div className="mx-auto max-w-7xl px-4 py-16 text-center sm:px-6 sm:py-20">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">Stay Connected</p>
-          <h2 className="mt-3 text-3xl font-bold text-slate-900 sm:text-4xl">Ready to Get Started?</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">Mission</p>
+          <h2 className="mt-3 text-3xl font-bold text-slate-900 sm:text-4xl">From fragmented support to structured development</h2>
           <p className="mx-auto mt-4 max-w-3xl text-slate-600">
-            Join thousands of Zimbabweans abroad who are investing safely, accessing trusted services, and
-            participating in national development.
+            WTP transforms diaspora contribution into trusted, scalable national development by improving
+            transparency, reducing fraud, and enabling confident participation in Zimbabwe&apos;s economic and
+            civic future.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
@@ -287,6 +326,8 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      <TwitterEmbed />
     </main>
   )
 }

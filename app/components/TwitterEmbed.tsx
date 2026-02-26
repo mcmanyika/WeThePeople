@@ -120,8 +120,8 @@ export default function TwitterEmbed({ hideAtSelectors }: TwitterEmbedProps) {
 
   return (
     <>
-      {/* Floating X button — fixed top-right */}
-      <div className="fixed right-6 top-24 z-40 flex flex-col items-center gap-2 transition-opacity duration-300">
+      {/* Floating X button — fixed bottom-right */}
+      <div className="fixed bottom-6 right-6 z-40 flex flex-col items-center gap-2 transition-opacity duration-300">
         <button
           onClick={() => setIsOpen(!isOpen)}
           className={`group flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-all hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
@@ -158,7 +158,7 @@ export default function TwitterEmbed({ hideAtSelectors }: TwitterEmbedProps) {
 
       {/* Expanded tweet panel */}
       {isOpen && (
-        <div className="fixed right-6 top-40 z-40 w-[340px] max-h-[70vh] overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-2xl animate-[fadeInScale_0.2s_ease-out]">
+        <div className="fixed bottom-24 right-6 z-40 w-[340px] max-h-[70vh] overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-2xl animate-[fadeInScale_0.2s_ease-out]">
           {/* Panel header */}
           <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-100 bg-white/95 backdrop-blur-sm px-4 py-3 rounded-t-2xl">
             <div className="flex items-center gap-2">
